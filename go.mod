@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/bits-and-blooms/bitset v1.13.0
-	github.com/go-chi/chi v1.5.5
+	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-logr/logr v1.4.1
 	github.com/gogo/protobuf v1.3.2
 	github.com/google/go-cmp v0.6.0
