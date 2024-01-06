@@ -1,22 +1,24 @@
-# IronCore
+# Spheric
 
-[![REUSE status](https://api.reuse.software/badge/github.com/ironcore-dev/ironcore)](https://api.reuse.software/info/github.com/ironcore-dev/ironcore)
-[![Go Report Card](https://goreportcard.com/badge/github.com/ironcore-dev/ironcore)](https://goreportcard.com/report/github.com/ironcore-dev/ironcore)
+[![Go Reference](https://pkg.go.dev/badge/spheric.cloud/spheric.svg)](https://pkg.go.dev/spheric.cloud/spheric)
+[![Go Report Card](https://goreportcard.com/badge/spheric.cloud/spheric)](https://goreportcard.com/report/spheric.cloud/spheric)
 [![GitHub License](https://img.shields.io/static/v1?label=License&message=Apache-2.0&color=blue)](LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://makeapullrequest.com)
 
-<img src="docs/assets/logo.svg" alt="IronCore Logo" width="200" />
+<img src="docs/assets/logo.png" alt="Spheric Logo" width="200" />
 
-IronCore is an open source system for managing compute and storage workloads across multiple
-providers.
+Spheric is an open source system for scalable management of compute resources.
 
-The IronCore API is a declarative API, built on top of Kubernetes' API Machinery as an
-aggregated API server. The API does not have any tight coupling to Kubernetes core
-container workloads.
+The Spheric API is built using the Kubernetes API model as an aggregated API server.
+Spheric resources don't have tight couplings to the Kubernetes core resources.
 
-## To start developing IronCore
+> [!NOTE]
+> Spheric is a hard fork of [ironcore](https://github.com/ironcore-dev/ironcore) /
+> [onmetal-api](https://github.com/onmetal/onmetal-api).
 
-> ⚠️ Before contributing, make sure you read the [contribution guidelines](docs/development/contribution.md)
+## To start developing Spheric
+
+> [!IMPORTANT]
+> Before contributing, make sure you read the [contribution guidelines](docs/development/contribution.md)
 
 Please see our documentation in the `/docs` folder for more details.
 

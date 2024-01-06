@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -7,10 +9,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/ironcore-dev/ironcore/internal/api"
-	"github.com/ironcore-dev/ironcore/internal/apis/storage"
-	"github.com/ironcore-dev/ironcore/internal/apis/storage/validation"
-	"github.com/ironcore-dev/ironcore/utils/equality"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -19,6 +17,10 @@ import (
 	apisrvstorage "k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/names"
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
+	"spheric.cloud/spheric/internal/api"
+	"spheric.cloud/spheric/internal/apis/storage"
+	"spheric.cloud/spheric/internal/apis/storage/validation"
+	"spheric.cloud/spheric/utils/equality"
 )
 
 func GetAttrs(obj runtime.Object) (labels.Set, fields.Set, error) {
@@ -54,7 +56,7 @@ func (volumePoolStrategy) NamespaceScoped() bool {
 
 func (volumePoolStrategy) GetResetFields() map[fieldpath.APIVersion]*fieldpath.Set {
 	return map[fieldpath.APIVersion]*fieldpath.Set{
-		"storage.ironcore.dev/v1alpha1": fieldpath.NewSet(
+		"storage.spheric.cloud/v1alpha1": fieldpath.NewSet(
 			fieldpath.MakePathOrDie("status"),
 		),
 	}
@@ -112,7 +114,7 @@ var StatusStrategy = volumePoolStatusStrategy{Strategy}
 
 func (volumePoolStatusStrategy) GetResetFields() map[fieldpath.APIVersion]*fieldpath.Set {
 	return map[fieldpath.APIVersion]*fieldpath.Set{
-		"storage.ironcore.dev/v1alpha1": fieldpath.NewSet(
+		"storage.spheric.cloud/v1alpha1": fieldpath.NewSet(
 			fieldpath.MakePathOrDie("spec"),
 		),
 	}

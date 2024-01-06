@@ -19,7 +19,7 @@ linters-settings:
   misspell:
     ignore-words:
       - strat
-      - iritable
+      - sritable
   revive:
     severity: error
     rules:
@@ -30,11 +30,11 @@ linters-settings:
         disabled: true
   importas:
     alias:
-      - pkg: github.com/ironcore-dev/ironcore/api/(\w+)/(v[\w\d]+)
+      - pkg: spheric.cloud/spheric/api/(\w+)/(v[\w\d]+)
         alias: $1$2
-      - pkg: github.com/ironcore-dev/ironcore/internal/apis/(\w+)
+      - pkg: spheric.cloud/spheric/internal/apis/(\w+)
         alias: $1
-      - pkg: github.com/ironcore-dev/ironcore/internal/client/(\w+)
+      - pkg: spheric.cloud/spheric/internal/client/(\w+)
         alias: ${1}client
 
 issues:

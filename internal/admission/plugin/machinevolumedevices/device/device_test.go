@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -6,10 +8,10 @@ package device_test
 import (
 	"fmt"
 
-	. "github.com/ironcore-dev/ironcore/internal/admission/plugin/machinevolumedevices/device"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
+	. "spheric.cloud/spheric/internal/admission/plugin/machinevolumedevices/device"
 )
 
 var _ = Describe("Device", func() {

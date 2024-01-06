@@ -1,18 +1,20 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
 package networking
 
 import (
-	"github.com/ironcore-dev/ironcore/internal/apis/ipam"
+	"spheric.cloud/spheric/internal/apis/ipam"
 )
 
 const (
 	// NetworkPluginsGroup is the system rbac group all network plugins are in.
-	NetworkPluginsGroup = "networking.ironcore.dev:system:networkplugins"
+	NetworkPluginsGroup = "networking.spheric.cloud:system:networkplugins"
 
 	// NetworkPluginUserNamePrefix is the prefix all network plugin users should have.
-	NetworkPluginUserNamePrefix = "networking.ironcore.dev:system:networkplugin:"
+	NetworkPluginUserNamePrefix = "networking.spheric.cloud:system:networkplugin:"
 )
 
 // NetworkPluginCommonName constructs the common name for a certificate of a network plugin user.

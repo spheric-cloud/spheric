@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -9,27 +11,27 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
-	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/bcm"
 	corev1 "k8s.io/api/core/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	storagev1alpha1 "spheric.cloud/spheric/api/storage/v1alpha1"
+	"spheric.cloud/spheric/poollet/bucketpoollet/bcm"
+	sri "spheric.cloud/spheric/sri/apis/bucket/v1alpha1"
 )
 
 type BucketPoolReconciler struct {
 	client.Client
 	BucketPoolName    string
-	BucketRuntime     iri.BucketRuntimeClient
+	BucketRuntime     sri.BucketRuntimeClient
 	BucketClassMapper bcm.BucketClassMapper
 }
 
-//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=bucketpools,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=bucketpools/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=bucketclasses,verbs=get;list;watch
+//+kubebuilder:rbac:groups=storage.spheric.cloud,resources=bucketpools,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=storage.spheric.cloud,resources=bucketpools/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=storage.spheric.cloud,resources=bucketclasses,verbs=get;list;watch
 
 func (r *BucketPoolReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
@@ -55,12 +57,12 @@ func (r *BucketPoolReconciler) delete(ctx context.Context, log logr.Logger, buck
 }
 
 func (r *BucketPoolReconciler) supportsBucketClass(ctx context.Context, log logr.Logger, bucketClass *storagev1alpha1.BucketClass) (bool, error) {
-	iriCapabilities, err := getIRIBucketClassCapabilities(bucketClass)
+	sriCapabilities, err := getSRIBucketClassCapabilities(bucketClass)
 	if err != nil {
-		return false, fmt.Errorf("error getting iri mahchine class capabilities: %w", err)
+		return false, fmt.Errorf("error getting sri mahchine class capabilities: %w", err)
 	}
 
-	_, err = r.BucketClassMapper.GetBucketClassFor(ctx, bucketClass.Name, iriCapabilities)
+	_, err = r.BucketClassMapper.GetBucketClassFor(ctx, bucketClass.Name, sriCapabilities)
 	if err != nil {
 		if !errors.Is(err, bcm.ErrNoMatchingBucketClass) && !errors.Is(err, bcm.ErrAmbiguousMatchingBucketClass) {
 			return false, fmt.Errorf("error getting bucket class for %s: %w", bucketClass.Name, err)

@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -11,14 +13,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ironcore-dev/ironcore/client-go/informers"
-	"github.com/ironcore-dev/ironcore/client-go/ironcore"
-	corev1alpha1listers "github.com/ironcore-dev/ironcore/client-go/listers/core/v1alpha1"
-	utilcontext "github.com/ironcore-dev/ironcore/utils/context"
-	"github.com/ironcore-dev/ironcore/utils/quota"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apiserver/pkg/admission"
+	"spheric.cloud/spheric/client-go/informers"
+	corev1alpha1listers "spheric.cloud/spheric/client-go/listers/core/v1alpha1"
+	"spheric.cloud/spheric/client-go/spheric"
+	utilcontext "spheric.cloud/spheric/utils/context"
+	"spheric.cloud/spheric/utils/quota"
 )
 
 const PluginName = "ResourceQuota"
@@ -35,7 +37,7 @@ type ResourceQuota struct {
 
 	ctx context.Context
 
-	client   ironcore.Interface
+	client   spheric.Interface
 	lister   corev1alpha1listers.ResourceQuotaLister
 	registry quota.Registry
 
@@ -52,11 +54,11 @@ func (r *ResourceQuota) SetQuotaRegistry(registry quota.Registry) {
 	r.registry = registry
 }
 
-func (r *ResourceQuota) SetExternalIronCoreClientSet(client ironcore.Interface) {
+func (r *ResourceQuota) SetExternalSphericClientSet(client spheric.Interface) {
 	r.client = client
 }
 
-func (r *ResourceQuota) SetExternalIronCoreInformerFactory(f informers.SharedInformerFactory) {
+func (r *ResourceQuota) SetExternalSphericInformerFactory(f informers.SharedInformerFactory) {
 	r.lister = f.Core().V1alpha1().ResourceQuotas().Lister()
 }
 

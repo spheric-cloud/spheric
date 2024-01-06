@@ -1,20 +1,22 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
 package controllers_test
 
 import (
-	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
-	"github.com/ironcore-dev/ironcore/iri/testing/volume"
-	"github.com/ironcore-dev/ironcore/utils/quota"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
+	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
+	storagev1alpha1 "spheric.cloud/spheric/api/storage/v1alpha1"
+	sri "spheric.cloud/spheric/sri/apis/volume/v1alpha1"
+	"spheric.cloud/spheric/sri/testing/volume"
+	"spheric.cloud/spheric/utils/quota"
 )
 
 var _ = Describe("VolumePoolController", func() {
@@ -48,10 +50,10 @@ var _ = Describe("VolumePoolController", func() {
 
 		srv.SetVolumeClasses([]*volume.FakeVolumeClassStatus{
 			{
-				VolumeClassStatus: iri.VolumeClassStatus{
-					VolumeClass: &iri.VolumeClass{
+				VolumeClassStatus: sri.VolumeClassStatus{
+					VolumeClass: &sri.VolumeClass{
 						Name: volumeClass.Name,
-						Capabilities: &iri.VolumeClassCapabilities{
+						Capabilities: &sri.VolumeClassCapabilities{
 							Tps:  262144000,
 							Iops: 15000,
 						},
@@ -59,10 +61,10 @@ var _ = Describe("VolumePoolController", func() {
 				},
 			},
 			{
-				VolumeClassStatus: iri.VolumeClassStatus{
-					VolumeClass: &iri.VolumeClass{
+				VolumeClassStatus: sri.VolumeClassStatus{
+					VolumeClass: &sri.VolumeClass{
 						Name: expandableVolumeClass.Name,
-						Capabilities: &iri.VolumeClassCapabilities{
+						Capabilities: &sri.VolumeClassCapabilities{
 							Tps:  262144000,
 							Iops: 1000,
 						},
@@ -70,10 +72,10 @@ var _ = Describe("VolumePoolController", func() {
 				},
 			},
 			{
-				VolumeClassStatus: iri.VolumeClassStatus{
-					VolumeClass: &iri.VolumeClass{
+				VolumeClassStatus: sri.VolumeClassStatus{
+					VolumeClass: &sri.VolumeClass{
 						Name: testVolumeClass.Name,
-						Capabilities: &iri.VolumeClassCapabilities{
+						Capabilities: &sri.VolumeClassCapabilities{
 							Tps:  262144000,
 							Iops: 100,
 						},
@@ -114,10 +116,10 @@ var _ = Describe("VolumePoolController", func() {
 		By("creating a volume class")
 		srv.SetVolumeClasses([]*volume.FakeVolumeClassStatus{
 			{
-				VolumeClassStatus: iri.VolumeClassStatus{
-					VolumeClass: &iri.VolumeClass{
+				VolumeClassStatus: sri.VolumeClassStatus{
+					VolumeClass: &sri.VolumeClass{
 						Name: volumeClass.Name,
-						Capabilities: &iri.VolumeClassCapabilities{
+						Capabilities: &sri.VolumeClassCapabilities{
 							Tps:  262144000,
 							Iops: 15000,
 						},
@@ -125,10 +127,10 @@ var _ = Describe("VolumePoolController", func() {
 				},
 			},
 			{
-				VolumeClassStatus: iri.VolumeClassStatus{
-					VolumeClass: &iri.VolumeClass{
+				VolumeClassStatus: sri.VolumeClassStatus{
+					VolumeClass: &sri.VolumeClass{
 						Name: expandableVolumeClass.Name,
-						Capabilities: &iri.VolumeClassCapabilities{
+						Capabilities: &sri.VolumeClassCapabilities{
 							Tps:  262144000,
 							Iops: 1000,
 						},
@@ -136,10 +138,10 @@ var _ = Describe("VolumePoolController", func() {
 				},
 			},
 			{
-				VolumeClassStatus: iri.VolumeClassStatus{
-					VolumeClass: &iri.VolumeClass{
+				VolumeClassStatus: sri.VolumeClassStatus{
+					VolumeClass: &sri.VolumeClass{
 						Name: "testVolumeClass.Name",
-						Capabilities: &iri.VolumeClassCapabilities{
+						Capabilities: &sri.VolumeClassCapabilities{
 							Tps:  262144000,
 							Iops: 100,
 						},
@@ -195,10 +197,10 @@ var _ = Describe("VolumePoolController", func() {
 		By("announcing the capacity")
 		srv.SetVolumeClasses([]*volume.FakeVolumeClassStatus{
 			{
-				VolumeClassStatus: iri.VolumeClassStatus{
-					VolumeClass: &iri.VolumeClass{
+				VolumeClassStatus: sri.VolumeClassStatus{
+					VolumeClass: &sri.VolumeClass{
 						Name: volumeClass.Name,
-						Capabilities: &iri.VolumeClassCapabilities{
+						Capabilities: &sri.VolumeClassCapabilities{
 							Tps:  262144000,
 							Iops: 15000,
 						},
@@ -207,10 +209,10 @@ var _ = Describe("VolumePoolController", func() {
 				},
 			},
 			{
-				VolumeClassStatus: iri.VolumeClassStatus{
-					VolumeClass: &iri.VolumeClass{
+				VolumeClassStatus: sri.VolumeClassStatus{
+					VolumeClass: &sri.VolumeClass{
 						Name: expandableVolumeClass.Name,
-						Capabilities: &iri.VolumeClassCapabilities{
+						Capabilities: &sri.VolumeClassCapabilities{
 							Tps:  262144000,
 							Iops: 1000,
 						},

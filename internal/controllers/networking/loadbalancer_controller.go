@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -8,10 +10,6 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
-	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	"github.com/ironcore-dev/ironcore/internal/client/networking"
-	clientutils "github.com/ironcore-dev/ironcore/utils/client"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -23,6 +21,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	commonv1alpha1 "spheric.cloud/spheric/api/common/v1alpha1"
+	networkingv1alpha1 "spheric.cloud/spheric/api/networking/v1alpha1"
+	"spheric.cloud/spheric/internal/client/networking"
+	clientutils "spheric.cloud/spheric/utils/client"
 )
 
 var (
@@ -33,12 +35,12 @@ type LoadBalancerReconciler struct {
 	client.Client
 }
 
-//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=loadbalancers,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=loadbalancers/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=loadbalancers/finalizers,verbs=update
-//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networkinterfaces,verbs=get;list;watch
-//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networks,verbs=get;list;watch
-//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=loadbalancerroutings,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=networking.spheric.cloud,resources=loadbalancers,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=networking.spheric.cloud,resources=loadbalancers/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=networking.spheric.cloud,resources=loadbalancers/finalizers,verbs=update
+//+kubebuilder:rbac:groups=networking.spheric.cloud,resources=networkinterfaces,verbs=get;list;watch
+//+kubebuilder:rbac:groups=networking.spheric.cloud,resources=networks,verbs=get;list;watch
+//+kubebuilder:rbac:groups=networking.spheric.cloud,resources=loadbalancerroutings,verbs=get;list;watch;create;update;patch;delete
 
 func (r *LoadBalancerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)

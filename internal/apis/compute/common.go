@@ -1,11 +1,13 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
 package compute
 
 import (
-	"github.com/ironcore-dev/ironcore/internal/apis/networking"
-	"github.com/ironcore-dev/ironcore/internal/apis/storage"
+	"spheric.cloud/spheric/internal/apis/networking"
+	"spheric.cloud/spheric/internal/apis/storage"
 )
 
 const (
@@ -13,10 +15,10 @@ const (
 	MachineMachineClassRefNameField = "spec.machineClassRef.name"
 
 	// MachinePoolsGroup is the system rbac group all machine pools are in.
-	MachinePoolsGroup = "compute.ironcore.dev:system:machinepools"
+	MachinePoolsGroup = "compute.spheric.cloud:system:machinepools"
 
 	// MachinePoolUserNamePrefix is the prefix all machine pool users should have.
-	MachinePoolUserNamePrefix = "compute.ironcore.dev:system:machinepool:"
+	MachinePoolUserNamePrefix = "compute.spheric.cloud:system:machinepool:"
 )
 
 // MachinePoolCommonName constructs the common name for a certificate of a machine pool user.

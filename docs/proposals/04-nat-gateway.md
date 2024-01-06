@@ -78,7 +78,7 @@ The current usage of ports is reported in `status.portsUsed`.
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: networking.ironcore.dev/v1alpha1
+apiVersion: networking.spheric.cloud/v1alpha1
 kind: NATGateway
 metadata:
   namespace: default

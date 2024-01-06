@@ -1,4 +1,4 @@
-apiVersion: storage.ironcore.dev/v1alpha1
+apiVersion: storage.spheric.cloud/v1alpha1
 kind: VolumeClass
 metadata:
   name: volumeclass-sample

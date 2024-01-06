@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,9 +12,6 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/controller-utils/clientutils"
-	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	computeclient "github.com/ironcore-dev/ironcore/internal/client/compute"
-	"github.com/ironcore-dev/ironcore/utils/slices"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/util/workqueue"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -20,6 +19,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
+	computev1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
+	computeclient "spheric.cloud/spheric/internal/client/compute"
+	"spheric.cloud/spheric/utils/slices"
 )
 
 // MachineClassReconciler reconciles a MachineClassRef object
@@ -28,10 +30,10 @@ type MachineClassReconciler struct {
 	APIReader client.Reader
 }
 
-//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machineclasses,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machineclasses/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machineclasses/finalizers,verbs=update
-//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machines,verbs=get;list;watch
+//+kubebuilder:rbac:groups=compute.spheric.cloud,resources=machineclasses,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=compute.spheric.cloud,resources=machineclasses/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=compute.spheric.cloud,resources=machineclasses/finalizers,verbs=update
+//+kubebuilder:rbac:groups=compute.spheric.cloud,resources=machines,verbs=get;list;watch
 
 // Reconcile moves the current state of the cluster closer to the desired state
 func (r *MachineClassReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {

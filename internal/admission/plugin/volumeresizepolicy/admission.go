@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -8,13 +10,13 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	"github.com/ironcore-dev/ironcore/client-go/ironcore"
-	"github.com/ironcore-dev/ironcore/internal/apis/core"
-	"github.com/ironcore-dev/ironcore/internal/apis/storage"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apiserver/pkg/admission"
+	"spheric.cloud/spheric/api/storage/v1alpha1"
+	"spheric.cloud/spheric/client-go/spheric"
+	"spheric.cloud/spheric/internal/apis/core"
+	"spheric.cloud/spheric/internal/apis/storage"
 )
 
 const PluginName = "VolumeExpansion"
@@ -26,7 +28,7 @@ func Register(plugins *admission.Plugins) {
 }
 
 type VolumeExpansion struct {
-	client ironcore.Interface
+	client spheric.Interface
 	*admission.Handler
 }
 
@@ -87,7 +89,7 @@ func (v *VolumeExpansion) Validate(ctx context.Context, a admission.Attributes, 
 	return nil
 }
 
-func (v *VolumeExpansion) SetExternalIronCoreClientSet(client ironcore.Interface) {
+func (v *VolumeExpansion) SetExternalSphericClientSet(client spheric.Interface) {
 	v.client = client
 }
 

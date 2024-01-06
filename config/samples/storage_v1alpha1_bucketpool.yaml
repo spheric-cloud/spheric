@@ -1,11 +1,11 @@
-apiVersion: storage.ironcore.dev/v1alpha1
+apiVersion: storage.spheric.cloud/v1alpha1
 kind: BucketPool
 metadata:
   name: bucketpool-sample
 spec:
-  providerID: ironcore://shared
+  providerID: spheric://shared
 #status:
 #  state: Available
 #  available:
-#    ironcore.dev/fast-class: 10Gi
-#    ironcore.dev/slow-class: 100Gi
+#    spheric.cloud/fast-class: 10Gi
+#    spheric.cloud/slow-class: 100Gi

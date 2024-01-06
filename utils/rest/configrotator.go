@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -15,7 +17,6 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	"github.com/ironcore-dev/ironcore/utils/certificate"
 	certificatesv1 "k8s.io/api/certificates/v1"
 	utilnet "k8s.io/apimachinery/pkg/util/net"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -25,6 +26,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
+	"spheric.cloud/spheric/utils/certificate"
 )
 
 func loadConfigs(cfg, bootstrapCfg *rest.Config) (certCfg, clientCfg *rest.Config, initCert *tls.Certificate, err error) {

@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -8,13 +10,13 @@ import (
 	"fmt"
 	"sync"
 
-	clientcmdutil "github.com/ironcore-dev/ironcore/utils/clientcmd"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	clientcmdutil "spheric.cloud/spheric/utils/clientcmd"
 )
 
 type Store interface {
@@ -152,7 +154,7 @@ type WithOverrides clientcmd.ConfigOverrides
 
 const (
 	DefaultSecretKubeconfigField            = "kubeconfig"
-	DefaultSecretConfigReadWriterFieldOwner = client.FieldOwner("ironcore.dev/config-read-writer")
+	DefaultSecretConfigReadWriterFieldOwner = client.FieldOwner("spheric.cloud/config-read-writer")
 )
 
 func setSecretConfigReadWriterOptionsDefaults(o *SecretStoreOptions) {

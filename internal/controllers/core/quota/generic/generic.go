@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -6,9 +8,9 @@ package generic
 import (
 	"fmt"
 
-	"github.com/ironcore-dev/ironcore/utils/quota"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"spheric.cloud/spheric/utils/quota"
 )
 
 func NewReplenishReconcilerForRegistryAndType(

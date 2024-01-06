@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,9 +12,9 @@ import (
 	"os"
 	"strings"
 
-	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	"github.com/spf13/pflag"
 	"k8s.io/apimachinery/pkg/util/yaml"
+	computev1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
 )
 
 const (

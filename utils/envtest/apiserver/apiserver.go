@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -20,10 +22,10 @@ import (
 	"time"
 
 	"github.com/ironcore-dev/controller-utils/buildutils"
-	"github.com/ironcore-dev/ironcore/utils/envtest/internal/testing/controlplane"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/rest"
+	"spheric.cloud/spheric/utils/envtest/internal/testing/controlplane"
 )
 
 type ProcessArgs map[string][]string

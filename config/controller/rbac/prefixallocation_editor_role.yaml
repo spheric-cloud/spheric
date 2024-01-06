@@ -5,7 +5,7 @@ metadata:
   name: prefixallocation-editor-role
 rules:
   - apiGroups:
-      - ipam.ironcore.dev
+      - ipam.spheric.cloud
     resources:
       - prefixallocations
     verbs:
@@ -17,7 +17,7 @@ rules:
       - update
       - watch
   - apiGroups:
-      - ipam.ironcore.dev
+      - ipam.spheric.cloud
     resources:
       - prefixallocations/status
     verbs:

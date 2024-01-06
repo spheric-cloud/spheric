@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -12,21 +14,6 @@ import (
 	"time"
 
 	"github.com/ironcore-dev/controller-utils/configutils"
-	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
-	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	computeclient "github.com/ironcore-dev/ironcore/internal/client/compute"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
-	iriremotemachine "github.com/ironcore-dev/ironcore/iri/remote/machine"
-	"github.com/ironcore-dev/ironcore/poollet/irievent"
-	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/addresses"
-	machinepoolletclient "github.com/ironcore-dev/ironcore/poollet/machinepoollet/client"
-	machinepoolletconfig "github.com/ironcore-dev/ironcore/poollet/machinepoollet/client/config"
-	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers"
-	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mcm"
-	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/server"
-	"github.com/ironcore-dev/ironcore/utils/client/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"k8s.io/apimachinery/pkg/fields"
@@ -40,6 +27,21 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
+	computev1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
+	ipamv1alpha1 "spheric.cloud/spheric/api/ipam/v1alpha1"
+	networkingv1alpha1 "spheric.cloud/spheric/api/networking/v1alpha1"
+	storagev1alpha1 "spheric.cloud/spheric/api/storage/v1alpha1"
+	computeclient "spheric.cloud/spheric/internal/client/compute"
+	"spheric.cloud/spheric/poollet/machinepoollet/addresses"
+	machinepoolletclient "spheric.cloud/spheric/poollet/machinepoollet/client"
+	machinepoolletconfig "spheric.cloud/spheric/poollet/machinepoollet/client/config"
+	"spheric.cloud/spheric/poollet/machinepoollet/controllers"
+	"spheric.cloud/spheric/poollet/machinepoollet/mcm"
+	"spheric.cloud/spheric/poollet/machinepoollet/server"
+	"spheric.cloud/spheric/poollet/srievent"
+	sri "spheric.cloud/spheric/sri/apis/machine/v1alpha1"
+	sriremotemachine "spheric.cloud/spheric/sri/remote/machine"
+	"spheric.cloud/spheric/utils/client/config"
 )
 
 var (
@@ -89,8 +91,8 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.LeaderElectionKubeconfig, "leader-election-kubeconfig", "", "Path pointing to a kubeconfig to use for leader election.")
 
 	fs.StringVar(&o.MachinePoolName, "machine-pool-name", o.MachinePoolName, "Name of the machine pool to announce / watch")
-	fs.StringToStringVar(&o.MachineDownwardAPILabels, "machine-downward-api-label", o.MachineDownwardAPILabels, "Downward-API labels to set on the iri machine.")
-	fs.StringToStringVar(&o.MachineDownwardAPIAnnotations, "machine-downward-api-annotation", o.MachineDownwardAPIAnnotations, "Downward-API annotations to set on the iri machine.")
+	fs.StringToStringVar(&o.MachineDownwardAPILabels, "machine-downward-api-label", o.MachineDownwardAPILabels, "Downward-API labels to set on the sri machine.")
+	fs.StringToStringVar(&o.MachineDownwardAPIAnnotations, "machine-downward-api-annotation", o.MachineDownwardAPIAnnotations, "Downward-API annotations to set on the sri machine.")
 	fs.StringVar(&o.ProviderID, "provider-id", "", "Provider id to announce on the machine pool.")
 	fs.StringVar(&o.MachineRuntimeEndpoint, "machine-runtime-endpoint", o.MachineRuntimeEndpoint, "Endpoint of the remote machine runtime service.")
 	fs.DurationVar(&o.MachineRuntimeSocketDiscoveryTimeout, "machine-runtime-socket-discovery-timeout", 20*time.Second, "Timeout for discovering the machine runtime socket.")
@@ -175,7 +177,7 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error creating new getter: %w", err)
 	}
 
-	endpoint, err := iriremotemachine.GetAddressWithTimeout(opts.MachineRuntimeSocketDiscoveryTimeout, opts.MachineRuntimeEndpoint)
+	endpoint, err := sriremotemachine.GetAddressWithTimeout(opts.MachineRuntimeSocketDiscoveryTimeout, opts.MachineRuntimeEndpoint)
 	if err != nil {
 		return fmt.Errorf("error detecting machine runtime endpoint: %w", err)
 	}
@@ -187,7 +189,7 @@ func Run(ctx context.Context, opts Options) error {
 
 	setupLog.V(1).Info("Discovered addresses to report", "MachinePoolAddresses", machinePoolAddresses)
 
-	machineRuntime, err := iriremotemachine.NewRemoteRuntime(endpoint)
+	machineRuntime, err := sriremotemachine.NewRemoteRuntime(endpoint)
 	if err != nil {
 		return fmt.Errorf("error creating remote machine runtime: %w", err)
 	}
@@ -210,7 +212,7 @@ func Run(ctx context.Context, opts Options) error {
 		Metrics:                 metricsserver.Options{BindAddress: opts.MetricsAddr},
 		HealthProbeBindAddress:  opts.ProbeAddr,
 		LeaderElection:          opts.EnableLeaderElection,
-		LeaderElectionID:        "bfafcebe.ironcore.dev",
+		LeaderElectionID:        "bfafcebe.spheric.cloud",
 		LeaderElectionNamespace: opts.LeaderElectionNamespace,
 		LeaderElectionConfig:    leaderElectionCfg,
 		Cache:                   cache.Options{ByObject: map[client.Object]cache.ByObject{}},
@@ -231,7 +233,7 @@ func Run(ctx context.Context, opts Options) error {
 		return err
 	}
 
-	version, err := machineRuntime.Version(ctx, &iri.VersionRequest{})
+	version, err := machineRuntime.Version(ctx, &sri.VersionRequest{})
 	if err != nil {
 		return fmt.Errorf("error getting machine runtime version: %w", err)
 	}
@@ -255,13 +257,13 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error adding machine class mapper: %w", err)
 	}
 
-	machineEvents := irievent.NewGenerator(func(ctx context.Context) ([]*iri.Machine, error) {
-		res, err := machineRuntime.ListMachines(ctx, &iri.ListMachinesRequest{})
+	machineEvents := srievent.NewGenerator(func(ctx context.Context) ([]*sri.Machine, error) {
+		res, err := machineRuntime.ListMachines(ctx, &sri.ListMachinesRequest{})
 		if err != nil {
 			return nil, err
 		}
 		return res.Machines, nil
-	}, irievent.GeneratorOptions{})
+	}, srievent.GeneratorOptions{})
 	if err := mgr.Add(machineEvents); err != nil {
 		return fmt.Errorf("error adding machine event generator: %w", err)
 	}

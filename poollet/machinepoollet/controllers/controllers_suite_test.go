@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -11,22 +13,6 @@ import (
 
 	"github.com/ironcore-dev/controller-utils/buildutils"
 	"github.com/ironcore-dev/controller-utils/modutils"
-	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
-	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
-	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	computeclient "github.com/ironcore-dev/ironcore/internal/client/compute"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
-	"github.com/ironcore-dev/ironcore/iri/testing/machine"
-	"github.com/ironcore-dev/ironcore/poollet/irievent"
-	machinepoolletclient "github.com/ironcore-dev/ironcore/poollet/machinepoollet/client"
-	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers"
-	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mcm"
-	utilsenvtest "github.com/ironcore-dev/ironcore/utils/envtest"
-	"github.com/ironcore-dev/ironcore/utils/envtest/apiserver"
-	"github.com/ironcore-dev/ironcore/utils/envtest/controllermanager"
-	"github.com/ironcore-dev/ironcore/utils/envtest/process"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -42,6 +28,22 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	metricserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
+	computev1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
+	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
+	ipamv1alpha1 "spheric.cloud/spheric/api/ipam/v1alpha1"
+	networkingv1alpha1 "spheric.cloud/spheric/api/networking/v1alpha1"
+	storagev1alpha1 "spheric.cloud/spheric/api/storage/v1alpha1"
+	computeclient "spheric.cloud/spheric/internal/client/compute"
+	machinepoolletclient "spheric.cloud/spheric/poollet/machinepoollet/client"
+	"spheric.cloud/spheric/poollet/machinepoollet/controllers"
+	"spheric.cloud/spheric/poollet/machinepoollet/mcm"
+	"spheric.cloud/spheric/poollet/srievent"
+	sri "spheric.cloud/spheric/sri/apis/machine/v1alpha1"
+	"spheric.cloud/spheric/sri/testing/machine"
+	utilsenvtest "spheric.cloud/spheric/utils/envtest"
+	"spheric.cloud/spheric/utils/envtest/apiserver"
+	"spheric.cloud/spheric/utils/envtest/controllermanager"
+	"spheric.cloud/spheric/utils/envtest/process"
 )
 
 var (
@@ -81,7 +83,7 @@ var _ = BeforeSuite(func() {
 	testEnv = &envtest.Environment{}
 	testEnvExt = &utilsenvtest.EnvironmentExtensions{
 		APIServiceDirectoryPaths: []string{
-			modutils.Dir("github.com/ironcore-dev/ironcore", "config", "apiserver", "apiservice", "bases"),
+			modutils.Dir("spheric.cloud/spheric", "config", "apiserver", "apiservice", "bases"),
 		},
 		ErrorIfAPIServicePathIsMissing: true,
 		AdditionalServices: []utilsenvtest.AdditionalService{
@@ -109,7 +111,7 @@ var _ = BeforeSuite(func() {
 	SetClient(k8sClient)
 
 	apiSrv, err := apiserver.New(cfg, apiserver.Options{
-		MainPath:     "github.com/ironcore-dev/ironcore/cmd/ironcore-apiserver",
+		MainPath:     "spheric.cloud/spheric/cmd/apiserver",
 		BuildOptions: []buildutils.BuildOption{buildutils.ModModeMod},
 		ETCDServers:  []string{testEnv.ControlPlane.Etcd.URL.String()},
 		Host:         testEnvExt.APIServiceInstallOptions.LocalServingHost,
@@ -125,7 +127,7 @@ var _ = BeforeSuite(func() {
 
 	ctrlMgr, err := controllermanager.New(cfg, controllermanager.Options{
 		Args:         process.EmptyArgs().Set("controllers", "*"),
-		MainPath:     "github.com/ironcore-dev/ironcore/cmd/ironcore-controller-manager",
+		MainPath:     "spheric.cloud/spheric/cmd/controller-manager",
 		BuildOptions: []buildutils.BuildOption{buildutils.ModModeMod},
 		Host:         testEnvExt.GetAdditionalServiceHost(controllerManagerService),
 		Port:         testEnvExt.GetAdditionalServicePort(controllerManagerService),
@@ -176,10 +178,10 @@ func SetupTest() (*corev1.Namespace, *computev1alpha1.MachinePool, *computev1alp
 		*srv = *machine.NewFakeRuntimeService()
 		srv.SetMachineClasses([]*machine.FakeMachineClassStatus{
 			{
-				MachineClassStatus: iri.MachineClassStatus{
-					MachineClass: &iri.MachineClass{
+				MachineClassStatus: sri.MachineClassStatus{
+					MachineClass: &sri.MachineClass{
 						Name: mc.Name,
-						Capabilities: &iri.MachineClassCapabilities{
+						Capabilities: &sri.MachineClassCapabilities{
 							CpuMillis:   mc.Capabilities.CPU().MilliValue(),
 							MemoryBytes: mc.Capabilities.Memory().Value(),
 						},
@@ -223,13 +225,13 @@ func SetupTest() (*corev1.Namespace, *computev1alpha1.MachinePool, *computev1alp
 			},
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
-		machineEvents := irievent.NewGenerator(func(ctx context.Context) ([]*iri.Machine, error) {
-			res, err := srv.ListMachines(ctx, &iri.ListMachinesRequest{})
+		machineEvents := srievent.NewGenerator(func(ctx context.Context) ([]*sri.Machine, error) {
+			res, err := srv.ListMachines(ctx, &sri.ListMachinesRequest{})
 			if err != nil {
 				return nil, err
 			}
 			return res.Machines, nil
-		}, irievent.GeneratorOptions{})
+		}, srievent.GeneratorOptions{})
 
 		Expect(k8sManager.Add(machineEvents)).To(Succeed())
 

@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -11,9 +13,6 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	"github.com/ironcore-dev/ironcore/utils/certificate"
-	certificatetesting "github.com/ironcore-dev/ironcore/utils/certificate/testing"
-	. "github.com/ironcore-dev/ironcore/utils/rest"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	v1 "k8s.io/api/authorization/v1"
@@ -26,6 +25,9 @@ import (
 	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
+	"spheric.cloud/spheric/utils/certificate"
+	certificatetesting "spheric.cloud/spheric/utils/certificate/testing"
+	. "spheric.cloud/spheric/utils/rest"
 )
 
 var _ = Describe("ConfigRotator", func() {
@@ -61,7 +63,7 @@ var _ = Describe("ConfigRotator", func() {
 
 		By("creating a rotator")
 		template := &x509.CertificateRequest{}
-		signerName := "rotator-signer.ironcore.dev"
+		signerName := "rotator-signer.spheric.cloud"
 		requestedDuration := pointer.Duration(1 * time.Hour)
 		rotatorName := "rotator"
 		r, err := NewConfigRotator(nil, bootstrapUser.Config(), ConfigRotatorOptions{
@@ -164,7 +166,7 @@ var _ = Describe("ConfigRotator", func() {
 
 		By("creating a rotator")
 		template := &x509.CertificateRequest{}
-		signerName := "rotator-signer.ironcore.dev"
+		signerName := "rotator-signer.spheric.cloud"
 		requestedDuration := pointer.Duration(1 * time.Hour)
 		rotatorName := "rotator"
 

@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -6,8 +8,6 @@ package validation
 import (
 	"fmt"
 
-	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
-	"github.com/ironcore-dev/ironcore/internal/apis/networking"
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -15,6 +15,8 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	sphericvalidation "spheric.cloud/spheric/internal/api/validation"
+	"spheric.cloud/spheric/internal/apis/networking"
 )
 
 // ValidateLoadBalancer validates an LoadBalancer object.
@@ -32,7 +34,7 @@ func validateLoadBalancerSpec(spec *networking.LoadBalancerSpec, lbMeta *metav1.
 
 	allErrs = append(allErrs, validateLoadBalancerType(spec.Type, fldPath.Child("type"))...)
 
-	allErrs = append(allErrs, ironcorevalidation.ValidateIPFamilies(spec.IPFamilies, fldPath.Child("ipFamilies"))...)
+	allErrs = append(allErrs, sphericvalidation.ValidateIPFamilies(spec.IPFamilies, fldPath.Child("ipFamilies"))...)
 
 	allErrs = append(allErrs, validateNetworkInterfaceIPSources(spec.IPs, spec.IPFamilies, lbMeta, fldPath.Child("ips"))...)
 
@@ -88,14 +90,14 @@ var supportedLoadBalancerTypes = sets.New(
 )
 
 func validateLoadBalancerType(loadBalancerType networking.LoadBalancerType, fldPath *field.Path) field.ErrorList {
-	return ironcorevalidation.ValidateEnum(supportedLoadBalancerTypes, loadBalancerType, fldPath, "must specify type")
+	return sphericvalidation.ValidateEnum(supportedLoadBalancerTypes, loadBalancerType, fldPath, "must specify type")
 }
 
 func validateLoadBalancerPort(port networking.LoadBalancerPort, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
 	if port.Protocol != nil {
-		allErrs = append(allErrs, ironcorevalidation.ValidateProtocol(*port.Protocol, fldPath.Child("protocol"))...)
+		allErrs = append(allErrs, sphericvalidation.ValidateProtocol(*port.Protocol, fldPath.Child("protocol"))...)
 	}
 
 	for _, msg := range validation.IsValidPortNum(int(port.Port)) {
@@ -129,7 +131,7 @@ func ValidateLoadBalancerUpdate(newLoadBalancer, oldLoadBalancer *networking.Loa
 func validateLoadBalancerSpecUpdate(newSpec, oldSpec *networking.LoadBalancerSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableField(newSpec.NetworkRef, oldSpec.NetworkRef, fldPath.Child("networkRef"))...)
+	allErrs = append(allErrs, sphericvalidation.ValidateImmutableField(newSpec.NetworkRef, oldSpec.NetworkRef, fldPath.Child("networkRef"))...)
 
 	return allErrs
 }

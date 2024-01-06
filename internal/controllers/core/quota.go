@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -13,7 +15,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
 
-const ReplenishResourceQuotaAnnotation = "core.ironcore.dev/replenish-resourcequota"
+const ReplenishResourceQuotaAnnotation = "core.spheric.cloud/replenish-resourcequota"
 
 func HasReplenishResourceQuotaAnnotation(obj client.Object) bool {
 	return metautils.HasAnnotation(obj, ReplenishResourceQuotaAnnotation)

@@ -11,15 +11,14 @@ RUN go mod download
 
 # Copy the go source
 COPY api/ api/
-COPY broker/ broker/
 COPY client-go/ client-go/
 COPY cmd/ cmd/
 COPY internal/ internal/
-COPY iri/ iri/
-COPY irictl/ irictl/
-COPY irictl-bucket/ irictl-bucket/
-COPY irictl-machine/ irictl-machine/
-COPY irictl-volume/ irictl-volume/
+COPY sri/ sri/
+COPY srictl/ srictl/
+COPY srictl-bucket/ srictl-bucket/
+COPY srictl-machine/ srictl-machine/
+COPY srictl-volume/ srictl-volume/
 COPY poollet/ poollet/
 COPY utils/ utils/
 
@@ -32,13 +31,13 @@ FROM builder as apiserver-builder
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/ironcore-apiserver ./cmd/ironcore-apiserver
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/apiserver ./cmd/apiserver
 
 FROM builder as manager-builder
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/ironcore-controller-manager ./cmd/ironcore-controller-manager
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/controller-manager ./cmd/controller-manager
 
 FROM builder as machinepoollet-builder
 
@@ -46,19 +45,11 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
     CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/machinepoollet ./poollet/machinepoollet/cmd/machinepoollet/main.go
 
-FROM builder as machinebroker-builder
-
-# TODO: Remove irictl-machine once debug containers are more broadly available.
-RUN --mount=type=cache,target=/root/.cache/go-build \
-    --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/machinebroker ./broker/machinebroker/cmd/machinebroker/main.go && \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/irictl-machine ./irictl-machine/cmd/irictl-machine/main.go
-
-FROM builder as irictl-machine-builder
+FROM builder as srictl-machine-builder
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/irictl-machine ./irictl-machine/cmd/irictl-machine/main.go
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/srictl-machine ./srictl-machine/cmd/srictl-machine/main.go
 
 FROM builder as volumepoollet-builder
 
@@ -66,20 +57,11 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
     CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/volumepoollet ./poollet/volumepoollet/cmd/volumepoollet/main.go
 
-
-FROM builder as volumebroker-builder
-
-# TODO: Remove irictl-volume once debug containers are more broadly available.
-RUN --mount=type=cache,target=/root/.cache/go-build \
-    --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/volumebroker ./broker/volumebroker/cmd/volumebroker/main.go && \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/irictl-volume ./irictl-volume/cmd/irictl-volume/main.go
-
-FROM builder as irictl-volume-builder
+FROM builder as srictl-volume-builder
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/irictl-volume ./irictl-volume/cmd/irictl-volume/main.go
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/srictl-volume ./srictl-volume/cmd/srictl-volume/main.go
 
 FROM builder as bucketpoollet-builder
 
@@ -87,36 +69,27 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
     CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/bucketpoollet ./poollet/bucketpoollet/cmd/bucketpoollet/main.go
 
-
-FROM builder as bucketbroker-builder
-
-# TODO: Remove irictl-bucket once debug containers are more broadly available.
-RUN --mount=type=cache,target=/root/.cache/go-build \
-    --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/bucketbroker ./broker/bucketbroker/cmd/bucketbroker/main.go && \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/irictl-bucket ./irictl-bucket/cmd/irictl-bucket/main.go
-
-FROM builder as irictl-bucket-builder
+FROM builder as srictl-bucket-builder
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/irictl-bucket ./irictl-bucket/cmd/irictl-bucket/main.go
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/srictl-bucket ./srictl-bucket/cmd/srictl-bucket/main.go
 
 # Use distroless as minimal base image to package the manager binary
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
-FROM gcr.io/distroless/static:nonroot as manager
+FROM gcr.io/distroless/static:nonroot as controller-manager
 WORKDIR /
-COPY --from=manager-builder /workspace/bin/ironcore-controller-manager .
+COPY --from=manager-builder /workspace/bin/controller-manager .
 USER 65532:65532
 
-ENTRYPOINT ["/ironcore-controller-manager"]
+ENTRYPOINT ["/controller-manager"]
 
 FROM gcr.io/distroless/static:nonroot as apiserver
 WORKDIR /
-COPY --from=apiserver-builder /workspace/bin/ironcore-apiserver .
+COPY --from=apiserver-builder /workspace/bin/apiserver .
 USER 65532:65532
 
-ENTRYPOINT ["/ironcore-apiserver"]
+ENTRYPOINT ["/apiserver"]
 
 FROM gcr.io/distroless/static:nonroot as machinepoollet
 WORKDIR /
@@ -125,19 +98,9 @@ USER 65532:65532
 
 ENTRYPOINT ["/machinepoollet"]
 
-# TODO: Switch to distroless as soon as ephemeral debug containers are more broadly available.
-FROM debian:bullseye-slim as machinebroker
+FROM debian:bullseye-slim as srictl-machine
 WORKDIR /
-COPY --from=machinebroker-builder /workspace/bin/machinebroker .
-# TODO: Remove irictl-machine as soon as ephemeral debug containers are more broadly available.
-COPY --from=machinebroker-builder /workspace/bin/irictl-machine .
-USER 65532:65532
-
-ENTRYPOINT ["/machinebroker"]
-
-FROM debian:bullseye-slim as irictl-machine
-WORKDIR /
-COPY --from=irictl-machine-builder /workspace/bin/irictl-machine .
+COPY --from=srictl-machine-builder /workspace/bin/srictl-machine .
 USER 65532:65532
 
 FROM gcr.io/distroless/static:nonroot as volumepoollet
@@ -147,19 +110,9 @@ USER 65532:65532
 
 ENTRYPOINT ["/volumepoollet"]
 
-# TODO: Switch to distroless as soon as ephemeral debug containers are more broadly available.
-FROM debian:bullseye-slim as volumebroker
+FROM debian:bullseye-slim as srictl-volume
 WORKDIR /
-COPY --from=volumebroker-builder /workspace/bin/volumebroker .
-# TODO: Remove irictl-volume as soon as ephemeral debug containers are more broadly available.
-COPY --from=volumebroker-builder /workspace/bin/irictl-volume .
-USER 65532:65532
-
-ENTRYPOINT ["/volumebroker"]
-
-FROM debian:bullseye-slim as irictl-volume
-WORKDIR /
-COPY --from=irictl-volume-builder /workspace/bin/irictl-volume .
+COPY --from=srictl-volume-builder /workspace/bin/srictl-volume .
 USER 65532:65532
 
 FROM gcr.io/distroless/static:nonroot as bucketpoollet
@@ -169,17 +122,7 @@ USER 65532:65532
 
 ENTRYPOINT ["/bucketpoollet"]
 
-# TODO: Switch to distroless as soon as ephemeral debug containers are more broadly available.
-FROM debian:bullseye-slim as bucketbroker
+FROM debian:bullseye-slim as srictl-bucket
 WORKDIR /
-COPY --from=bucketbroker-builder /workspace/bin/bucketbroker .
-# TODO: Remove irictl-bucket as soon as ephemeral debug containers are more broadly available.
-COPY --from=bucketbroker-builder /workspace/bin/irictl-bucket .
-USER 65532:65532
-
-ENTRYPOINT ["/bucketbroker"]
-
-FROM debian:bullseye-slim as irictl-bucket
-WORKDIR /
-COPY --from=irictl-bucket-builder /workspace/bin/irictl-bucket .
+COPY --from=srictl-bucket-builder /workspace/bin/srictl-bucket .
 USER 65532:65532

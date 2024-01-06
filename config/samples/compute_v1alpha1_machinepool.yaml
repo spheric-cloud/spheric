@@ -1,10 +1,10 @@
-apiVersion: compute.ironcore.dev/v1alpha1
+apiVersion: compute.spheric.cloud/v1alpha1
 kind: MachinePool
 metadata:
   name: machinepool-sample
   labels:
-    ironcore.dev/az: az1
+    spheric.cloud/az: az1
 spec:
-  providerID: ironcore://shared
+  providerID: spheric://shared
 # status:
 #   state: Available

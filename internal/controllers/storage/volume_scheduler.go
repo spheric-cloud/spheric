@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -8,11 +10,6 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	"github.com/ironcore-dev/ironcore/api/common/v1alpha1"
-	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	storageclient "github.com/ironcore-dev/ironcore/internal/client/storage"
-	"github.com/ironcore-dev/ironcore/internal/controllers/storage/scheduler"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/record"
@@ -25,6 +22,11 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"spheric.cloud/spheric/api/common/v1alpha1"
+	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
+	storagev1alpha1 "spheric.cloud/spheric/api/storage/v1alpha1"
+	storageclient "spheric.cloud/spheric/internal/client/storage"
+	"spheric.cloud/spheric/internal/controllers/storage/scheduler"
 )
 
 const (
@@ -40,9 +42,9 @@ type VolumeScheduler struct {
 }
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
-//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumes,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumes/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumepools,verbs=get;list;watch
+//+kubebuilder:rbac:groups=storage.spheric.cloud,resources=volumes,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=storage.spheric.cloud,resources=volumes/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=storage.spheric.cloud,resources=volumepools,verbs=get;list;watch
 
 // Reconcile reconciles the desired with the actual state.
 func (s *VolumeScheduler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {

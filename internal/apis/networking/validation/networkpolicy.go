@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -6,9 +8,6 @@ package validation
 import (
 	"fmt"
 
-	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
-	"github.com/ironcore-dev/ironcore/internal/apis/core"
-	"github.com/ironcore-dev/ironcore/internal/apis/networking"
 	"go4.org/netipx"
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
@@ -16,6 +15,9 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	sphericvalidation "spheric.cloud/spheric/internal/api/validation"
+	"spheric.cloud/spheric/internal/apis/core"
+	"spheric.cloud/spheric/internal/apis/networking"
 )
 
 func ValidateNetworkPolicy(networkPolicy *networking.NetworkPolicy) field.ErrorList {
@@ -131,7 +133,7 @@ func validateNetworkPolicyPort(port *networking.NetworkPolicyPort, fldPath *fiel
 	}
 
 	if protocol := port.Protocol; protocol != nil {
-		allErrs = append(allErrs, ironcorevalidation.ValidateProtocol(*protocol, fldPath.Child("protocol"))...)
+		allErrs = append(allErrs, sphericvalidation.ValidateProtocol(*protocol, fldPath.Child("protocol"))...)
 	}
 
 	return allErrs
@@ -166,7 +168,7 @@ func validateNetworkPolicyPeer(peer *networking.NetworkPolicyPeer, supportedObje
 func validateNetworkPolicyPeerObjectSelector(sel *core.ObjectSelector, allowedKinds sets.Set[string], fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, ironcorevalidation.ValidateEnum(allowedKinds, sel.Kind, fldPath.Child("kind"), "must specify kind")...)
+	allErrs = append(allErrs, sphericvalidation.ValidateEnum(allowedKinds, sel.Kind, fldPath.Child("kind"), "must specify kind")...)
 	allErrs = append(allErrs, metav1validation.ValidateLabelSelector(&sel.LabelSelector, metav1validation.LabelSelectorValidationOptions{}, fldPath)...)
 
 	return allErrs
@@ -206,7 +208,7 @@ var supportedPolicyTypes = sets.New(
 )
 
 func validatePolicyType(policyType networking.PolicyType, fldPath *field.Path) field.ErrorList {
-	return ironcorevalidation.ValidateEnum(supportedPolicyTypes, policyType, fldPath, "must specify type")
+	return sphericvalidation.ValidateEnum(supportedPolicyTypes, policyType, fldPath, "must specify type")
 }
 
 func validatePolicyTypes(policyTypes []networking.PolicyType, fldPath *field.Path) field.ErrorList {
@@ -243,7 +245,7 @@ func ValidateNetworkPolicyUpdate(newNetworkPolicy, oldNetworkPolicy *networking.
 func validateNetworkPolicySpecUpdate(newSpec, oldSpec *networking.NetworkPolicySpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableField(newSpec.NetworkRef, oldSpec.NetworkRef, fldPath.Child("networkRef"))...)
+	allErrs = append(allErrs, sphericvalidation.ValidateImmutableField(newSpec.NetworkRef, oldSpec.NetworkRef, fldPath.Child("networkRef"))...)
 
 	return allErrs
 }

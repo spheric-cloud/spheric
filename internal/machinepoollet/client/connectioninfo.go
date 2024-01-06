@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,12 +12,12 @@ import (
 	"strconv"
 	"time"
 
-	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	utilnet "k8s.io/apimachinery/pkg/util/net"
 	"k8s.io/apiserver/pkg/server/egressselector"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/transport"
+	computev1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
 )
 
 // ConnectionInfo provides the information needed to connect to a machine poollet.

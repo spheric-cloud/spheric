@@ -1,13 +1,15 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
 package validation
 
 import (
-	commonvalidation "github.com/ironcore-dev/ironcore/internal/apis/common/validation"
-	"github.com/ironcore-dev/ironcore/internal/apis/networking"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	commonvalidation "spheric.cloud/spheric/internal/apis/common/validation"
+	"spheric.cloud/spheric/internal/apis/networking"
 )
 
 // ValidateLoadBalancerRouting validates an LoadBalancerRouting object.

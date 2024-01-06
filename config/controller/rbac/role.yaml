@@ -52,7 +52,7 @@ rules:
   verbs:
   - approve
 - apiGroups:
-  - compute.ironcore.dev
+  - compute.spheric.cloud
   resources:
   - machineclasses
   verbs:
@@ -64,13 +64,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - compute.ironcore.dev
+  - compute.spheric.cloud
   resources:
   - machineclasses/finalizers
   verbs:
   - update
 - apiGroups:
-  - compute.ironcore.dev
+  - compute.spheric.cloud
   resources:
   - machineclasses/status
   verbs:
@@ -78,7 +78,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - compute.ironcore.dev
+  - compute.spheric.cloud
   resources:
   - machinepools
   verbs:
@@ -86,7 +86,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - compute.ironcore.dev
+  - compute.spheric.cloud
   resources:
   - machines
   verbs:
@@ -96,7 +96,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - compute.ironcore.dev
+  - compute.spheric.cloud
   resources:
   - machines/status
   verbs:
@@ -104,7 +104,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - core.ironcore.dev
+  - core.spheric.cloud
   resources:
   - resourcequotas
   verbs:
@@ -116,13 +116,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - core.ironcore.dev
+  - core.spheric.cloud
   resources:
   - resourcequotas/finalizers
   verbs:
   - update
 - apiGroups:
-  - core.ironcore.dev
+  - core.spheric.cloud
   resources:
   - resourcequotas/status
   verbs:
@@ -130,7 +130,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - ipam.ironcore.dev
+  - ipam.spheric.cloud
   resources:
   - prefixallocations
   verbs:
@@ -142,7 +142,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - ipam.ironcore.dev
+  - ipam.spheric.cloud
   resources:
   - prefixallocations/status
   verbs:
@@ -150,7 +150,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - ipam.ironcore.dev
+  - ipam.spheric.cloud
   resources:
   - prefixes
   verbs:
@@ -162,13 +162,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - ipam.ironcore.dev
+  - ipam.spheric.cloud
   resources:
   - prefixes/finalizers
   verbs:
   - update
 - apiGroups:
-  - ipam.ironcore.dev
+  - ipam.spheric.cloud
   resources:
   - prefixes/status
   verbs:
@@ -176,7 +176,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - networking.ironcore.dev
+  - networking.spheric.cloud
   resources:
   - loadbalancerroutings
   verbs:
@@ -188,7 +188,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.ironcore.dev
+  - networking.spheric.cloud
   resources:
   - loadbalancers
   verbs:
@@ -200,13 +200,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.ironcore.dev
+  - networking.spheric.cloud
   resources:
   - loadbalancers/finalizers
   verbs:
   - update
 - apiGroups:
-  - networking.ironcore.dev
+  - networking.spheric.cloud
   resources:
   - loadbalancers/status
   verbs:
@@ -214,7 +214,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - networking.ironcore.dev
+  - networking.spheric.cloud
   resources:
   - natgateways
   verbs:
@@ -222,7 +222,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - networking.ironcore.dev
+  - networking.spheric.cloud
   resources:
   - networkinterfaces
   verbs:
@@ -234,7 +234,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.ironcore.dev
+  - networking.spheric.cloud
   resources:
   - networks
   verbs:
@@ -246,13 +246,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.ironcore.dev
+  - networking.spheric.cloud
   resources:
   - networks/finalizers
   verbs:
   - update
 - apiGroups:
-  - networking.ironcore.dev
+  - networking.spheric.cloud
   resources:
   - networks/status
   verbs:
@@ -260,7 +260,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - networking.ironcore.dev
+  - networking.spheric.cloud
   resources:
   - virtualips
   verbs:
@@ -272,7 +272,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - storage.ironcore.dev
+  - storage.spheric.cloud
   resources:
   - bucketclasses
   verbs:
@@ -284,13 +284,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - storage.ironcore.dev
+  - storage.spheric.cloud
   resources:
   - bucketclasses/finalizers
   verbs:
   - update
 - apiGroups:
-  - storage.ironcore.dev
+  - storage.spheric.cloud
   resources:
   - bucketclasses/status
   verbs:
@@ -298,7 +298,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - storage.ironcore.dev
+  - storage.spheric.cloud
   resources:
   - bucketpools
   verbs:
@@ -306,7 +306,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - storage.ironcore.dev
+  - storage.spheric.cloud
   resources:
   - buckets
   verbs:
@@ -316,7 +316,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - storage.ironcore.dev
+  - storage.spheric.cloud
   resources:
   - buckets/status
   verbs:
@@ -324,7 +324,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - storage.ironcore.dev
+  - storage.spheric.cloud
   resources:
   - volumeclasses
   verbs:
@@ -336,13 +336,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - storage.ironcore.dev
+  - storage.spheric.cloud
   resources:
   - volumeclasses/finalizers
   verbs:
   - update
 - apiGroups:
-  - storage.ironcore.dev
+  - storage.spheric.cloud
   resources:
   - volumeclasses/status
   verbs:
@@ -350,7 +350,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - storage.ironcore.dev
+  - storage.spheric.cloud
   resources:
   - volumepools
   verbs:
@@ -358,7 +358,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - storage.ironcore.dev
+  - storage.spheric.cloud
   resources:
   - volumes
   verbs:
@@ -370,7 +370,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - storage.ironcore.dev
+  - storage.spheric.cloud
   resources:
   - volumes/status
   verbs:

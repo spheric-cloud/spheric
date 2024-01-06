@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -8,8 +10,6 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/lru"
@@ -18,6 +18,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	computev1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
+	networkingv1alpha1 "spheric.cloud/spheric/api/networking/v1alpha1"
 )
 
 type NetworkInterfaceReleaseReconciler struct {
@@ -27,8 +29,8 @@ type NetworkInterfaceReleaseReconciler struct {
 	AbsenceCache *lru.Cache
 }
 
-//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networkinterfaces,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machines,verbs=get;list;watch
+//+kubebuilder:rbac:groups=networking.spheric.cloud,resources=networkinterfaces,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=compute.spheric.cloud,resources=machines,verbs=get;list;watch
 
 func (r *NetworkInterfaceReleaseReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)

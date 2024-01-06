@@ -1,15 +1,17 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
 package validation
 
 import (
-	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
-	"github.com/ironcore-dev/ironcore/internal/apis/networking"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	sphericvalidation "spheric.cloud/spheric/internal/api/validation"
+	"spheric.cloud/spheric/internal/apis/networking"
 )
 
 // ValidateNetwork validates a network object.
@@ -92,7 +94,7 @@ func validateNetworkSpecUpdate(newSpec, oldSpec *networking.NetworkSpec, fldPath
 	var allErrs field.ErrorList
 
 	if oldSpec.ProviderID != "" {
-		allErrs = append(allErrs, ironcorevalidation.ValidateImmutableField(newSpec.ProviderID, oldSpec.ProviderID, fldPath.Child("providerID"))...)
+		allErrs = append(allErrs, sphericvalidation.ValidateImmutableField(newSpec.ProviderID, oldSpec.ProviderID, fldPath.Child("providerID"))...)
 	}
 
 	return allErrs

@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,13 +12,6 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/gogo/protobuf/proto"
-	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
-	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
-	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers/events"
-	"github.com/ironcore-dev/ironcore/utils/claimmanager"
-	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
@@ -24,6 +19,13 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	commonv1alpha1 "spheric.cloud/spheric/api/common/v1alpha1"
+	computev1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
+	storagev1alpha1 "spheric.cloud/spheric/api/storage/v1alpha1"
+	"spheric.cloud/spheric/poollet/machinepoollet/controllers/events"
+	sri "spheric.cloud/spheric/sri/apis/machine/v1alpha1"
+	"spheric.cloud/spheric/utils/claimmanager"
+	utilslices "spheric.cloud/spheric/utils/slices"
 )
 
 type volumeClaimStrategy struct {
@@ -110,12 +112,12 @@ func (r *MachineReconciler) getVolumesForMachine(ctx context.Context, machine *c
 	return volumes, errors.Join(errs...)
 }
 
-func (r *MachineReconciler) prepareRemoteIRIVolume(
+func (r *MachineReconciler) prepareRemoteSRIVolume(
 	ctx context.Context,
 	machine *computev1alpha1.Machine,
 	machineVolume *computev1alpha1.Volume,
 	volume *storagev1alpha1.Volume,
-) (*iri.Volume, bool, error) {
+) (*sri.Volume, bool, error) {
 	access := volume.Status.Access
 	if access == nil {
 		r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady, "Volume %s does not report status access", volume.Name)
@@ -162,10 +164,10 @@ func (r *MachineReconciler) prepareRemoteIRIVolume(
 		encryptionData = secret.Data
 	}
 
-	return &iri.Volume{
+	return &sri.Volume{
 		Name:   machineVolume.Name,
 		Device: *machineVolume.Device,
-		Connection: &iri.VolumeConnection{
+		Connection: &sri.VolumeConnection{
 			Driver:         access.Driver,
 			Handle:         access.Handle,
 			Attributes:     access.VolumeAttributes,
@@ -175,33 +177,33 @@ func (r *MachineReconciler) prepareRemoteIRIVolume(
 	}, true, nil
 }
 
-func (r *MachineReconciler) prepareEmptyDiskIRIVolume(machineVolume *computev1alpha1.Volume) *iri.Volume {
+func (r *MachineReconciler) prepareEmptyDiskSRIVolume(machineVolume *computev1alpha1.Volume) *sri.Volume {
 	var sizeBytes int64
 	if sizeLimit := machineVolume.EmptyDisk.SizeLimit; sizeLimit != nil {
 		sizeBytes = sizeLimit.Value()
 	}
-	return &iri.Volume{
+	return &sri.Volume{
 		Name:   machineVolume.Name,
 		Device: *machineVolume.Device,
-		EmptyDisk: &iri.EmptyDisk{
+		EmptyDisk: &sri.EmptyDisk{
 			SizeBytes: sizeBytes,
 		},
 	}
 }
 
-func (r *MachineReconciler) prepareIRIVolumes(
+func (r *MachineReconciler) prepareSRIVolumes(
 	ctx context.Context,
 	machine *computev1alpha1.Machine,
 	volumes []storagev1alpha1.Volume,
-) ([]*iri.Volume, bool, error) {
+) ([]*sri.Volume, bool, error) {
 	var (
 		volumeNameToMachineVolume = r.volumeNameToMachineVolume(machine)
-		iriVolumes                []*iri.Volume
+		sriVolumes                []*sri.Volume
 		errs                      []error
 	)
 	for _, volume := range volumes {
 		machineVolume := volumeNameToMachineVolume[volume.Name]
-		iriVolume, ok, err := r.prepareRemoteIRIVolume(ctx, machine, &machineVolume, &volume)
+		sriVolume, ok, err := r.prepareRemoteSRIVolume(ctx, machine, &machineVolume, &volume)
 		if err != nil {
 			errs = append(errs, err)
 			continue
@@ -210,7 +212,7 @@ func (r *MachineReconciler) prepareIRIVolumes(
 			continue
 		}
 
-		iriVolumes = append(iriVolumes, iriVolume)
+		sriVolumes = append(sriVolumes, sriVolume)
 	}
 	if err := errors.Join(errs...); err != nil {
 		return nil, false, err
@@ -221,50 +223,50 @@ func (r *MachineReconciler) prepareIRIVolumes(
 			continue
 		}
 
-		iriVolume := r.prepareEmptyDiskIRIVolume(&machineVolume)
-		iriVolumes = append(iriVolumes, iriVolume)
+		sriVolume := r.prepareEmptyDiskSRIVolume(&machineVolume)
+		sriVolumes = append(sriVolumes, sriVolume)
 	}
 
-	if len(iriVolumes) != len(machine.Spec.Volumes) {
+	if len(sriVolumes) != len(machine.Spec.Volumes) {
 		expectedVolumeNames := utilslices.ToSetFunc(machine.Spec.Volumes, func(v computev1alpha1.Volume) string { return v.Name })
-		actualVolumeNames := utilslices.ToSetFunc(iriVolumes, (*iri.Volume).GetName)
+		actualVolumeNames := utilslices.ToSetFunc(sriVolumes, (*sri.Volume).GetName)
 		missingVolumeNames := sets.List(expectedVolumeNames.Difference(actualVolumeNames))
 		r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady, "Machine volumes are not ready: %v", missingVolumeNames)
 		return nil, false, nil
 	}
-	return iriVolumes, true, nil
+	return sriVolumes, true, nil
 }
 
-func (r *MachineReconciler) getExistingIRIVolumesForMachine(
+func (r *MachineReconciler) getExistingSRIVolumesForMachine(
 	ctx context.Context,
 	log logr.Logger,
-	iriMachine *iri.Machine,
-	desiredIRIVolumes []*iri.Volume,
-) ([]*iri.Volume, error) {
+	sriMachine *sri.Machine,
+	desiredSRIVolumes []*sri.Volume,
+) ([]*sri.Volume, error) {
 	var (
-		iriVolumes              []*iri.Volume
-		desiredIRIVolumesByName = utilslices.ToMapByKey(desiredIRIVolumes, (*iri.Volume).GetName)
+		sriVolumes              []*sri.Volume
+		desiredSRIVolumesByName = utilslices.ToMapByKey(desiredSRIVolumes, (*sri.Volume).GetName)
 		errs                    []error
 	)
 
-	for _, iriVolume := range iriMachine.Spec.Volumes {
-		log := log.WithValues("Volume", iriVolume.Name)
+	for _, sriVolume := range sriMachine.Spec.Volumes {
+		log := log.WithValues("Volume", sriVolume.Name)
 
-		desiredIRIVolume, ok := desiredIRIVolumesByName[iriVolume.Name]
-		if ok && proto.Equal(desiredIRIVolume, iriVolume) {
-			log.V(1).Info("Existing IRI volume is up-to-date")
-			iriVolumes = append(iriVolumes, iriVolume)
+		desiredSRIVolume, ok := desiredSRIVolumesByName[sriVolume.Name]
+		if ok && proto.Equal(desiredSRIVolume, sriVolume) {
+			log.V(1).Info("Existing SRI volume is up-to-date")
+			sriVolumes = append(sriVolumes, sriVolume)
 			continue
 		}
 
-		log.V(1).Info("Detaching outdated IRI volume")
-		_, err := r.MachineRuntime.DetachVolume(ctx, &iri.DetachVolumeRequest{
-			MachineId: iriMachine.Metadata.Id,
-			Name:      iriVolume.Name,
+		log.V(1).Info("Detaching outdated SRI volume")
+		_, err := r.MachineRuntime.DetachVolume(ctx, &sri.DetachVolumeRequest{
+			MachineId: sriMachine.Metadata.Id,
+			Name:      sriVolume.Name,
 		})
 		if err != nil {
 			if status.Code(err) != codes.NotFound {
-				errs = append(errs, fmt.Errorf("[volume %s] %w", iriVolume.Name, err))
+				errs = append(errs, fmt.Errorf("[volume %s] %w", sriVolume.Name, err))
 				continue
 			}
 		}
@@ -272,59 +274,59 @@ func (r *MachineReconciler) getExistingIRIVolumesForMachine(
 	if len(errs) > 0 {
 		return nil, errors.Join(errs...)
 	}
-	return iriVolumes, nil
+	return sriVolumes, nil
 }
 
-func (r *MachineReconciler) getNewIRIVolumesForMachine(
+func (r *MachineReconciler) getNewSRIVolumesForMachine(
 	ctx context.Context,
 	log logr.Logger,
-	iriMachine *iri.Machine,
-	desiredIRIVolumes, existingIRIVolumes []*iri.Volume,
-) ([]*iri.Volume, error) {
+	sriMachine *sri.Machine,
+	desiredSRIVolumes, existingSRIVolumes []*sri.Volume,
+) ([]*sri.Volume, error) {
 	var (
-		desiredNewIRIVolumes = FindNewIRIVolumes(desiredIRIVolumes, existingIRIVolumes)
-		iriVolumes           []*iri.Volume
+		desiredNewSRIVolumes = FindNewSRIVolumes(desiredSRIVolumes, existingSRIVolumes)
+		sriVolumes           []*sri.Volume
 		errs                 []error
 	)
-	for _, newIRIVolume := range desiredNewIRIVolumes {
-		log := log.WithValues("Volume", newIRIVolume.Name)
+	for _, newSRIVolume := range desiredNewSRIVolumes {
+		log := log.WithValues("Volume", newSRIVolume.Name)
 		log.V(1).Info("Attaching new volume")
-		if _, err := r.MachineRuntime.AttachVolume(ctx, &iri.AttachVolumeRequest{
-			MachineId: iriMachine.Metadata.Id,
-			Volume:    newIRIVolume,
+		if _, err := r.MachineRuntime.AttachVolume(ctx, &sri.AttachVolumeRequest{
+			MachineId: sriMachine.Metadata.Id,
+			Volume:    newSRIVolume,
 		}); err != nil {
-			errs = append(errs, fmt.Errorf("[volume %s] %w", newIRIVolume.Name, err))
+			errs = append(errs, fmt.Errorf("[volume %s] %w", newSRIVolume.Name, err))
 			continue
 		}
 
-		iriVolumes = append(iriVolumes, newIRIVolume)
+		sriVolumes = append(sriVolumes, newSRIVolume)
 	}
 	if len(errs) > 0 {
 		return nil, errors.Join(errs...)
 	}
-	return iriVolumes, nil
+	return sriVolumes, nil
 }
 
-func (r *MachineReconciler) updateIRIVolumes(
+func (r *MachineReconciler) updateSRIVolumes(
 	ctx context.Context,
 	log logr.Logger,
 	machine *computev1alpha1.Machine,
-	iriMachine *iri.Machine,
+	sriMachine *sri.Machine,
 	volumes []storagev1alpha1.Volume,
 ) error {
-	desiredIRIVolumes, _, err := r.prepareIRIVolumes(ctx, machine, volumes)
+	desiredSRIVolumes, _, err := r.prepareSRIVolumes(ctx, machine, volumes)
 	if err != nil {
-		return fmt.Errorf("error preparing iri volumes: %w", err)
+		return fmt.Errorf("error preparing sri volumes: %w", err)
 	}
 
-	extistingIRIVolumes, err := r.getExistingIRIVolumesForMachine(ctx, log, iriMachine, desiredIRIVolumes)
+	extistingSRIVolumes, err := r.getExistingSRIVolumesForMachine(ctx, log, sriMachine, desiredSRIVolumes)
 	if err != nil {
-		return fmt.Errorf("error getting existing iri volumes for machine: %w", err)
+		return fmt.Errorf("error getting existing sri volumes for machine: %w", err)
 	}
 
-	_, err = r.getNewIRIVolumesForMachine(ctx, log, iriMachine, desiredIRIVolumes, extistingIRIVolumes)
+	_, err = r.getNewSRIVolumesForMachine(ctx, log, sriMachine, desiredSRIVolumes, extistingSRIVolumes)
 	if err != nil {
-		return fmt.Errorf("error getting new iri volumes for machine: %w", err)
+		return fmt.Errorf("error getting new sri volumes for machine: %w", err)
 	}
 
 	return nil
@@ -332,11 +334,11 @@ func (r *MachineReconciler) updateIRIVolumes(
 
 func (r *MachineReconciler) getVolumeStatusesForMachine(
 	machine *computev1alpha1.Machine,
-	iriMachine *iri.Machine,
+	sriMachine *sri.Machine,
 	now metav1.Time,
 ) ([]computev1alpha1.VolumeStatus, error) {
 	var (
-		iriVolumeStatusByName        = utilslices.ToMapByKey(iriMachine.Status.Volumes, (*iri.VolumeStatus).GetName)
+		sriVolumeStatusByName        = utilslices.ToMapByKey(sriMachine.Status.Volumes, (*sri.VolumeStatus).GetName)
 		existingVolumeStatusesByName = utilslices.ToMapByKey(machine.Status.Volumes, func(status computev1alpha1.VolumeStatus) string { return status.Name })
 		volumeStatuses               []computev1alpha1.VolumeStatus
 		errs                         []error
@@ -344,12 +346,12 @@ func (r *MachineReconciler) getVolumeStatusesForMachine(
 
 	for _, machineVolume := range machine.Spec.Volumes {
 		var (
-			iriVolumeStatus, ok = iriVolumeStatusByName[machineVolume.Name]
+			sriVolumeStatus, ok = sriVolumeStatusByName[machineVolume.Name]
 			volumeStatusValues  computev1alpha1.VolumeStatus
 		)
 		if ok {
 			var err error
-			volumeStatusValues, err = r.convertIRIVolumeStatus(iriVolumeStatus)
+			volumeStatusValues, err = r.convertSRIVolumeStatus(sriVolumeStatus)
 			if err != nil {
 				return nil, fmt.Errorf("[volume %s] %w", machineVolume.Name, err)
 			}
@@ -370,27 +372,27 @@ func (r *MachineReconciler) getVolumeStatusesForMachine(
 	return volumeStatuses, nil
 }
 
-var iriVolumeStateToVolumeState = map[iri.VolumeState]computev1alpha1.VolumeState{
-	iri.VolumeState_VOLUME_ATTACHED: computev1alpha1.VolumeStateAttached,
-	iri.VolumeState_VOLUME_PENDING:  computev1alpha1.VolumeStatePending,
+var sriVolumeStateToVolumeState = map[sri.VolumeState]computev1alpha1.VolumeState{
+	sri.VolumeState_VOLUME_ATTACHED: computev1alpha1.VolumeStateAttached,
+	sri.VolumeState_VOLUME_PENDING:  computev1alpha1.VolumeStatePending,
 }
 
-func (r *MachineReconciler) convertIRIVolumeState(iriState iri.VolumeState) (computev1alpha1.VolumeState, error) {
-	if res, ok := iriVolumeStateToVolumeState[iriState]; ok {
+func (r *MachineReconciler) convertSRIVolumeState(sriState sri.VolumeState) (computev1alpha1.VolumeState, error) {
+	if res, ok := sriVolumeStateToVolumeState[sriState]; ok {
 		return res, nil
 	}
-	return "", fmt.Errorf("unknown iri volume state %v", iriState)
+	return "", fmt.Errorf("unknown sri volume state %v", sriState)
 }
 
-func (r *MachineReconciler) convertIRIVolumeStatus(iriVolumeStatus *iri.VolumeStatus) (computev1alpha1.VolumeStatus, error) {
-	state, err := r.convertIRIVolumeState(iriVolumeStatus.State)
+func (r *MachineReconciler) convertSRIVolumeStatus(sriVolumeStatus *sri.VolumeStatus) (computev1alpha1.VolumeStatus, error) {
+	state, err := r.convertSRIVolumeState(sriVolumeStatus.State)
 	if err != nil {
 		return computev1alpha1.VolumeStatus{}, err
 	}
 
 	return computev1alpha1.VolumeStatus{
-		Name:   iriVolumeStatus.Name,
-		Handle: iriVolumeStatus.Handle,
+		Name:   sriVolumeStatus.Name,
+		Handle: sriVolumeStatus.Handle,
 		State:  state,
 	}, nil
 }

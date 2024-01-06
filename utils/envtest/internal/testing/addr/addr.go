@@ -26,7 +26,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ironcore-dev/ironcore/third_party/kubernetes/pkg/util/flock"
+	"spheric.cloud/spheric/third_party/kubernetes/pkg/util/flock"
 )
 
 // TODO(directxman12): interface / release functionality for external port managers

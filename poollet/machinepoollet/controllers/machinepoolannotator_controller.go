@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -8,10 +10,6 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	"github.com/ironcore-dev/ironcore/poollet/irievent"
-	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mcm"
-	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -20,6 +18,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/source"
+	computev1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
+	"spheric.cloud/spheric/poollet/machinepoollet/mcm"
+	"spheric.cloud/spheric/poollet/srievent"
+	sphericclient "spheric.cloud/spheric/utils/client"
 )
 
 type MachinePoolAnnotatorReconciler struct {
@@ -36,7 +38,7 @@ func (r *MachinePoolAnnotatorReconciler) Reconcile(ctx context.Context, req ctrl
 		},
 	}
 
-	if err := ironcoreclient.PatchAddReconcileAnnotation(ctx, r.Client, machinePool); client.IgnoreNotFound(err) != nil {
+	if err := sphericclient.PatchAddReconcileAnnotation(ctx, r.Client, machinePool); client.IgnoreNotFound(err) != nil {
 		return ctrl.Result{}, fmt.Errorf("error patching machine pool: %w", err)
 	}
 	return ctrl.Result{}, nil
@@ -50,7 +52,7 @@ func (r *MachinePoolAnnotatorReconciler) SetupWithManager(mgr ctrl.Manager) erro
 		return err
 	}
 
-	src, err := r.iriClassEventSource(mgr)
+	src, err := r.sriClassEventSource(mgr)
 	if err != nil {
 		return err
 	}
@@ -64,7 +66,7 @@ func (r *MachinePoolAnnotatorReconciler) SetupWithManager(mgr ctrl.Manager) erro
 	return nil
 }
 
-func (r *MachinePoolAnnotatorReconciler) machinePoolAnnotatorEventHandler(log logr.Logger, c chan<- event.GenericEvent) irievent.EnqueueFunc {
+func (r *MachinePoolAnnotatorReconciler) machinePoolAnnotatorEventHandler(log logr.Logger, c chan<- event.GenericEvent) srievent.EnqueueFunc {
 	handleEvent := func() {
 		select {
 		case c <- event.GenericEvent{Object: &computev1alpha1.MachinePool{ObjectMeta: metav1.ObjectMeta{
@@ -76,22 +78,22 @@ func (r *MachinePoolAnnotatorReconciler) machinePoolAnnotatorEventHandler(log lo
 		}
 	}
 
-	return irievent.EnqueueFunc{EnqueueFunc: handleEvent}
+	return srievent.EnqueueFunc{EnqueueFunc: handleEvent}
 }
 
-func (r *MachinePoolAnnotatorReconciler) iriClassEventSource(mgr ctrl.Manager) (source.Source, error) {
+func (r *MachinePoolAnnotatorReconciler) sriClassEventSource(mgr ctrl.Manager) (source.Source, error) {
 	ch := make(chan event.GenericEvent, 1024)
 
 	if err := mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
-		log := ctrl.LoggerFrom(ctx).WithName("machinepool").WithName("irieventhandlers")
+		log := ctrl.LoggerFrom(ctx).WithName("machinepool").WithName("srieventhandlers")
 
-		notifierFuncs := []func() (irievent.ListenerRegistration, error){
-			func() (irievent.ListenerRegistration, error) {
+		notifierFuncs := []func() (srievent.ListenerRegistration, error){
+			func() (srievent.ListenerRegistration, error) {
 				return r.MachineClassMapper.AddListener(r.machinePoolAnnotatorEventHandler(log, ch))
 			},
 		}
 
-		var notifier []irievent.ListenerRegistration
+		var notifier []srievent.ListenerRegistration
 		defer func() {
 			log.V(1).Info("Removing notifier")
 			for _, n := range notifier {

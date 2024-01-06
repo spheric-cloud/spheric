@@ -1,25 +1,27 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
 package rest
 
 import (
-	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	"github.com/ironcore-dev/ironcore/internal/api"
-	"github.com/ironcore-dev/ironcore/internal/apis/networking"
-	loadbalancerstorage "github.com/ironcore-dev/ironcore/internal/registry/networking/loadbalancer/storage"
-	loadbalancerroutingstorage "github.com/ironcore-dev/ironcore/internal/registry/networking/loadbalancerrouting/storage"
-	natgatewaystorage "github.com/ironcore-dev/ironcore/internal/registry/networking/natgateway/storage"
-	networkstorage "github.com/ironcore-dev/ironcore/internal/registry/networking/network/storage"
-	networkinterfacestorage "github.com/ironcore-dev/ironcore/internal/registry/networking/networkinterface/storage"
-	networkpolicystorage "github.com/ironcore-dev/ironcore/internal/registry/networking/networkpolicy/storage"
-	virtualipstorage "github.com/ironcore-dev/ironcore/internal/registry/networking/virtualip/storage"
-	ironcoreserializer "github.com/ironcore-dev/ironcore/internal/serializer"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/registry/generic"
 	"k8s.io/apiserver/pkg/registry/rest"
 	genericapiserver "k8s.io/apiserver/pkg/server"
+	networkingv1alpha1 "spheric.cloud/spheric/api/networking/v1alpha1"
+	"spheric.cloud/spheric/internal/api"
+	"spheric.cloud/spheric/internal/apis/networking"
+	loadbalancerstorage "spheric.cloud/spheric/internal/registry/networking/loadbalancer/storage"
+	loadbalancerroutingstorage "spheric.cloud/spheric/internal/registry/networking/loadbalancerrouting/storage"
+	natgatewaystorage "spheric.cloud/spheric/internal/registry/networking/natgateway/storage"
+	networkstorage "spheric.cloud/spheric/internal/registry/networking/network/storage"
+	networkinterfacestorage "spheric.cloud/spheric/internal/registry/networking/networkinterface/storage"
+	networkpolicystorage "spheric.cloud/spheric/internal/registry/networking/networkpolicy/storage"
+	virtualipstorage "spheric.cloud/spheric/internal/registry/networking/virtualip/storage"
+	sphericserializer "spheric.cloud/spheric/internal/serializer"
 
 	"k8s.io/apiserver/pkg/server/storage"
 )
@@ -33,7 +35,7 @@ func (p StorageProvider) GroupName() string {
 func (p StorageProvider) NewRESTStorage(apiResourceConfigSource storage.APIResourceConfigSource, restOptionsGetter generic.RESTOptionsGetter) (genericapiserver.APIGroupInfo, bool, error) {
 	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(p.GroupName(), api.Scheme, metav1.ParameterCodec, api.Codecs)
 	apiGroupInfo.PrioritizedVersions = []schema.GroupVersion{networkingv1alpha1.SchemeGroupVersion}
-	apiGroupInfo.NegotiatedSerializer = ironcoreserializer.DefaultSubsetNegotiatedSerializer(api.Codecs)
+	apiGroupInfo.NegotiatedSerializer = sphericserializer.DefaultSubsetNegotiatedSerializer(api.Codecs)
 
 	storageMap, err := p.v1alpha1Storage(restOptionsGetter)
 	if err != nil {

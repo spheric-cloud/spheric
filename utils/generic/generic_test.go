@@ -1,13 +1,15 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
 package generic_test
 
 import (
-	. "github.com/ironcore-dev/ironcore/utils/generic"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
+	. "spheric.cloud/spheric/utils/generic"
 )
 
 var _ = Describe("Generic", func() {

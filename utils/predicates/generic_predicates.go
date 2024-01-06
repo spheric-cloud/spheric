@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -7,11 +9,11 @@ import (
 	"strings"
 
 	"github.com/go-logr/logr"
-	"github.com/ironcore-dev/ironcore/utils/annotations"
-	"github.com/ironcore-dev/ironcore/utils/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"spheric.cloud/spheric/utils/annotations"
+	"spheric.cloud/spheric/utils/labels"
 )
 
 // ResourceHasFilterLabel returns a predicate that returns true only if the provided resource contains

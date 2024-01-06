@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -8,13 +10,13 @@ import (
 	"crypto/x509"
 
 	"github.com/go-logr/logr"
-	utilcertificate "github.com/ironcore-dev/ironcore/utils/certificate"
-	"github.com/ironcore-dev/ironcore/utils/client/config"
-	utilrest "github.com/ironcore-dev/ironcore/utils/rest"
-	utilresttesting "github.com/ironcore-dev/ironcore/utils/rest/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"k8s.io/client-go/rest"
+	utilcertificate "spheric.cloud/spheric/utils/certificate"
+	"spheric.cloud/spheric/utils/client/config"
+	utilrest "spheric.cloud/spheric/utils/rest"
+	utilresttesting "spheric.cloud/spheric/utils/rest/testing"
 )
 
 var _ = Describe("Controller", func() {

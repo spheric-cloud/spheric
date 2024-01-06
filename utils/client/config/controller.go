@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -12,8 +14,6 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	"github.com/ironcore-dev/ironcore/utils/certificate"
-	utilrest "github.com/ironcore-dev/ironcore/utils/rest"
 	certificatesv1 "k8s.io/api/certificates/v1"
 	utilnet "k8s.io/apimachinery/pkg/util/net"
 	"k8s.io/apiserver/pkg/server/healthz"
@@ -21,6 +21,8 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
+	"spheric.cloud/spheric/utils/certificate"
+	utilrest "spheric.cloud/spheric/utils/rest"
 )
 
 type Controller interface {

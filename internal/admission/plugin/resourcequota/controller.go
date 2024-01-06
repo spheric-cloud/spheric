@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -11,15 +13,15 @@ import (
 	"sync"
 	"time"
 
-	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
-	"github.com/ironcore-dev/ironcore/utils/quota"
-	ironcoreutilruntime "github.com/ironcore-dev/ironcore/utils/runtime"
-	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apiserver/pkg/admission"
 	"k8s.io/client-go/util/workqueue"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
+	"spheric.cloud/spheric/utils/quota"
+	sphericutilruntime "spheric.cloud/spheric/utils/runtime"
+	utilslices "spheric.cloud/spheric/utils/slices"
 )
 
 type Evaluator interface {
@@ -102,7 +104,7 @@ func (e *EvaluatorController) check(ctx context.Context, ns string, waiters []*a
 }
 
 func (e *EvaluatorController) checkResourceQuotas(ctx context.Context, quotas []corev1alpha1.ResourceQuota, waiters []*admissionWaiter, retries int) {
-	originalQuotas := ironcoreutilruntime.DeepCopySliceRefs(quotas)
+	originalQuotas := sphericutilruntime.DeepCopySliceRefs(quotas)
 
 	var atLeastOneChanged bool
 	for _, waiter := range waiters {
@@ -363,7 +365,7 @@ func (e *EvaluatorController) checkRequest(ctx context.Context, quotas []corev1a
 		return quotas, nil
 	}
 
-	outQuotas := ironcoreutilruntime.DeepCopySliceRefs(quotas)
+	outQuotas := sphericutilruntime.DeepCopySliceRefs(quotas)
 	for _, i := range indexes {
 		resourceQuota := outQuotas[i]
 

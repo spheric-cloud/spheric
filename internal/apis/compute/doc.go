@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -5,7 +7,7 @@
 // +k8s:openapi-gen=true
 // +k8s:defaulter-gen=TypeMeta
 // +k8s:protobuf-gen=package
-// +groupName=compute.ironcore.dev
+// +groupName=compute.spheric.cloud
 
 // Package compute is the internal version of the API.
-package compute // import "github.com/ironcore-dev/ironcore/internal/apis/compute"
+package compute // import "spheric.cloud/spheric/internal/apis/compute"

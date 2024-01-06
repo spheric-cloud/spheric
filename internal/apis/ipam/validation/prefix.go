@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -6,16 +8,16 @@ package validation
 import (
 	"fmt"
 
-	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
-	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
-	commonvalidation "github.com/ironcore-dev/ironcore/internal/apis/common/validation"
-	"github.com/ironcore-dev/ironcore/internal/apis/ipam"
 	"go4.org/netipx"
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	commonv1alpha1 "spheric.cloud/spheric/api/common/v1alpha1"
+	sphericvalidation "spheric.cloud/spheric/internal/api/validation"
+	commonvalidation "spheric.cloud/spheric/internal/apis/common/validation"
+	"spheric.cloud/spheric/internal/apis/ipam"
 )
 
 func ValidatePrefix(prefix *ipam.Prefix) field.ErrorList {
@@ -30,7 +32,7 @@ func ValidatePrefix(prefix *ipam.Prefix) field.ErrorList {
 func validateIPFamilyAndOptionalPrefixAndLength(ipFamily corev1.IPFamily, prefix *commonv1alpha1.IPPrefix, prefixLength int32, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, ironcorevalidation.ValidateIPFamily(ipFamily, fldPath.Child("ipFamily"))...)
+	allErrs = append(allErrs, sphericvalidation.ValidateIPFamily(ipFamily, fldPath.Child("ipFamily"))...)
 
 	if prefix != nil {
 		allErrs = append(allErrs, commonvalidation.ValidateIPPrefix(ipFamily, *prefix, fldPath.Child("prefix"))...)
@@ -126,7 +128,7 @@ func validatePrefixSpecUpdate(newSpec, oldSpec *ipam.PrefixSpec, fldPath *field.
 		oldSpecCopy.ParentRef = newSpecCopy.ParentRef
 	}
 
-	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableFieldWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)
+	allErrs = append(allErrs, sphericvalidation.ValidateImmutableFieldWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)
 
 	return allErrs
 }

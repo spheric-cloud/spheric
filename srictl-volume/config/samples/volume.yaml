@@ -1,0 +1,10 @@
+metadata:
+  annotations:
+    foo: bar
+  labels:
+    bar: baz
+spec:
+  class: volumeclass-sample
+  image: ghcr.io/spheric-cloud/spheric-image/gardenlinux:latest
+  resources:
+    storage_bytes: 1073741824

@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -7,9 +9,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/ironcore-dev/ironcore/internal/api"
-	"github.com/ironcore-dev/ironcore/internal/apis/storage"
-	"github.com/ironcore-dev/ironcore/internal/apis/storage/validation"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -17,6 +16,9 @@ import (
 	"k8s.io/apiserver/pkg/registry/generic"
 	apisrvstorage "k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/names"
+	"spheric.cloud/spheric/internal/api"
+	"spheric.cloud/spheric/internal/apis/storage"
+	"spheric.cloud/spheric/internal/apis/storage/validation"
 )
 
 func GetAttrs(obj runtime.Object) (labels.Set, fields.Set, error) {

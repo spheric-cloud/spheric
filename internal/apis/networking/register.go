@@ -1,8 +1,10 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
 // Package networking contains API Schema definitions for the networking internal API group
-// +groupName=networking.ironcore.dev
+// +groupName=networking.spheric.cloud
 package networking
 
 import (
@@ -12,7 +14,7 @@ import (
 
 var (
 	// SchemeGroupVersion is group version used to register these objects
-	SchemeGroupVersion = schema.GroupVersion{Group: "networking.ironcore.dev", Version: runtime.APIVersionInternal}
+	SchemeGroupVersion = schema.GroupVersion{Group: "networking.spheric.cloud", Version: runtime.APIVersionInternal}
 
 	// SchemeBuilder is used to add go types to the GroupVersionKind scheme
 	SchemeBuilder = runtime.NewSchemeBuilder(addKnownTypes)

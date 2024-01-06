@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -6,16 +8,16 @@ package validation
 import (
 	"fmt"
 
-	"github.com/ironcore-dev/ironcore/internal/admission/plugin/machinevolumedevices/device"
-	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
-	"github.com/ironcore-dev/ironcore/internal/apis/compute"
-	"github.com/ironcore-dev/ironcore/internal/apis/storage"
-	storagevalidation "github.com/ironcore-dev/ironcore/internal/apis/storage/validation"
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	"spheric.cloud/spheric/internal/admission/plugin/machinevolumedevices/device"
+	sphericvalidation "spheric.cloud/spheric/internal/api/validation"
+	"spheric.cloud/spheric/internal/apis/compute"
+	"spheric.cloud/spheric/internal/apis/storage"
+	storagevalidation "spheric.cloud/spheric/internal/apis/storage/validation"
 )
 
 // ValidateMachine validates a Machine object.
@@ -45,7 +47,7 @@ var supportedMachinePowers = sets.New(
 )
 
 func validateMachinePower(power compute.Power, fldPath *field.Path) field.ErrorList {
-	return ironcorevalidation.ValidateEnum(supportedMachinePowers, power, fldPath, "must specify machine power")
+	return sphericvalidation.ValidateEnum(supportedMachinePowers, power, fldPath, "must specify machine power")
 }
 
 // validateMachineSpec validates the spec of a Machine object.
@@ -154,7 +156,7 @@ func validateEmptyDiskVolumeSource(source *compute.EmptyDiskVolumeSource, fldPat
 	var allErrs field.ErrorList
 
 	if sizeLimit := source.SizeLimit; sizeLimit != nil {
-		allErrs = append(allErrs, ironcorevalidation.ValidateNonNegativeQuantity(*sizeLimit, fldPath.Child("sizeLimit"))...)
+		allErrs = append(allErrs, sphericvalidation.ValidateNonNegativeQuantity(*sizeLimit, fldPath.Child("sizeLimit"))...)
 	}
 
 	return allErrs
@@ -195,9 +197,9 @@ func validateVolumeTemplateSpecForMachine(template *storage.VolumeTemplateSpec, 
 func validateMachineSpecUpdate(new, old *compute.MachineSpec, deletionTimestampSet bool, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableField(new.Image, old.Image, fldPath.Child("image"))...)
-	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableField(new.MachineClassRef, old.MachineClassRef, fldPath.Child("machineClassRef"))...)
-	allErrs = append(allErrs, ironcorevalidation.ValidateSetOnceField(new.MachinePoolRef, old.MachinePoolRef, fldPath.Child("machinePoolRef"))...)
+	allErrs = append(allErrs, sphericvalidation.ValidateImmutableField(new.Image, old.Image, fldPath.Child("image"))...)
+	allErrs = append(allErrs, sphericvalidation.ValidateImmutableField(new.MachineClassRef, old.MachineClassRef, fldPath.Child("machineClassRef"))...)
+	allErrs = append(allErrs, sphericvalidation.ValidateSetOnceField(new.MachinePoolRef, old.MachinePoolRef, fldPath.Child("machinePoolRef"))...)
 
 	return allErrs
 }

@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -17,11 +19,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi"
 	"github.com/go-logr/logr"
-	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	irimachine "github.com/ironcore-dev/ironcore/iri/apis/machine"
-	utilshttp "github.com/ironcore-dev/ironcore/utils/http"
 	"k8s.io/apiserver/pkg/authentication/authenticator"
 	"k8s.io/apiserver/pkg/authentication/authenticatorfactory"
 	"k8s.io/apiserver/pkg/authentication/user"
@@ -36,13 +35,16 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
+	computev1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
+	srimachine "spheric.cloud/spheric/sri/apis/machine"
+	utilshttp "spheric.cloud/spheric/utils/http"
 )
 
 var log = logf.Log.WithName("machinepoollet").WithName("server")
 
 type Options struct {
-	// MachineRuntime is the iri-machine runtime service.
-	MachineRuntime irimachine.RuntimeService
+	// MachineRuntime is the sri-machine runtime service.
+	MachineRuntime srimachine.RuntimeService
 
 	// Log is the logger to use in the server.
 	// If unset, a package-global router will be used.
@@ -57,7 +59,7 @@ type Options struct {
 
 	// CertDir is the directory that contains the server key and certificate.
 	// If not set, the server would look up the key and certificate in
-	// {TempDir}/ironcore-machinepool-server/serving-certs. The key and certificate
+	// {TempDir}/spheric-machinepool-server/serving-certs. The key and certificate
 	// must be named tls.key and tls.crt, respectively.
 	// If the files don't exist, a self-signed certificate is generated.
 	CertDir string
@@ -96,7 +98,7 @@ type Server struct {
 
 	auth Auth
 
-	machineRuntime irimachine.RuntimeService
+	machineRuntime srimachine.RuntimeService
 
 	cacheTTL time.Duration
 
@@ -313,7 +315,7 @@ func (s *Server) router() http.Handler {
 	r.Use(utilshttp.InjectLogger(s.log))
 	r.Use(utilshttp.LogRequest)
 
-	r.Route("/apis/compute.ironcore.dev", func(r chi.Router) {
+	r.Route("/apis/compute.spheric.cloud", func(r chi.Router) {
 		if s.auth != nil {
 			r.Use(s.authMiddleware)
 		}

@@ -73,7 +73,7 @@ To be more resilient and to scale beyond single `NetworkInterface`s, a `LoadBala
 
 ### Details
 
-- Load balancing is used to deliver a packet addressed to the load balancer to one of its targets via the ironcore
+- Load balancing is used to deliver a packet addressed to the load balancer to one of its targets via the spheric
   network routing
 - The target needs to be aware of the load balancer's IP and needs to answer with it (and to receive traffic with it)
 - Answers to the request will be directly delivered since all details are known by the target
@@ -91,7 +91,7 @@ for traffic forwarding (see [OEP-1](01-networking-integration.md#the-networkinte
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: networking.ironcore.dev/v1alpha1
+apiVersion: networking.spheric.cloud/v1alpha1
 kind: LoadBalancer
 metadata:
   namespace: default
@@ -129,15 +129,15 @@ status:
 
 ### Routing State Object
 
-The load balancer needs details computable at the ironcore API level to describe the explicit targets in a pool traffic
+The load balancer needs details computable at the spheric API level to describe the explicit targets in a pool traffic
 is routed to. `LoadBalancerRouting` describes `NetworkInterface`s load balanced traffic is routed to.
 This object describes a state of the `LoadBalancer` and results of the `LoadBalancer` definition
-specifically `networkInterfaceSelector` and `networkRef`. `LoadBalancerRouting` is reconciled by the `ironcore` load
+specifically `networkInterfaceSelector` and `networkRef`. `LoadBalancerRouting` is reconciled by the `spheric` load
 balancer controller.
 
 [//]: # (@formatter:off)
 ```yaml
-apiVersion: networking.ironcore.dev/v1alpha1
+apiVersion: networking.spheric.cloud/v1alpha1
 kind: LoadBalancerRouting
 metadata:
   namespace: default

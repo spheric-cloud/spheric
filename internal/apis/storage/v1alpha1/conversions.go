@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -6,8 +8,8 @@ package v1alpha1
 import (
 	"fmt"
 
-	"github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"spheric.cloud/spheric/api/storage/v1alpha1"
 )
 
 func addConversionFuncs(scheme *runtime.Scheme) error {

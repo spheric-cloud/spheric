@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -8,7 +10,6 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	"golang.org/x/exp/slices"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -18,6 +19,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	networkingv1alpha1 "spheric.cloud/spheric/api/networking/v1alpha1"
 )
 
 type NetworkReleaseReconciler struct {
@@ -27,7 +29,7 @@ type NetworkReleaseReconciler struct {
 	AbsenceCache *lru.Cache
 }
 
-//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networks,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=networking.spheric.cloud,resources=networks,verbs=get;list;watch;update;patch
 
 func (r *NetworkReleaseReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)

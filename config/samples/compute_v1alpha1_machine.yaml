@@ -1,4 +1,4 @@
-apiVersion: compute.ironcore.dev/v1alpha1
+apiVersion: compute.spheric.cloud/v1alpha1
 kind: Machine
 metadata:
   name: machine-sample

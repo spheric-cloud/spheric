@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -13,18 +15,18 @@ const (
 	BucketBucketClassRefNameField = "spec.bucketClassRef.name"
 
 	// VolumePoolsGroup is the system rbac group all volume pools are in.
-	VolumePoolsGroup = "storage.ironcore.dev:system:volumepools"
+	VolumePoolsGroup = "storage.spheric.cloud:system:volumepools"
 
 	// VolumePoolUserNamePrefix is the prefix all volume pool users should have.
-	VolumePoolUserNamePrefix = "storage.ironcore.dev:system:volumepool:"
+	VolumePoolUserNamePrefix = "storage.spheric.cloud:system:volumepool:"
 
 	// BucketPoolsGroup is the system rbac group all bucket pools are in.
-	BucketPoolsGroup = "storage.ironcore.dev:system:bucketpools"
+	BucketPoolsGroup = "storage.spheric.cloud:system:bucketpools"
 
 	// BucketPoolUserNamePrefix is the prefix all bucket pool users should have.
-	BucketPoolUserNamePrefix = "storage.ironcore.dev:system:bucketpool:"
+	BucketPoolUserNamePrefix = "storage.spheric.cloud:system:bucketpool:"
 
-	SecretTypeVolumeAuth = corev1.SecretType("storage.ironcore.dev/volume-auth")
+	SecretTypeVolumeAuth = corev1.SecretType("storage.spheric.cloud/volume-auth")
 )
 
 // VolumePoolCommonName constructs the common name for a certificate of a volume pool user.

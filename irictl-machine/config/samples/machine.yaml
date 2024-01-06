@@ -1,9 +1,0 @@
-metadata:
-  annotations:
-    foo: bar
-  labels:
-    bar: baz
-spec:
-  class: small
-  image:
-    image: ghcr.io/ironcore-dev/ironcore-image/gardenlinux:latest

@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,17 +12,6 @@ import (
 
 	"github.com/ironcore-dev/controller-utils/buildutils"
 	"github.com/ironcore-dev/controller-utils/modutils"
-	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	storageclient "github.com/ironcore-dev/ironcore/internal/client/storage"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
-	"github.com/ironcore-dev/ironcore/iri/testing/volume"
-	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers"
-	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
-	utilsenvtest "github.com/ironcore-dev/ironcore/utils/envtest"
-	"github.com/ironcore-dev/ironcore/utils/envtest/apiserver"
-	"github.com/ironcore-dev/ironcore/utils/envtest/controllermanager"
-	"github.com/ironcore-dev/ironcore/utils/envtest/process"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -37,6 +28,17 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	metricserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
+	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
+	storagev1alpha1 "spheric.cloud/spheric/api/storage/v1alpha1"
+	storageclient "spheric.cloud/spheric/internal/client/storage"
+	"spheric.cloud/spheric/poollet/volumepoollet/controllers"
+	"spheric.cloud/spheric/poollet/volumepoollet/vcm"
+	sri "spheric.cloud/spheric/sri/apis/volume/v1alpha1"
+	"spheric.cloud/spheric/sri/testing/volume"
+	utilsenvtest "spheric.cloud/spheric/utils/envtest"
+	"spheric.cloud/spheric/utils/envtest/apiserver"
+	"spheric.cloud/spheric/utils/envtest/controllermanager"
+	"spheric.cloud/spheric/utils/envtest/process"
 )
 
 var (
@@ -73,7 +75,7 @@ var _ = BeforeSuite(func() {
 	testEnv = &envtest.Environment{}
 	testEnvExt = &utilsenvtest.EnvironmentExtensions{
 		APIServiceDirectoryPaths: []string{
-			modutils.Dir("github.com/ironcore-dev/ironcore", "config", "apiserver", "apiservice", "bases"),
+			modutils.Dir("spheric.cloud/spheric", "config", "apiserver", "apiservice", "bases"),
 		},
 		ErrorIfAPIServicePathIsMissing: true,
 		AdditionalServices: []utilsenvtest.AdditionalService{
@@ -98,7 +100,7 @@ var _ = BeforeSuite(func() {
 	SetClient(k8sClient)
 
 	apiSrv, err := apiserver.New(cfg, apiserver.Options{
-		MainPath:     "github.com/ironcore-dev/ironcore/cmd/ironcore-apiserver",
+		MainPath:     "spheric.cloud/spheric/cmd/apiserver",
 		BuildOptions: []buildutils.BuildOption{buildutils.ModModeMod},
 		ETCDServers:  []string{testEnv.ControlPlane.Etcd.URL.String()},
 		Host:         testEnvExt.APIServiceInstallOptions.LocalServingHost,
@@ -114,7 +116,7 @@ var _ = BeforeSuite(func() {
 
 	ctrlMgr, err := controllermanager.New(cfg, controllermanager.Options{
 		Args:         process.EmptyArgs().Set("controllers", "*"),
-		MainPath:     "github.com/ironcore-dev/ironcore/cmd/ironcore-controller-manager",
+		MainPath:     "spheric.cloud/spheric/cmd/controller-manager",
 		BuildOptions: []buildutils.BuildOption{buildutils.ModModeMod},
 		Host:         testEnvExt.GetAdditionalServiceHost(controllerManagerService),
 		Port:         testEnvExt.GetAdditionalServicePort(controllerManagerService),
@@ -179,10 +181,10 @@ func SetupTest() (*corev1.Namespace, *storagev1alpha1.VolumePool, *storagev1alph
 		*srv = *volume.NewFakeRuntimeService()
 		srv.SetVolumeClasses([]*volume.FakeVolumeClassStatus{
 			{
-				VolumeClassStatus: iri.VolumeClassStatus{
-					VolumeClass: &iri.VolumeClass{
+				VolumeClassStatus: sri.VolumeClassStatus{
+					VolumeClass: &sri.VolumeClass{
 						Name: vc.Name,
-						Capabilities: &iri.VolumeClassCapabilities{
+						Capabilities: &sri.VolumeClassCapabilities{
 							Tps:  262144000,
 							Iops: 15000,
 						},
@@ -190,10 +192,10 @@ func SetupTest() (*corev1.Namespace, *storagev1alpha1.VolumePool, *storagev1alph
 				},
 			},
 			{
-				VolumeClassStatus: iri.VolumeClassStatus{
-					VolumeClass: &iri.VolumeClass{
+				VolumeClassStatus: sri.VolumeClassStatus{
+					VolumeClass: &sri.VolumeClass{
 						Name: expandableVc.Name,
-						Capabilities: &iri.VolumeClassCapabilities{
+						Capabilities: &sri.VolumeClassCapabilities{
 							Tps:  262144000,
 							Iops: 1000,
 						},

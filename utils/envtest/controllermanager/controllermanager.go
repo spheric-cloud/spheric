@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -11,9 +13,9 @@ import (
 	"time"
 
 	"github.com/ironcore-dev/controller-utils/buildutils"
-	"github.com/ironcore-dev/ironcore/utils/envtest/internal/testing/controlplane"
-	"github.com/ironcore-dev/ironcore/utils/envtest/process"
 	"k8s.io/client-go/rest"
+	"spheric.cloud/spheric/utils/envtest/internal/testing/controlplane"
+	"spheric.cloud/spheric/utils/envtest/process"
 )
 
 type ControllerManager struct {

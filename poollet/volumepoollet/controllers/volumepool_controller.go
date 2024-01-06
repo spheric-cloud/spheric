@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -8,34 +10,34 @@ import (
 	"errors"
 	"fmt"
 
-	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
-	storageclient "github.com/ironcore-dev/ironcore/internal/client/storage"
-	"github.com/ironcore-dev/ironcore/utils/quota"
 	"k8s.io/apimachinery/pkg/api/resource"
+	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
+	storageclient "spheric.cloud/spheric/internal/client/storage"
+	"spheric.cloud/spheric/utils/quota"
 
 	"github.com/go-logr/logr"
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
-	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
-	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	corev1 "k8s.io/api/core/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	storagev1alpha1 "spheric.cloud/spheric/api/storage/v1alpha1"
+	"spheric.cloud/spheric/poollet/volumepoollet/vcm"
+	sri "spheric.cloud/spheric/sri/apis/volume/v1alpha1"
+	sphericclient "spheric.cloud/spheric/utils/client"
 )
 
 type VolumePoolReconciler struct {
 	client.Client
 	VolumePoolName    string
-	VolumeRuntime     iri.VolumeRuntimeClient
+	VolumeRuntime     sri.VolumeRuntimeClient
 	VolumeClassMapper vcm.VolumeClassMapper
 }
 
-//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumepools,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumepools/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumeclasses,verbs=get;list;watch
+//+kubebuilder:rbac:groups=storage.spheric.cloud,resources=volumepools,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=storage.spheric.cloud,resources=volumepools/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=storage.spheric.cloud,resources=volumeclasses,verbs=get;list;watch
 
 func (r *VolumePoolReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
@@ -60,13 +62,13 @@ func (r *VolumePoolReconciler) delete(ctx context.Context, log logr.Logger, volu
 	return ctrl.Result{}, nil
 }
 
-func (r *VolumePoolReconciler) supportsVolumeClass(ctx context.Context, log logr.Logger, volumeClass *storagev1alpha1.VolumeClass) (*iri.VolumeClass, *resource.Quantity, error) {
-	iriCapabilities, err := getIRIVolumeClassCapabilities(volumeClass)
+func (r *VolumePoolReconciler) supportsVolumeClass(ctx context.Context, log logr.Logger, volumeClass *storagev1alpha1.VolumeClass) (*sri.VolumeClass, *resource.Quantity, error) {
+	sriCapabilities, err := getSRIVolumeClassCapabilities(volumeClass)
 	if err != nil {
-		return nil, nil, fmt.Errorf("error getting iri mahchine class capabilities: %w", err)
+		return nil, nil, fmt.Errorf("error getting sri mahchine class capabilities: %w", err)
 	}
 
-	class, quantity, err := r.VolumeClassMapper.GetVolumeClassFor(ctx, volumeClass.Name, iriCapabilities)
+	class, quantity, err := r.VolumeClassMapper.GetVolumeClassFor(ctx, volumeClass.Name, sriCapabilities)
 	if err != nil {
 		if !errors.Is(err, vcm.ErrNoMatchingVolumeClass) && !errors.Is(err, vcm.ErrAmbiguousMatchingVolumeClass) {
 			return nil, nil, fmt.Errorf("error getting volume class for %s: %w", volumeClass.Name, err)
@@ -136,7 +138,7 @@ func (r *VolumePoolReconciler) reconcile(ctx context.Context, log logr.Logger, v
 	log.V(1).Info("Reconcile")
 
 	log.V(1).Info("Ensuring no reconcile annotation")
-	modified, err := ironcoreclient.PatchEnsureNoReconcileAnnotation(ctx, r.Client, volumePool)
+	modified, err := sphericclient.PatchEnsureNoReconcileAnnotation(ctx, r.Client, volumePool)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error ensuring no reconcile annotation: %w", err)
 	}

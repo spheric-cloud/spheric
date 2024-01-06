@@ -1,18 +1,20 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
 package validation_test
 
 import (
-	"github.com/ironcore-dev/ironcore/internal/apis/ipam"
-	. "github.com/ironcore-dev/ironcore/internal/apis/ipam/validation"
-	. "github.com/ironcore-dev/ironcore/internal/testutils/validation"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	"spheric.cloud/spheric/internal/apis/ipam"
+	. "spheric.cloud/spheric/internal/apis/ipam/validation"
+	. "spheric.cloud/spheric/internal/testutils/validation"
 )
 
 var _ = Describe("PrefixTemplate", func() {

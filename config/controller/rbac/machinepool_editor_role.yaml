@@ -5,7 +5,7 @@ metadata:
   name: machinepool-editor-role
 rules:
   - apiGroups:
-      - compute.ironcore.dev
+      - compute.spheric.cloud
     resources:
       - machinepools
     verbs:
@@ -17,7 +17,7 @@ rules:
       - update
       - watch
   - apiGroups:
-      - compute.ironcore.dev
+      - compute.spheric.cloud
     resources:
       - machinepools/status
     verbs:
