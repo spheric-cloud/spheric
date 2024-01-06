@@ -1,12 +1,14 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
 package config_test
 
 import (
-	"github.com/ironcore-dev/ironcore/utils/client/config"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"spheric.cloud/spheric/utils/client/config"
 )
 
 var _ = Describe("Options", func() {

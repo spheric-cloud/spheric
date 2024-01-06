@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -9,14 +11,14 @@ import (
 	"strings"
 	"time"
 
-	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
-	"github.com/ironcore-dev/ironcore/client-go/ironcore"
-	corev1alpha1listers "github.com/ironcore-dev/ironcore/client-go/listers/core/v1alpha1"
 	"golang.org/x/exp/slices"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apiserver/pkg/storage"
 	"k8s.io/utils/lru"
+	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
+	corev1alpha1listers "spheric.cloud/spheric/client-go/listers/core/v1alpha1"
+	"spheric.cloud/spheric/client-go/spheric"
 )
 
 type QuotaAccessor interface {
@@ -25,7 +27,7 @@ type QuotaAccessor interface {
 }
 
 type quotaAccessor struct {
-	client ironcore.Interface
+	client spheric.Interface
 
 	lister corev1alpha1listers.ResourceQuotaLister
 
@@ -36,7 +38,7 @@ type quotaAccessor struct {
 }
 
 func NewQuotaAccessor(
-	client ironcore.Interface,
+	client spheric.Interface,
 	lister corev1alpha1listers.ResourceQuotaLister,
 ) (QuotaAccessor, error) {
 	if client == nil {

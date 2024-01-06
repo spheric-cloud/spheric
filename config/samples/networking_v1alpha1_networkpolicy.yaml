@@ -1,4 +1,4 @@
-apiVersion: networking.ironcore.dev/v1alpha1
+apiVersion: networking.spheric.cloud/v1alpha1
 kind: NetworkPolicy
 metadata:
   namespace: default

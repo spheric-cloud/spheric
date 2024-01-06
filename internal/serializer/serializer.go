@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -38,7 +40,7 @@ func SubsetNegotiatedSerializer(codecs serializer.CodecFactory, accepts ...func(
 	return subsetNegotiatedSerializer{accepts, codecs}
 }
 
-// DefaultSubsetNegotiatedSerializer is the default ironcore serializer that does not use protobuf.
+// DefaultSubsetNegotiatedSerializer is the default spheric serializer that does not use protobuf.
 // Since our types *don't* implement protobuf encoding, and without removing the protobuf support,
 // namespace deletion would fail (see issue https://github.com/kubernetes/kubernetes/issues/86666). As such,
 // until we either enhance content type negotiation or implement protobuf for our types, we have to make

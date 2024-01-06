@@ -1,13 +1,15 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
 package apivalidation
 
 import (
-	"github.com/ironcore-dev/ironcore/internal/apis/storage"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	"spheric.cloud/spheric/internal/apis/storage"
 )
 
 var supportedIPFamilies = sets.New(

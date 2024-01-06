@@ -1,20 +1,22 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
 package rest
 
 import (
-	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	"github.com/ironcore-dev/ironcore/internal/api"
-	"github.com/ironcore-dev/ironcore/internal/apis/compute"
-	machinepoolletclient "github.com/ironcore-dev/ironcore/internal/machinepoollet/client"
-	machinestorage "github.com/ironcore-dev/ironcore/internal/registry/compute/machine/storage"
-	machineclassstore "github.com/ironcore-dev/ironcore/internal/registry/compute/machineclass/storage"
-	machinepoolstorage "github.com/ironcore-dev/ironcore/internal/registry/compute/machinepool/storage"
-	ironcoreserializer "github.com/ironcore-dev/ironcore/internal/serializer"
 	"k8s.io/apiserver/pkg/registry/generic"
 	"k8s.io/apiserver/pkg/registry/rest"
 	genericapiserver "k8s.io/apiserver/pkg/server"
+	computev1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
+	"spheric.cloud/spheric/internal/api"
+	"spheric.cloud/spheric/internal/apis/compute"
+	machinepoolletclient "spheric.cloud/spheric/internal/machinepoollet/client"
+	machinestorage "spheric.cloud/spheric/internal/registry/compute/machine/storage"
+	machineclassstore "spheric.cloud/spheric/internal/registry/compute/machineclass/storage"
+	machinepoolstorage "spheric.cloud/spheric/internal/registry/compute/machinepool/storage"
+	sphericserializer "spheric.cloud/spheric/internal/serializer"
 
 	serverstorage "k8s.io/apiserver/pkg/server/storage"
 )
@@ -29,7 +31,7 @@ func (p StorageProvider) GroupName() string {
 
 func (p StorageProvider) NewRESTStorage(apiResourceConfigSource serverstorage.APIResourceConfigSource, restOptionsGetter generic.RESTOptionsGetter) (genericapiserver.APIGroupInfo, bool, error) {
 	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(p.GroupName(), api.Scheme, api.ParameterCodec, api.Codecs)
-	apiGroupInfo.NegotiatedSerializer = ironcoreserializer.DefaultSubsetNegotiatedSerializer(api.Codecs)
+	apiGroupInfo.NegotiatedSerializer = sphericserializer.DefaultSubsetNegotiatedSerializer(api.Codecs)
 
 	storageMap, err := p.v1alpha1Storage(restOptionsGetter)
 	if err != nil {

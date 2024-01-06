@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -6,14 +8,14 @@ package validation
 import (
 	"fmt"
 
-	"github.com/ironcore-dev/ironcore/internal/apis/core"
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	"spheric.cloud/spheric/internal/apis/core"
 
-	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
-	"github.com/ironcore-dev/ironcore/internal/apis/storage"
+	sphericvalidation "spheric.cloud/spheric/internal/api/validation"
+	"spheric.cloud/spheric/internal/apis/storage"
 )
 
 func ValidateVolume(volume *storage.Volume) field.ErrorList {
@@ -43,7 +45,7 @@ func validateVolumeSpec(spec *storage.VolumeSpec, fldPath *field.Path) field.Err
 
 		storageValue, ok := spec.Resources[core.ResourceStorage]
 		if ok {
-			allErrs = append(allErrs, ironcorevalidation.ValidatePositiveQuantity(storageValue, fldPath.Child("resources").Key(string(corev1.ResourceStorage)))...)
+			allErrs = append(allErrs, sphericvalidation.ValidatePositiveQuantity(storageValue, fldPath.Child("resources").Key(string(corev1.ResourceStorage)))...)
 		} else {
 			allErrs = append(allErrs, field.Required(fldPath.Child("resources").Key(string(core.ResourceStorage)), fmt.Sprintf("must specify %s", core.ResourceStorage)))
 		}
@@ -113,9 +115,9 @@ func ValidateVolumeUpdate(newVolume, oldVolume *storage.Volume) field.ErrorList 
 func validateVolumeSpecUpdate(newSpec, oldSpec *storage.VolumeSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableField(newSpec.VolumeClassRef, oldSpec.VolumeClassRef, fldPath.Child("volumeClassRef"))...)
-	allErrs = append(allErrs, ironcorevalidation.ValidateSetOnceField(newSpec.VolumePoolRef, oldSpec.VolumePoolRef, fldPath.Child("volumePoolRef"))...)
-	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableField(newSpec.Encryption, oldSpec.Encryption, fldPath.Child("encryption"))...)
+	allErrs = append(allErrs, sphericvalidation.ValidateImmutableField(newSpec.VolumeClassRef, oldSpec.VolumeClassRef, fldPath.Child("volumeClassRef"))...)
+	allErrs = append(allErrs, sphericvalidation.ValidateSetOnceField(newSpec.VolumePoolRef, oldSpec.VolumePoolRef, fldPath.Child("volumePoolRef"))...)
+	allErrs = append(allErrs, sphericvalidation.ValidateImmutableField(newSpec.Encryption, oldSpec.Encryption, fldPath.Child("encryption"))...)
 
 	return allErrs
 }

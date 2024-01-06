@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -11,20 +13,20 @@ import (
 )
 
 const (
-	MachineUIDLabel       = "machinepoollet.ironcore.dev/machine-uid"
-	MachineNamespaceLabel = "machinepoollet.ironcore.dev/machine-namespace"
-	MachineNameLabel      = "machinepoollet.ironcore.dev/machine-name"
+	MachineUIDLabel       = "machinepoollet.spheric.cloud/machine-uid"
+	MachineNamespaceLabel = "machinepoollet.spheric.cloud/machine-namespace"
+	MachineNameLabel      = "machinepoollet.spheric.cloud/machine-name"
 
-	MachineGenerationAnnotation    = "machinepoollet.ironcore.dev/machine-generation"
-	IRIMachineGenerationAnnotation = "machinepoollet.ironcore.dev/irimachine-generation"
+	MachineGenerationAnnotation    = "machinepoollet.spheric.cloud/machine-generation"
+	SRIMachineGenerationAnnotation = "machinepoollet.spheric.cloud/srimachine-generation"
 
-	NetworkInterfaceMappingAnnotation = "machinepoollet.ironcore.dev/networkinterfacemapping"
+	NetworkInterfaceMappingAnnotation = "machinepoollet.spheric.cloud/networkinterfacemapping"
 
-	FieldOwner       = "machinepoollet.ironcore.dev/field-owner"
-	MachineFinalizer = "machinepoollet.ironcore.dev/machine"
+	FieldOwner       = "machinepoollet.spheric.cloud/field-owner"
+	MachineFinalizer = "machinepoollet.spheric.cloud/machine"
 
 	// DownwardAPIPrefix is the prefix for any downward label.
-	DownwardAPIPrefix = "downward-api.machinepoollet.ironcore.dev/"
+	DownwardAPIPrefix = "downward-api.machinepoollet.spheric.cloud/"
 )
 
 // DownwardAPILabel makes a downward api label name from the given name.

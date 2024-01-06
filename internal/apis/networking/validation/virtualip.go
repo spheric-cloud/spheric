@@ -1,14 +1,16 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
 package validation
 
 import (
-	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
-	"github.com/ironcore-dev/ironcore/internal/apis/networking"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	sphericvalidation "spheric.cloud/spheric/internal/api/validation"
+	"spheric.cloud/spheric/internal/apis/networking"
 )
 
 // ValidateVirtualIP validates a virtual ip object.
@@ -37,14 +39,14 @@ var supportedVirtualIPTypes = sets.New(
 )
 
 func validateVirtualIPType(virtualIPType networking.VirtualIPType, fldPath *field.Path) field.ErrorList {
-	return ironcorevalidation.ValidateEnum(supportedVirtualIPTypes, virtualIPType, fldPath, "must specify type")
+	return sphericvalidation.ValidateEnum(supportedVirtualIPTypes, virtualIPType, fldPath, "must specify type")
 }
 
 func validateVirtualIPSpec(spec *networking.VirtualIPSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, validateVirtualIPType(spec.Type, fldPath.Child("type"))...)
-	allErrs = append(allErrs, ironcorevalidation.ValidateIPFamily(spec.IPFamily, fldPath.Child("ipFamily"))...)
+	allErrs = append(allErrs, sphericvalidation.ValidateIPFamily(spec.IPFamily, fldPath.Child("ipFamily"))...)
 
 	if targetRef := spec.TargetRef; targetRef != nil {
 		for _, msg := range apivalidation.NameIsDNSLabel(targetRef.Name, false) {
@@ -63,7 +65,7 @@ func validateVirtualIPSpecUpdate(newSpec, oldSpec *networking.VirtualIPSpec, fld
 	oldSpecCopy := oldSpec.DeepCopy()
 
 	oldSpecCopy.TargetRef = newSpec.TargetRef
-	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableFieldWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)
+	allErrs = append(allErrs, sphericvalidation.ValidateImmutableFieldWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)
 
 	return allErrs
 }

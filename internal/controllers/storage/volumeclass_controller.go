@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,9 +12,6 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/controller-utils/clientutils"
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	storageclient "github.com/ironcore-dev/ironcore/internal/client/storage"
-	"github.com/ironcore-dev/ironcore/utils/slices"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/util/workqueue"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -20,6 +19,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
+	storagev1alpha1 "spheric.cloud/spheric/api/storage/v1alpha1"
+	storageclient "spheric.cloud/spheric/internal/client/storage"
+	"spheric.cloud/spheric/utils/slices"
 )
 
 // VolumeClassReconciler reconciles a VolumeClass object
@@ -28,10 +30,10 @@ type VolumeClassReconciler struct {
 	APIReader client.Reader
 }
 
-//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumeclasses,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumeclasses/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumeclasses/finalizers,verbs=update
-//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumes,verbs=get;list;watch
+//+kubebuilder:rbac:groups=storage.spheric.cloud,resources=volumeclasses,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=storage.spheric.cloud,resources=volumeclasses/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=storage.spheric.cloud,resources=volumeclasses/finalizers,verbs=update
+//+kubebuilder:rbac:groups=storage.spheric.cloud,resources=volumes,verbs=get;list;watch
 
 // Reconcile moves the current state of the cluster closer to the desired state.
 func (r *VolumeClassReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {

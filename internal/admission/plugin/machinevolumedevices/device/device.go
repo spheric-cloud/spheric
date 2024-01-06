@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -17,8 +19,8 @@ const (
 	// MaxIndex is the maximum index usable for Name / returned by ParseName.
 	MaxIndex = numLetters*numLetters + numLetters - 1
 
-	// IronCorePrefix is the device prefix used by ironcore devices.
-	IronCorePrefix = "od"
+	// SphericPrefix is the device prefix used by spheric devices.
+	SphericPrefix = "od"
 )
 
 var (

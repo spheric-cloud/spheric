@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -8,12 +10,12 @@ import (
 	"crypto/x509/pkix"
 	"os"
 
-	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	utilcertificate "github.com/ironcore-dev/ironcore/utils/certificate"
-	"github.com/ironcore-dev/ironcore/utils/client/config"
 	certificatesv1 "k8s.io/api/certificates/v1"
 	"k8s.io/apiserver/pkg/server/egressselector"
 	ctrl "sigs.k8s.io/controller-runtime"
+	computev1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
+	utilcertificate "spheric.cloud/spheric/utils/certificate"
+	"spheric.cloud/spheric/utils/client/config"
 )
 
 var log = ctrl.Log.WithName("client").WithName("config")

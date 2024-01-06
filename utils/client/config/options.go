@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -6,8 +8,8 @@ package config
 import (
 	"fmt"
 
-	"github.com/ironcore-dev/ironcore/utils/generic"
 	"github.com/spf13/pflag"
+	"spheric.cloud/spheric/utils/generic"
 )
 
 // GetConfigOptions are options to supply for a GetConfig call.

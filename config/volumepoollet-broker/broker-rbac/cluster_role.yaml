@@ -6,7 +6,7 @@ metadata:
   name: broker-role
 rules:
   - apiGroups:
-      - storage.ironcore.dev
+      - storage.spheric.cloud
     resources:
       - volumeclasses
     verbs:
@@ -14,7 +14,7 @@ rules:
       - list
       - watch
   - apiGroups:
-      - storage.ironcore.dev
+      - storage.spheric.cloud
     resources:
       - volumepools
     verbs:

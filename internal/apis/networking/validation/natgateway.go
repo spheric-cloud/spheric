@@ -1,14 +1,16 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
 package validation
 
 import (
-	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
-	"github.com/ironcore-dev/ironcore/internal/apis/networking"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	sphericvalidation "spheric.cloud/spheric/internal/api/validation"
+	"spheric.cloud/spheric/internal/apis/networking"
 )
 
 // ValidateNATGateway validates an NATGateway object.
@@ -26,14 +28,14 @@ func validateNATGatewaySpec(spec *networking.NATGatewaySpec, fldPath *field.Path
 
 	allErrs = append(allErrs, validateNATGatewayType(spec.Type, fldPath.Child("type"))...)
 
-	allErrs = append(allErrs, ironcorevalidation.ValidateIPFamily(spec.IPFamily, fldPath.Child("ipFamily"))...)
+	allErrs = append(allErrs, sphericvalidation.ValidateIPFamily(spec.IPFamily, fldPath.Child("ipFamily"))...)
 
 	for _, msg := range apivalidation.NameIsDNSLabel(spec.NetworkRef.Name, false) {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("networkRef").Child("name"), spec.NetworkRef.Name, msg))
 	}
 
 	if spec.PortsPerNetworkInterface != nil {
-		allErrs = append(allErrs, ironcorevalidation.ValidatePowerOfTwo(int64(*spec.PortsPerNetworkInterface), fldPath.Child("portsPerNetworkInterface"))...)
+		allErrs = append(allErrs, sphericvalidation.ValidatePowerOfTwo(int64(*spec.PortsPerNetworkInterface), fldPath.Child("portsPerNetworkInterface"))...)
 	}
 
 	return allErrs
@@ -44,7 +46,7 @@ var supportedNATGatewayTypes = sets.New(
 )
 
 func validateNATGatewayType(natGatewayType networking.NATGatewayType, fldPath *field.Path) field.ErrorList {
-	return ironcorevalidation.ValidateEnum(supportedNATGatewayTypes, natGatewayType, fldPath, "must specify type")
+	return sphericvalidation.ValidateEnum(supportedNATGatewayTypes, natGatewayType, fldPath, "must specify type")
 }
 
 // ValidateNATGatewayUpdate validates a NATGateway object before an update.
@@ -62,7 +64,7 @@ func ValidateNATGatewayUpdate(newNATGateway, oldNATGateway *networking.NATGatewa
 func validateNATGatewaySpecPrefixUpdate(newSpec, oldSpec *networking.NATGatewaySpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableField(newSpec.NetworkRef, oldSpec.NetworkRef, fldPath.Child("networkRef"))...)
+	allErrs = append(allErrs, sphericvalidation.ValidateImmutableField(newSpec.NetworkRef, oldSpec.NetworkRef, fldPath.Child("networkRef"))...)
 
 	return allErrs
 }

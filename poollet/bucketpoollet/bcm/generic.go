@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,10 +12,10 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
 	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/wait"
 	ctrl "sigs.k8s.io/controller-runtime"
+	sri "spheric.cloud/spheric/sri/apis/bucket/v1alpha1"
 )
 
 type capabilities struct {
@@ -21,10 +23,10 @@ type capabilities struct {
 	iops int64
 }
 
-func getCapabilities(iriCaps *iri.BucketClassCapabilities) capabilities {
+func getCapabilities(sriCaps *sri.BucketClassCapabilities) capabilities {
 	return capabilities{
-		tps:  iriCaps.Tps,
-		iops: iriCaps.Iops,
+		tps:  sriCaps.Tps,
+		iops: sriCaps.Iops,
 	}
 }
 
@@ -34,17 +36,17 @@ type Generic struct {
 	sync   bool
 	synced chan struct{}
 
-	bucketClassByName         map[string]*iri.BucketClass
-	bucketClassByCapabilities map[capabilities][]*iri.BucketClass
+	bucketClassByName         map[string]*sri.BucketClass
+	bucketClassByCapabilities map[capabilities][]*sri.BucketClass
 
-	bucketRuntime iri.BucketRuntimeClient
+	bucketRuntime sri.BucketRuntimeClient
 
 	relistPeriod time.Duration
 }
 
 func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
 	log.V(1).Info("Relisting bucket classes")
-	res, err := g.bucketRuntime.ListBucketClasses(ctx, &iri.ListBucketClassesRequest{})
+	res, err := g.bucketRuntime.ListBucketClasses(ctx, &sri.ListBucketClassesRequest{})
 	if err != nil {
 		return fmt.Errorf("error listing bucket classes: %w", err)
 	}
@@ -79,7 +81,7 @@ func (g *Generic) Start(ctx context.Context) error {
 	return nil
 }
 
-func (g *Generic) GetBucketClassFor(ctx context.Context, name string, caps *iri.BucketClassCapabilities) (*iri.BucketClass, error) {
+func (g *Generic) GetBucketClassFor(ctx context.Context, name string, caps *sri.BucketClassCapabilities) (*sri.BucketClass, error) {
 	g.mu.RLock()
 	defer g.mu.RUnlock()
 
@@ -122,12 +124,12 @@ func setGenericOptionsDefaults(o *GenericOptions) {
 	}
 }
 
-func NewGeneric(runtime iri.BucketRuntimeClient, opts GenericOptions) BucketClassMapper {
+func NewGeneric(runtime sri.BucketRuntimeClient, opts GenericOptions) BucketClassMapper {
 	setGenericOptionsDefaults(&opts)
 	return &Generic{
 		synced:                    make(chan struct{}),
-		bucketClassByName:         map[string]*iri.BucketClass{},
-		bucketClassByCapabilities: map[capabilities][]*iri.BucketClass{},
+		bucketClassByName:         map[string]*sri.BucketClass{},
+		bucketClassByCapabilities: map[capabilities][]*sri.BucketClass{},
 		bucketRuntime:             runtime,
 		relistPeriod:              opts.RelistPeriod,
 	}

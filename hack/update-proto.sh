@@ -33,14 +33,14 @@ function generate() {
   export PATH="$PATH:$(dirname "$PROTOC_GEN_GOGO")"
   echo "Generating ${blue}$package${normal}"
   protoc \
-    --proto_path "./github.com/ironcore-dev/ironcore/$package" \
+    --proto_path "./spheric.cloud/spheric/$package" \
     --proto_path "$VIRTUAL_GOPATH/src" \
     --gogo_out=plugins=grpc:"$VIRTUAL_GOPATH/src" \
-    "./github.com/ironcore-dev/ironcore/$package/api.proto"
+    "./spheric.cloud/spheric/$package/api.proto"
   )
 }
 
-generate "iri/apis/meta/v1alpha1"
-generate "iri/apis/machine/v1alpha1"
-generate "iri/apis/volume/v1alpha1"
-generate "iri/apis/bucket/v1alpha1"
+generate "sri/apis/meta/v1alpha1"
+generate "sri/apis/machine/v1alpha1"
+generate "sri/apis/volume/v1alpha1"
+generate "sri/apis/bucket/v1alpha1"

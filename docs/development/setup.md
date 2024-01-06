@@ -10,11 +10,11 @@
 
 ## Clone the Repository
 
-To bring up and start locally the `ironcore` project for development purposes you first need to clone the repository.
+To bring up and start locally the `spheric` project for development purposes you first need to clone the repository.
 
 ```shell
-git clone git@github.com:ironcore-dev/ironcore.git
-cd ironcore
+git clone git@github.com:spheric-cloud/spheric.git
+cd spheric
 ```
 
 ## Install cert-manager
@@ -27,7 +27,7 @@ kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/
 
 ## Install APIs into the Cluster
 
-Your Kubernetes API server needs to know about the APIs which come with the `ironcore` project. To install the APIs
+Your Kubernetes API server needs to know about the APIs which come with the `spheric` project. To install the APIs
 your cluster, run
 
 ```shell
@@ -78,7 +78,7 @@ have been regenerated.
 ## Setup formatting tools
 
 The project uses `gofmt` and `goimports` for formatting. `gofmt` is used with default settings. While `goimports` should
-be used with `--local github.com/ironcore-dev` flag, so that `goimports` would sort `ironcore` pkgs separately.
+be used with `--local github.com/spheric-cloud` flag, so that `goimports` would sort `spheric` pkgs separately.
 
 You can automate running formatting tools in your IDE.
 
@@ -87,12 +87,12 @@ You can automate running formatting tools in your IDE.
 ```
     "go.formatTool": "goimports",
     "gopls": {
-        "formatting.local": "github.com/ironcore-dev",
+        "formatting.local": "github.com/spheric-cloud",
     },
 ```
 
 - **Goland** -- go to `File -> Settings -> Tools -> File Watchers` and replace contents of `Arguments`
-  with `--local github.com/ironcore -w $FilePath$`
+  with `--local github.com/spheric -w $FilePath$`
 
 ## Cleanup
 

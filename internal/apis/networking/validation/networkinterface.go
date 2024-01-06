@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -6,14 +8,14 @@ package validation
 import (
 	"fmt"
 
-	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
-	"github.com/ironcore-dev/ironcore/internal/apis/ipam"
-	ipamvalidation "github.com/ironcore-dev/ironcore/internal/apis/ipam/validation"
-	"github.com/ironcore-dev/ironcore/internal/apis/networking"
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	sphericvalidation "spheric.cloud/spheric/internal/api/validation"
+	"spheric.cloud/spheric/internal/apis/ipam"
+	ipamvalidation "spheric.cloud/spheric/internal/apis/ipam/validation"
+	"spheric.cloud/spheric/internal/apis/networking"
 )
 
 // ValidateNetworkInterface validates a network interface object.
@@ -54,7 +56,7 @@ func validateNetworkInterfaceSpec(spec *networking.NetworkInterfaceSpec, nicMeta
 		}
 	}
 
-	allErrs = append(allErrs, ironcorevalidation.ValidateIPFamilies(spec.IPFamilies, fldPath.Child("ipFamilies"))...)
+	allErrs = append(allErrs, sphericvalidation.ValidateIPFamilies(spec.IPFamilies, fldPath.Child("ipFamilies"))...)
 
 	if len(spec.IPFamilies) != len(spec.IPs) {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("ips"), spec.IPFamilies, "ip families must match ips"))
@@ -206,7 +208,7 @@ func validateNetworkInterfaceSpecUpdate(newSpec, oldSpec *networking.NetworkInte
 	oldSpecCopy.Prefixes = newSpec.Prefixes
 	oldSpecCopy.MachineRef = newSpec.MachineRef
 	oldSpecCopy.VirtualIP = newSpec.VirtualIP
-	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableFieldWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)
+	allErrs = append(allErrs, sphericvalidation.ValidateImmutableFieldWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)
 
 	return allErrs
 }

@@ -28,7 +28,7 @@ spec:
         runAsNonRoot: true
       containers:
         - command:
-            - /ironcore-controller-manager
+            - /controller-manager
           args:
             - --leader-elect
             - --controllers=*

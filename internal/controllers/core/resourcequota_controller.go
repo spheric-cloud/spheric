@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -9,9 +11,6 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/controller-utils/metautils"
-	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
-	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
-	"github.com/ironcore-dev/ironcore/utils/quota"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -22,6 +21,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
+	sphericclient "spheric.cloud/spheric/utils/client"
+	"spheric.cloud/spheric/utils/quota"
 )
 
 type ResourceQuotaReconciler struct {
@@ -31,16 +33,16 @@ type ResourceQuotaReconciler struct {
 	Registry  quota.Registry
 }
 
-//+kubebuilder:rbac:groups=core.ironcore.dev,resources=resourcequotas,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=core.ironcore.dev,resources=resourcequotas/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=core.ironcore.dev,resources=resourcequotas/finalizers,verbs=update
+//+kubebuilder:rbac:groups=core.spheric.cloud,resources=resourcequotas,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=core.spheric.cloud,resources=resourcequotas/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=core.spheric.cloud,resources=resourcequotas/finalizers,verbs=update
 
 //+kubebuilder:rbac:groups="",resources=namespaces,verbs=get;list;watch;update;patch
 
-//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machines,verbs=get;list;watch
-//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machineclasses,verbs=get;list;watch
-//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumes,verbs=get;list;watch
-//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumeclasses,verbs=get;list;watch
+//+kubebuilder:rbac:groups=compute.spheric.cloud,resources=machines,verbs=get;list;watch
+//+kubebuilder:rbac:groups=compute.spheric.cloud,resources=machineclasses,verbs=get;list;watch
+//+kubebuilder:rbac:groups=storage.spheric.cloud,resources=volumes,verbs=get;list;watch
+//+kubebuilder:rbac:groups=storage.spheric.cloud,resources=volumeclasses,verbs=get;list;watch
 
 func (r *ResourceQuotaReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
@@ -202,7 +204,7 @@ func (r *ResourceQuotaReconciler) enqueueResourceQuotasByNamespace() handler.Eve
 			}
 		}()
 
-		return ironcoreclient.ReconcileRequestsFromObjectStructSlice(resourceQuotaList.Items)
+		return sphericclient.ReconcileRequestsFromObjectStructSlice(resourceQuotaList.Items)
 	})
 }
 

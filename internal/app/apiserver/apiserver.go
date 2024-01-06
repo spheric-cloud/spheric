@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -9,25 +11,6 @@ import (
 	"net"
 	"time"
 
-	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
-	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
-	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	"github.com/ironcore-dev/ironcore/client-go/informers"
-	clientset "github.com/ironcore-dev/ironcore/client-go/ironcore"
-	ironcoreopenapi "github.com/ironcore-dev/ironcore/client-go/openapi"
-	ironcoreinitializer "github.com/ironcore-dev/ironcore/internal/admission/initializer"
-	"github.com/ironcore-dev/ironcore/internal/admission/plugin/machinevolumedevices"
-	"github.com/ironcore-dev/ironcore/internal/admission/plugin/resourcequota"
-	"github.com/ironcore-dev/ironcore/internal/admission/plugin/volumeresizepolicy"
-	"github.com/ironcore-dev/ironcore/internal/api"
-	"github.com/ironcore-dev/ironcore/internal/apis/compute"
-	"github.com/ironcore-dev/ironcore/internal/apiserver"
-	"github.com/ironcore-dev/ironcore/internal/machinepoollet/client"
-	"github.com/ironcore-dev/ironcore/internal/quota/evaluator/ironcore"
-	apiequality "github.com/ironcore-dev/ironcore/utils/equality"
-	"github.com/ironcore-dev/ironcore/utils/quota"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"k8s.io/apimachinery/pkg/api/equality"
@@ -43,9 +26,28 @@ import (
 	serverstorage "k8s.io/apiserver/pkg/server/storage"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	netutils "k8s.io/utils/net"
+	computev1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
+	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
+	ipamv1alpha1 "spheric.cloud/spheric/api/ipam/v1alpha1"
+	networkingv1alpha1 "spheric.cloud/spheric/api/networking/v1alpha1"
+	storagev1alpha1 "spheric.cloud/spheric/api/storage/v1alpha1"
+	"spheric.cloud/spheric/client-go/informers"
+	sphericopenapi "spheric.cloud/spheric/client-go/openapi"
+	clientset "spheric.cloud/spheric/client-go/spheric"
+	sphericinitializer "spheric.cloud/spheric/internal/admission/initializer"
+	"spheric.cloud/spheric/internal/admission/plugin/machinevolumedevices"
+	"spheric.cloud/spheric/internal/admission/plugin/resourcequota"
+	"spheric.cloud/spheric/internal/admission/plugin/volumeresizepolicy"
+	"spheric.cloud/spheric/internal/api"
+	"spheric.cloud/spheric/internal/apis/compute"
+	"spheric.cloud/spheric/internal/apiserver"
+	"spheric.cloud/spheric/internal/machinepoollet/client"
+	"spheric.cloud/spheric/internal/quota/evaluator/spheric"
+	apiequality "spheric.cloud/spheric/utils/equality"
+	"spheric.cloud/spheric/utils/quota"
 )
 
-const defaultEtcdPathPrefix = "/registry/ironcore.dev"
+const defaultEtcdPathPrefix = "/registry/spheric.cloud"
 
 func init() {
 	utilruntime.Must(apiequality.AddFuncs(equality.Semantic))
@@ -63,14 +65,14 @@ func NewResourceConfig() *serverstorage.ResourceConfig {
 	return cfg
 }
 
-type IronCoreAPIServerOptions struct {
+type SphericAPIServerOptions struct {
 	RecommendedOptions   *genericoptions.RecommendedOptions
 	MachinePoolletConfig client.MachinePoolletClientConfig
 
 	SharedInformerFactory informers.SharedInformerFactory
 }
 
-func (o *IronCoreAPIServerOptions) AddFlags(fs *pflag.FlagSet) {
+func (o *SphericAPIServerOptions) AddFlags(fs *pflag.FlagSet) {
 	o.RecommendedOptions.AddFlags(fs)
 
 	// machinepoollet related flags:
@@ -90,8 +92,8 @@ func (o *IronCoreAPIServerOptions) AddFlags(fs *pflag.FlagSet) {
 		"Path to a cert file for the certificate authority.")
 }
 
-func NewIronCoreAPIServerOptions() *IronCoreAPIServerOptions {
-	o := &IronCoreAPIServerOptions{
+func NewSphericAPIServerOptions() *SphericAPIServerOptions {
+	o := &SphericAPIServerOptions{
 		RecommendedOptions: genericoptions.NewRecommendedOptions(
 			defaultEtcdPathPrefix,
 			api.Codecs.LegacyCodec(
@@ -130,11 +132,11 @@ func NewIronCoreAPIServerOptions() *IronCoreAPIServerOptions {
 	return o
 }
 
-func NewCommandStartIronCoreAPIServer(ctx context.Context, defaults *IronCoreAPIServerOptions) *cobra.Command {
+func NewCommandStartSphericAPIServer(ctx context.Context, defaults *SphericAPIServerOptions) *cobra.Command {
 	o := *defaults
 	cmd := &cobra.Command{
-		Short: "Launch an ironcoreAPI server",
-		Long:  "Launch an ironcoreAPI server",
+		Short: "Launch an sphericAPI server",
+		Long:  "Launch an sphericAPI server",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := o.Complete(); err != nil {
 				return err
@@ -155,13 +157,13 @@ func NewCommandStartIronCoreAPIServer(ctx context.Context, defaults *IronCoreAPI
 	return cmd
 }
 
-func (o *IronCoreAPIServerOptions) Validate(args []string) error {
+func (o *SphericAPIServerOptions) Validate(args []string) error {
 	var errors []error
 	errors = append(errors, o.RecommendedOptions.Validate()...)
 	return utilerrors.NewAggregate(errors)
 }
 
-func (o *IronCoreAPIServerOptions) Complete() error {
+func (o *SphericAPIServerOptions) Complete() error {
 	machinevolumedevices.Register(o.RecommendedOptions.Admission.Plugins)
 	resourcequota.Register(o.RecommendedOptions.Admission.Plugins)
 	volumeresizepolicy.Register(o.RecommendedOptions.Admission.Plugins)
@@ -176,7 +178,7 @@ func (o *IronCoreAPIServerOptions) Complete() error {
 	return nil
 }
 
-func (o *IronCoreAPIServerOptions) Config() (*apiserver.Config, error) {
+func (o *SphericAPIServerOptions) Config() (*apiserver.Config, error) {
 	if err := o.RecommendedOptions.SecureServing.MaybeDefaultWithSelfSignedCerts("localhost", nil, []net.IP{netutils.ParseIPSloppy("127.0.0.1")}); err != nil {
 		return nil, fmt.Errorf("error creating self-signed certificates: %w", err)
 	}
@@ -184,20 +186,20 @@ func (o *IronCoreAPIServerOptions) Config() (*apiserver.Config, error) {
 	o.RecommendedOptions.Etcd.StorageConfig.Paging = utilfeature.DefaultFeatureGate.Enabled(features.APIListChunking)
 
 	o.RecommendedOptions.ExtraAdmissionInitializers = func(c *genericapiserver.RecommendedConfig) ([]admission.PluginInitializer, error) {
-		ironcoreClient, err := clientset.NewForConfig(c.LoopbackClientConfig)
+		sphericClient, err := clientset.NewForConfig(c.LoopbackClientConfig)
 		if err != nil {
 			return nil, err
 		}
 
-		informerFactory := informers.NewSharedInformerFactory(ironcoreClient, c.LoopbackClientConfig.Timeout)
+		informerFactory := informers.NewSharedInformerFactory(sphericClient, c.LoopbackClientConfig.Timeout)
 		o.SharedInformerFactory = informerFactory
 
 		quotaRegistry := quota.NewRegistry(api.Scheme)
-		if err := quota.AddAllToRegistry(quotaRegistry, ironcore.NewEvaluatorsForAdmission(ironcoreClient, informerFactory)); err != nil {
+		if err := quota.AddAllToRegistry(quotaRegistry, spheric.NewEvaluatorsForAdmission(sphericClient, informerFactory)); err != nil {
 			return nil, fmt.Errorf("error initializing quota registry: %w", err)
 		}
 
-		genericInitializer := ironcoreinitializer.New(ironcoreClient, informerFactory, quotaRegistry)
+		genericInitializer := sphericinitializer.New(sphericClient, informerFactory, quotaRegistry)
 
 		return []admission.PluginInitializer{
 			genericInitializer,
@@ -206,13 +208,13 @@ func (o *IronCoreAPIServerOptions) Config() (*apiserver.Config, error) {
 
 	serverConfig := genericapiserver.NewRecommendedConfig(api.Codecs)
 
-	serverConfig.OpenAPIConfig = genericapiserver.DefaultOpenAPIConfig(ironcoreopenapi.GetOpenAPIDefinitions, openapi.NewDefinitionNamer(api.Scheme))
-	serverConfig.OpenAPIConfig.Info.Title = "ironcore-api"
+	serverConfig.OpenAPIConfig = genericapiserver.DefaultOpenAPIConfig(sphericopenapi.GetOpenAPIDefinitions, openapi.NewDefinitionNamer(api.Scheme))
+	serverConfig.OpenAPIConfig.Info.Title = "spheric-api"
 	serverConfig.OpenAPIConfig.Info.Version = "0.1"
 
 	if utilfeature.DefaultFeatureGate.Enabled(features.OpenAPIV3) {
-		serverConfig.OpenAPIV3Config = genericapiserver.DefaultOpenAPIV3Config(ironcoreopenapi.GetOpenAPIDefinitions, openapi.NewDefinitionNamer(api.Scheme))
-		serverConfig.OpenAPIV3Config.Info.Title = "ironcore-api"
+		serverConfig.OpenAPIV3Config = genericapiserver.DefaultOpenAPIV3Config(sphericopenapi.GetOpenAPIDefinitions, openapi.NewDefinitionNamer(api.Scheme))
+		serverConfig.OpenAPIV3Config.Info.Title = "spheric-api"
 		serverConfig.OpenAPIV3Config.Info.Version = "0.1"
 	}
 
@@ -238,7 +240,7 @@ func (o *IronCoreAPIServerOptions) Config() (*apiserver.Config, error) {
 	return config, nil
 }
 
-func (o *IronCoreAPIServerOptions) Run(ctx context.Context) error {
+func (o *SphericAPIServerOptions) Run(ctx context.Context) error {
 	config, err := o.Config()
 	if err != nil {
 		return err
@@ -249,7 +251,7 @@ func (o *IronCoreAPIServerOptions) Run(ctx context.Context) error {
 		return err
 	}
 
-	server.GenericAPIServer.AddPostStartHookOrDie("start-ironcore-api-server-informers", func(context genericapiserver.PostStartHookContext) error {
+	server.GenericAPIServer.AddPostStartHookOrDie("start-spheric-api-server-informers", func(context genericapiserver.PostStartHookContext) error {
 		config.GenericConfig.SharedInformerFactory.Start(context.StopCh)
 		o.SharedInformerFactory.Start(context.StopCh)
 		return nil

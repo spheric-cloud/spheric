@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -8,12 +10,6 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
-	"github.com/ironcore-dev/ironcore/poollet/irievent"
-	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
-	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -22,12 +18,18 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/source"
+	storagev1alpha1 "spheric.cloud/spheric/api/storage/v1alpha1"
+	"spheric.cloud/spheric/poollet/srievent"
+	volumepoolletv1alpha1 "spheric.cloud/spheric/poollet/volumepoollet/api/v1alpha1"
+	srimeta "spheric.cloud/spheric/sri/apis/meta/v1alpha1"
+	sri "spheric.cloud/spheric/sri/apis/volume/v1alpha1"
+	sphericclient "spheric.cloud/spheric/utils/client"
 )
 
 type VolumeAnnotatorReconciler struct {
 	client.Client
 
-	VolumeEvents irievent.Source[*iri.Volume]
+	VolumeEvents srievent.Source[*sri.Volume]
 }
 
 func (r *VolumeAnnotatorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -38,14 +40,14 @@ func (r *VolumeAnnotatorReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 		},
 	}
 
-	if err := ironcoreclient.PatchAddReconcileAnnotation(ctx, r.Client, volume); client.IgnoreNotFound(err) != nil {
+	if err := sphericclient.PatchAddReconcileAnnotation(ctx, r.Client, volume); client.IgnoreNotFound(err) != nil {
 		return ctrl.Result{}, fmt.Errorf("error patching volume: %w", err)
 	}
 	return ctrl.Result{}, nil
 }
 
-func volumeAnnotatorEventHandler[O irimeta.Object](log logr.Logger, c chan<- event.GenericEvent) irievent.HandlerFuncs[O] {
-	handleEvent := func(obj irimeta.Object) {
+func volumeAnnotatorEventHandler[O srimeta.Object](log logr.Logger, c chan<- event.GenericEvent) srievent.HandlerFuncs[O] {
+	handleEvent := func(obj srimeta.Object) {
 		namespace, ok := obj.GetMetadata().Labels[volumepoolletv1alpha1.VolumeNamespaceLabel]
 		if !ok {
 			return
@@ -70,17 +72,17 @@ func volumeAnnotatorEventHandler[O irimeta.Object](log logr.Logger, c chan<- eve
 		}
 	}
 
-	return irievent.HandlerFuncs[O]{
-		CreateFunc: func(event irievent.CreateEvent[O]) {
+	return srievent.HandlerFuncs[O]{
+		CreateFunc: func(event srievent.CreateEvent[O]) {
 			handleEvent(event.Object)
 		},
-		UpdateFunc: func(event irievent.UpdateEvent[O]) {
+		UpdateFunc: func(event srievent.UpdateEvent[O]) {
 			handleEvent(event.ObjectNew)
 		},
-		DeleteFunc: func(event irievent.DeleteEvent[O]) {
+		DeleteFunc: func(event srievent.DeleteEvent[O]) {
 			handleEvent(event.Object)
 		},
-		GenericFunc: func(event irievent.GenericEvent[O]) {
+		GenericFunc: func(event srievent.GenericEvent[O]) {
 			handleEvent(event.Object)
 		},
 	}
@@ -94,7 +96,7 @@ func (r *VolumeAnnotatorReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		return err
 	}
 
-	src, err := r.iriVolumeEventSource(mgr)
+	src, err := r.sriVolumeEventSource(mgr)
 	if err != nil {
 		return err
 	}
@@ -106,19 +108,19 @@ func (r *VolumeAnnotatorReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return nil
 }
 
-func (r *VolumeAnnotatorReconciler) iriVolumeEventSource(mgr ctrl.Manager) (source.Source, error) {
+func (r *VolumeAnnotatorReconciler) sriVolumeEventSource(mgr ctrl.Manager) (source.Source, error) {
 	ch := make(chan event.GenericEvent, 1024)
 
 	if err := mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
-		log := ctrl.LoggerFrom(ctx).WithName("volumeannotator").WithName("irieventhandlers")
+		log := ctrl.LoggerFrom(ctx).WithName("volumeannotator").WithName("srieventhandlers")
 
-		registrationFuncs := []func() (irievent.HandlerRegistration, error){
-			func() (irievent.HandlerRegistration, error) {
-				return r.VolumeEvents.AddHandler(volumeAnnotatorEventHandler[*iri.Volume](log, ch))
+		registrationFuncs := []func() (srievent.HandlerRegistration, error){
+			func() (srievent.HandlerRegistration, error) {
+				return r.VolumeEvents.AddHandler(volumeAnnotatorEventHandler[*sri.Volume](log, ch))
 			},
 		}
 
-		var handles []irievent.HandlerRegistration
+		var handles []srievent.HandlerRegistration
 		defer func() {
 			log.V(1).Info("Removing handles")
 			for _, handle := range handles {

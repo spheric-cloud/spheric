@@ -24,28 +24,22 @@ jobs:
     strategy:
       matrix:
         image:
-        - name: ironcore-controller-manager
-          target: manager
-        - name: ironcore-apiserver
+        - name: controller-manager
+          target: controller-manager
+        - name: apiserver
           target: apiserver
-        - name: ironcore-machinepoollet
+        - name: machinepoollet
           target: machinepoollet
-        - name: ironcore-machinebroker
-          target: machinebroker
-        - name: ironcore-irictl-machine
-          target: irictl-machine
-        - name: ironcore-volumepoollet
+        - name: srictl-machine
+          target: srictl-machine
+        - name: volumepoollet
           target: volumepoollet
-        - name: ironcore-volumebroker
-          target: volumebroker
-        - name: ironcore-irictl-volume
-          target: irictl-volume
-        - name: ironcore-bucketpoollet
+        - name: srictl-volume
+          target: srictl-volume
+        - name: bucketpoollet
           target: bucketpoollet
-        - name: ironcore-bucketbroker
-          target: bucketbroker
-        - name: ironcore-irictl-bucket
-          target: irictl-bucket
+        - name: srictl-bucket
+          target: srictl-bucket
     permissions:
       contents: read
       packages: write

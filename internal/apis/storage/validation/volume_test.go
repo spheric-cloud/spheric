@@ -1,20 +1,22 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
 package validation_test
 
 import (
-	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
-	"github.com/ironcore-dev/ironcore/internal/apis/core"
-	"github.com/ironcore-dev/ironcore/internal/apis/storage"
-	. "github.com/ironcore-dev/ironcore/internal/apis/storage/validation"
-	. "github.com/ironcore-dev/ironcore/internal/testutils/validation"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	commonv1alpha1 "spheric.cloud/spheric/api/common/v1alpha1"
+	"spheric.cloud/spheric/internal/apis/core"
+	"spheric.cloud/spheric/internal/apis/storage"
+	. "spheric.cloud/spheric/internal/apis/storage/validation"
+	. "spheric.cloud/spheric/internal/testutils/validation"
 )
 
 var _ = Describe("Volume", func() {

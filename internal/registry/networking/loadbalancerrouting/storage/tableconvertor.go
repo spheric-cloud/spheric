@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -6,12 +8,12 @@ package storage
 import (
 	"context"
 
-	"github.com/ironcore-dev/ironcore/internal/apis/networking"
-	"github.com/ironcore-dev/ironcore/internal/tableconvertor"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/meta/table"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"spheric.cloud/spheric/internal/apis/networking"
+	"spheric.cloud/spheric/internal/tableconvertor"
 )
 
 type convertor struct{}

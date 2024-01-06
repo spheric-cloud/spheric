@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,10 +12,6 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/ironcore-dev/ironcore/internal/api"
-	"github.com/ironcore-dev/ironcore/internal/apis/compute"
-	"github.com/ironcore-dev/ironcore/internal/apis/compute/validation"
-	"github.com/ironcore-dev/ironcore/internal/machinepoollet/client"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
@@ -25,6 +23,10 @@ import (
 	"k8s.io/apiserver/pkg/storage/names"
 	"k8s.io/client-go/tools/cache"
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
+	"spheric.cloud/spheric/internal/api"
+	"spheric.cloud/spheric/internal/apis/compute"
+	"spheric.cloud/spheric/internal/apis/compute/validation"
+	"spheric.cloud/spheric/internal/machinepoollet/client"
 )
 
 func GetAttrs(obj runtime.Object) (labels.Set, fields.Set, error) {
@@ -135,7 +137,7 @@ var StatusStrategy = machineStatusStrategy{Strategy}
 
 func (machineStatusStrategy) GetResetFields() map[fieldpath.APIVersion]*fieldpath.Set {
 	return map[fieldpath.APIVersion]*fieldpath.Set{
-		"compute.ironcore.dev/v1alpha1": fieldpath.NewSet(
+		"compute.spheric.cloud/v1alpha1": fieldpath.NewSet(
 			fieldpath.MakePathOrDie("spec"),
 		),
 	}
@@ -187,7 +189,7 @@ func ExecLocation(
 	loc := &url.URL{
 		Scheme: machinePoolInfo.Scheme,
 		Host:   net.JoinHostPort(machinePoolInfo.Hostname, machinePoolInfo.Port),
-		Path:   fmt.Sprintf("/apis/compute.ironcore.dev/namespaces/%s/machines/%s/exec", machine.Namespace, machine.Name),
+		Path:   fmt.Sprintf("/apis/compute.spheric.cloud/namespaces/%s/machines/%s/exec", machine.Namespace, machine.Name),
 	}
 	transport := machinePoolInfo.Transport
 	if opts.InsecureSkipTLSVerifyBackend {

@@ -1,8 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: ironcore-system
-  name: ironcore-controller-manager
+  namespace: spheric-system
+  name: spheric-controller-manager
 spec:
   template:
     spec:

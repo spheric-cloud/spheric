@@ -2,20 +2,17 @@
 CONTROLLER_IMG ?= controller:latest
 APISERVER_IMG ?= apiserver:latest
 MACHINEPOOLLET_IMG ?= machinepoollet:latest
-MACHINEBROKER_IMG ?= machinebroker:latest
-IRICTL_MACHINE_IMG ?= irictl-machine:latest
+SRICTL_MACHINE_IMG ?= srictl-machine:latest
 VOLUMEPOOLLET_IMG ?= volumepoollet:latest
-VOLUMEBROKER_IMG ?= volumebroker:latest
-IRICTL_VOLUME_IMG ?= irictl-volume:latest
+SRICTL_VOLUME_IMG ?= srictl-volume:latest
 BUCKETPOOLLET_IMG ?= bucketpoollet:latest
-BUCKETBROKER_IMG ?= bucketbroker:latest
-IRICTL_BUCKET_IMG ?= irictl-bucket:latest
+SRICTL_BUCKET_IMG ?= srictl-bucket:latest
 
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
 ENVTEST_K8S_VERSION = 1.28.0
 
 # Docker image name for the mkdocs based local development setup
-IMAGE=ironcore/documentation
+IMAGE=spheric/documentation
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
@@ -53,33 +50,29 @@ help: ## Display this help.
 ##@ Development
 
 .PHONY: manifests
-FILE="config/machinepoollet-broker/broker-rbac/role.yaml"
 manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
-	# ironcore-controller-manager
+	# controller-manager
 	$(CONTROLLER_GEN) rbac:roleName=manager-role webhook paths="./internal/controllers/...;./api/..." output:rbac:artifacts:config=config/controller/rbac
 
-	# machinepoollet-broker
+	# machinepoollet
 	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./poollet/machinepoollet/controllers/..." output:rbac:artifacts:config=config/machinepoollet-broker/poollet-rbac
-	$(CONTROLLER_GEN) rbac:roleName=broker-role paths="./broker/machinebroker/..." output:rbac:artifacts:config=config/machinepoollet-broker/broker-rbac
 	./hack/replace.sh config/machinepoollet-broker/broker-rbac/role.yaml 's/ClusterRole/Role/g'
 
 	# volumepoollet-broker
 	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./poollet/volumepoollet/controllers/..." output:rbac:artifacts:config=config/volumepoollet-broker/poollet-rbac
-	$(CONTROLLER_GEN) rbac:roleName=broker-role paths="./broker/volumebroker/..." output:rbac:artifacts:config=config/volumepoollet-broker/broker-rbac
 	./hack/replace.sh config/volumepoollet-broker/broker-rbac/role.yaml 's/ClusterRole/Role/g'
 
 	# bucketpoollet-broker
 	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./poollet/bucketpoollet/controllers/..." output:rbac:artifacts:config=config/bucketpoollet-broker/poollet-rbac
-	$(CONTROLLER_GEN) rbac:roleName=broker-role paths="./broker/bucketbroker/..." output:rbac:artifacts:config=config/bucketpoollet-broker/broker-rbac
 	./hack/replace.sh config/bucketpoollet-broker/broker-rbac/role.yaml 's/ClusterRole/Role/g'
 
 	# poollet system roles
 	cp config/machinepoollet-broker/poollet-rbac/role.yaml config/apiserver/rbac/machinepool_role.yaml
-	./hack/replace.sh config/apiserver/rbac/machinepool_role.yaml 's/manager-role/compute.ironcore.dev:system:machinepools/g'
+	./hack/replace.sh config/apiserver/rbac/machinepool_role.yaml 's/manager-role/compute.spheric.cloud:system:machinepools/g'
 	cp config/volumepoollet-broker/poollet-rbac/role.yaml config/apiserver/rbac/volumepool_role.yaml
-	./hack/replace.sh config/apiserver/rbac/volumepool_role.yaml 's/manager-role/storage.ironcore.dev:system:volumepools/g'
+	./hack/replace.sh config/apiserver/rbac/volumepool_role.yaml 's/manager-role/storage.spheric.cloud:system:volumepools/g'
 	cp config/bucketpoollet-broker/poollet-rbac/role.yaml config/apiserver/rbac/bucketpool_role.yaml
-	./hack/replace.sh config/apiserver/rbac/bucketpool_role.yaml 's/manager-role/storage.ironcore.dev:system:bucketpools/g'
+	./hack/replace.sh config/apiserver/rbac/bucketpool_role.yaml 's/manager-role/storage.spheric.cloud:system:bucketpools/g'
 
 .PHONY: generate
 generate: vgopath models-schema deepcopy-gen client-gen lister-gen informer-gen defaulter-gen conversion-gen openapi-gen applyconfiguration-gen
@@ -100,7 +93,7 @@ proto: goimports vgopath protoc-gen-gogo
 	VGOPATH=$(VGOPATH) \
 	PROTOC_GEN_GOGO=$(PROTOC_GEN_GOGO) \
 	./hack/update-proto.sh
-	$(GOIMPORTS) -w ./iri
+	$(GOIMPORTS) -w ./sri
 
 .PHONY: fmt
 fmt: goimports ## Run goimports against code.
@@ -119,7 +112,7 @@ clean: ## Clean any artifacts that can be regenerated.
 	rm -rf client-go/applyconfigurations
 	rm -rf client-go/informers
 	rm -rf client-go/listers
-	rm -rf client-go/ironcore
+	rm -rf client-go/spheric
 	rm -rf client-go/openapi
 
 .PHONY: add-license
@@ -128,7 +121,7 @@ add-license: addlicense ## Add license headers to all go files.
 
 .PHONY: check-license
 check-license: addlicense ## Check that every file has a license header present.
-	find . -name '*.go' -exec $(ADDLICENSE) -check -c 'IronCore authors' {} +
+	find . -name '*.go' -exec $(ADDLICENSE) -check -c 'Spheric authors' {} +
 
 .PHONY: check
 check: generate manifests add-license fmt lint test # Generate manifests, code, lint, add licenses, test
@@ -149,7 +142,7 @@ start-docs: ## Start the local mkdocs based development environment.
 
 .PHONY: clean-docs
 clean-docs: ## Remove all local mkdocs Docker images (cleanup).
-	docker container prune --force --filter "label=project=ironcore_documentation"
+	docker container prune --force --filter "label=project=spheric_documentation"
 
 .PHONY: test
 test: manifests generate fmt vet test-only ## Run tests.
@@ -158,10 +151,10 @@ test: manifests generate fmt vet test-only ## Run tests.
 test-only: envtest ## Run *only* the tests - no generation, linting etc.
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" go test ./... -coverprofile cover.out
 
-.PHONY: openapi-extractor
+.PHONY: extract-openapi
 extract-openapi: envtest openapi-extractor
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" $(OPENAPI_EXTRACTOR) \
-		--apiserver-package="github.com/ironcore-dev/ironcore/cmd/ironcore-apiserver" \
+		--apiserver-package="spheric.cloud/spheric/cmd/spheric-apiserver" \
 		--apiserver-build-opts=mod \
 		--apiservices="./config/apiserver/apiservice/bases" \
 		--output="./gen"
@@ -170,62 +163,50 @@ extract-openapi: envtest openapi-extractor
 
 .PHONY: build
 build: generate fmt vet ## Build manager binary.
-	go build -o bin/manager ./cmd/ironcore-controller-manager
+	go build -o bin/manager ./cmd/spheric-controller-manager
 
 .PHONY: run
 run: manifests generate fmt vet ## Run a controller from your host.
-	go run ./cmd/ironcore-controller-manager
+	go run ./cmd/spheric-controller-manager
 
 .PHONY: docker-build
 docker-build: \
-	docker-build-ironcore-apiserver docker-build-ironcore-controller-manager \
-	docker-build-machinepoollet docker-build-machinebroker docker-build-irictl-machine \
-	docker-build-volumepoollet docker-build-volumebroker docker-build-irictl-volume \
-	docker-build-bucketpoollet docker-build-bucketbroker docker-build-irictl-bucket ## Build docker image with the manager.
+	docker-build-spheric-apiserver docker-build-spheric-controller-manager \
+	docker-build-machinepoollet docker-build-srictl-machine \
+	docker-build-volumepoollet docker-build-srictl-volume \
+	docker-build-bucketpoollet docker-build-srictl-bucket ## Build docker image with the manager.
 
-.PHONY: docker-build-ironcore-apiserver
-docker-build-ironcore-apiserver: ## Build ironcore-apiserver.
+.PHONY: docker-build-spheric-apiserver
+docker-build-spheric-apiserver: ## Build apiserver.
 	docker build --target apiserver -t ${APISERVER_IMG} .
 
-.PHONY: docker-build-ironcore-controller-manager
-docker-build-ironcore-controller-manager: ## Build ironcore-controller-manager.
+.PHONY: docker-build-spheric-controller-manager
+docker-build-spheric-controller-manager: ## Build controller-manager.
 	docker build --target manager -t ${CONTROLLER_IMG} .
 
 .PHONY: docker-build-machinepoollet
 docker-build-machinepoollet: ## Build machinepoollet image.
 	docker build --target machinepoollet -t ${MACHINEPOOLLET_IMG} .
 
-.PHONY: docker-build-machinebroker
-docker-build-machinebroker: ## Build machinebroker image.
-	docker build --target machinebroker -t ${MACHINEBROKER_IMG} .
-
-.PHONY: docker-build-irictl-machine
-docker-build-irictl-machine: ## Build irictl-machine image.
-	docker build --target irictl-machine -t ${IRICTL_MACHINE_IMG} .
+.PHONY: docker-build-srictl-machine
+docker-build-srictl-machine: ## Build srictl-machine image.
+	docker build --target srictl-machine -t ${SRICTL_MACHINE_IMG} .
 
 .PHONY: docker-build-volumepoollet
 docker-build-volumepoollet: ## Build volumepoollet image.
 	docker build --target volumepoollet -t ${VOLUMEPOOLLET_IMG} .
 
-.PHONY: docker-build-volumebroker
-docker-build-volumebroker: ## Build volumebroker image.
-	docker build --target volumebroker -t ${VOLUMEBROKER_IMG} .
-
-.PHONY: docker-build-irictl-volume
-docker-build-irictl-volume: ## Build irictl-volume image.
-	docker build --target irictl-volume -t ${IRICTL_VOLUME_IMG} .
+.PHONY: docker-build-srictl-volume
+docker-build-srictl-volume: ## Build srictl-volume image.
+	docker build --target srictl-volume -t ${SRICTL_VOLUME_IMG} .
 
 .PHONY: docker-build-bucketpoollet
 docker-build-bucketpoollet: ## Build bucketpoollet image.
 	docker build --target bucketpoollet -t ${BUCKETPOOLLET_IMG} .
 
-.PHONY: docker-build-bucketbroker
-docker-build-bucketbroker: ## Build bucketbroker image.
-	docker build --target bucketbroker -t ${BUCKETBROKER_IMG} .
-
-.PHONY: docker-build-irictl-bucket
-docker-build-irictl-bucket: ## Build irictl-bucket image.
-	docker build --target irictl-bucket -t ${IRICTL_BUCKET_IMG} .
+.PHONY: docker-build-srictl-bucket
+docker-build-srictl-bucket: ## Build srictl-bucket image.
+	docker build --target srictl-bucket -t ${SRICTL_BUCKET_IMG} .
 
 .PHONY: docker-push
 docker-push: ## Push docker image with the manager.
@@ -277,36 +258,24 @@ kind-load-controller: ## Load the controller image into the kind cluster.
 kind-load-machinepoollet:
 	kind load docker-image ${MACHINEPOOLLET_IMG}
 
-.PHONY: kind-load-machinebroker
-kind-load-machinebroker:
-	kind load docker-image ${MACHINEBROKER_IMG}
-
 .PHONY: kind-load-volumepoollet
 kind-load-volumepoollet:
 	kind load docker-image ${VOLUMEPOOLLET_IMG}
 
-.PHONY: kind-load-volumebroker
-kind-load-volumebroker:
-	kind load docker-image ${VOLUMEBROKER_IMG}
-
 .PHONY: kind-load-bucketpoollet
 kind-load-bucketpoollet:
 	kind load docker-image ${BUCKETPOOLLET_IMG}
-
-.PHONY: kind-load-bucketbroker
-kind-load-bucketbroker:
-	kind load docker-image ${BUCKETBROKER_IMG}
 
 .PHONY: kind-load
 kind-load: kind-load-apiserver kind-load-controller ## Load the apiserver and controller in kind.
 
 .PHONY: kind-restart-apiserver
 kind-restart-apiserver: ## Restart the apiserver in kind. Useless if the manifests are not in place (deployed e.g. via kind-apply / kind-deploy).
-	kubectl -n ironcore-system delete rs -l control-plane=apiserver
+	kubectl -n spheric-system delete rs -l control-plane=apiserver
 
 .PHONY: kind-restart-controller
 kind-restart-controller: ## Restart the controller in kind. Useless if the manifests are not in place (deployed e.g. via kind-apply / kind-deploy).
-	kubectl -n ironcore-system delete rs -l control-plane=controller-manager
+	kubectl -n spheric-system delete rs -l control-plane=controller-manager
 
 .PHONY: kind-restart
 kind-restart: kind-restart-apiserver kind-restart-controller ## Restart the apiserver and controller in kind. Restart is useless if the manifests are not in place (deployed e.g. via kind-apply / kind-deploy).
@@ -475,7 +444,7 @@ $(PROTOC_GEN_GOGO): $(LOCALBIN)
 .PHONY: models-schema
 models-schema: $(MODELS_SCHEMA) ## Install models-schema locally if necessary.
 $(MODELS_SCHEMA): $(LOCALBIN)
-	test -s $(LOCALBIN)/models-schema || GOBIN=$(LOCALBIN) go install github.com/ironcore-dev/ironcore/models-schema
+	test -s $(LOCALBIN)/models-schema || GOBIN=$(LOCALBIN) go install spheric.cloud/spheric/models-schema
 
 .PHONY: goimports
 goimports: $(GOIMPORTS) ## Download goimports locally if necessary.

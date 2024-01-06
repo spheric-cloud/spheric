@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -6,13 +8,13 @@ package machinevolumedevices_test
 import (
 	"context"
 
-	. "github.com/ironcore-dev/ironcore/internal/admission/plugin/machinevolumedevices"
-	"github.com/ironcore-dev/ironcore/internal/apis/compute"
-	"github.com/ironcore-dev/ironcore/internal/apis/storage"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apiserver/pkg/admission"
+	. "spheric.cloud/spheric/internal/admission/plugin/machinevolumedevices"
+	"spheric.cloud/spheric/internal/apis/compute"
+	"spheric.cloud/spheric/internal/apis/storage"
 )
 
 var _ = Describe("Admission", func() {

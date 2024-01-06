@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -16,7 +18,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	. "github.com/ironcore-dev/ironcore/utils/certificate"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	certificatesv1 "k8s.io/api/certificates/v1"
@@ -25,12 +26,13 @@ import (
 	certutil "k8s.io/client-go/util/cert"
 	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	. "spheric.cloud/spheric/utils/certificate"
 )
 
 var _ = Describe("Rotator", func() {
 	It("should rotate the certificates", func(ctx SpecContext) {
 		By("creating a new rotator")
-		signerName := "ironcore.dev/test-signer"
+		signerName := "spheric.cloud/test-signer"
 		r, err := NewRotator(RotatorOptions{
 			Name: "my-signer",
 			NewClient: func(cert *tls.Certificate) (client.WithWatch, error) {

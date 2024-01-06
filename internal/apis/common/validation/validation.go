@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -6,10 +8,10 @@ package validation
 import (
 	"fmt"
 
-	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
-	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	commonv1alpha1 "spheric.cloud/spheric/api/common/v1alpha1"
+	sphericvalidation "spheric.cloud/spheric/internal/api/validation"
 )
 
 func ValidateIPPrefix(ipFamily corev1.IPFamily, ipPrefix commonv1alpha1.IPPrefix, fldPath *field.Path) field.ErrorList {
@@ -18,7 +20,7 @@ func ValidateIPPrefix(ipFamily corev1.IPFamily, ipPrefix commonv1alpha1.IPPrefix
 	if !ipPrefix.IsValid() {
 		allErrs = append(allErrs, field.Invalid(fldPath, ipPrefix, "must specify a valid prefix"))
 	} else {
-		if !ironcorevalidation.IsSupportedIPFamily(ipFamily) {
+		if !sphericvalidation.IsSupportedIPFamily(ipFamily) {
 			allErrs = append(allErrs, field.Invalid(fldPath, ipPrefix, "cannot determine ip family for prefix"))
 		} else if ipFamily != ipPrefix.IP().Family() {
 			allErrs = append(allErrs, field.Invalid(fldPath, ipPrefix, fmt.Sprintf("expected ip family %s but got %s", ipFamily, ipPrefix.IP().Family())))
@@ -34,7 +36,7 @@ func ValidateIP(ipFamily corev1.IPFamily, ip commonv1alpha1.IP, fldPath *field.P
 	if !ip.IsValid() {
 		allErrs = append(allErrs, field.Invalid(fldPath, ip, "must specify a valid ip"))
 	} else {
-		if !ironcorevalidation.IsSupportedIPFamily(ipFamily) {
+		if !sphericvalidation.IsSupportedIPFamily(ipFamily) {
 			allErrs = append(allErrs, field.Invalid(fldPath, ip, "cannot determine ip family for ipo"))
 		} else if ipFamily != ip.Family() {
 			allErrs = append(allErrs, field.Invalid(fldPath, ip, fmt.Sprintf("expected ip family %s but got %s", ipFamily, ip.Family())))

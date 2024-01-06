@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -6,10 +8,10 @@ package addresses_test
 import (
 	"os"
 
-	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	. "github.com/ironcore-dev/ironcore/poollet/machinepoollet/addresses"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	computev1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
+	. "spheric.cloud/spheric/poollet/machinepoollet/addresses"
 )
 
 var _ = Describe("Addresses", func() {

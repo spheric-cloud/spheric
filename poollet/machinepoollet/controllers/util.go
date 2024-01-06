@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -7,39 +9,39 @@ import (
 	"fmt"
 	"strconv"
 
-	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
-	"github.com/ironcore-dev/ironcore/utils/generic"
-	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
+	sri "spheric.cloud/spheric/sri/apis/machine/v1alpha1"
+	"spheric.cloud/spheric/utils/generic"
+	utilslices "spheric.cloud/spheric/utils/slices"
 )
 
-func FindNewIRINetworkInterfaces(desiredIRINics, existingIRINics []*iri.NetworkInterface) []*iri.NetworkInterface {
+func FindNewSRINetworkInterfaces(desiredSRINics, existingSRINics []*sri.NetworkInterface) []*sri.NetworkInterface {
 	var (
-		existingIRINicNames = utilslices.ToSetFunc(existingIRINics, (*iri.NetworkInterface).GetName)
-		newIRINics          []*iri.NetworkInterface
+		existingSRINicNames = utilslices.ToSetFunc(existingSRINics, (*sri.NetworkInterface).GetName)
+		newSRINics          []*sri.NetworkInterface
 	)
-	for _, desiredIRINic := range desiredIRINics {
-		if existingIRINicNames.Has(desiredIRINic.Name) {
+	for _, desiredSRINic := range desiredSRINics {
+		if existingSRINicNames.Has(desiredSRINic.Name) {
 			continue
 		}
 
-		newIRINics = append(newIRINics, desiredIRINic)
+		newSRINics = append(newSRINics, desiredSRINic)
 	}
-	return newIRINics
+	return newSRINics
 }
 
-func FindNewIRIVolumes(desiredIRIVolumes, existingIRIVolumes []*iri.Volume) []*iri.Volume {
+func FindNewSRIVolumes(desiredSRIVolumes, existingSRIVolumes []*sri.Volume) []*sri.Volume {
 	var (
-		existingIRIVolumeNames = utilslices.ToSetFunc(existingIRIVolumes, (*iri.Volume).GetName)
-		newIRIVolumes          []*iri.Volume
+		existingSRIVolumeNames = utilslices.ToSetFunc(existingSRIVolumes, (*sri.Volume).GetName)
+		newSRIVolumes          []*sri.Volume
 	)
-	for _, desiredIRIVolume := range desiredIRIVolumes {
-		if existingIRIVolumeNames.Has(desiredIRIVolume.Name) {
+	for _, desiredSRIVolume := range desiredSRIVolumes {
+		if existingSRIVolumeNames.Has(desiredSRIVolume.Name) {
 			continue
 		}
 
-		newIRIVolumes = append(newIRIVolumes, desiredIRIVolume)
+		newSRIVolumes = append(newSRIVolumes, desiredSRIVolume)
 	}
-	return newIRIVolumes
+	return newSRIVolumes
 }
 
 func parseInt64(s string) (int64, error) {

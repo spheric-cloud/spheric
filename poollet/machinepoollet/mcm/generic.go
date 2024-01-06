@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -11,13 +13,13 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/gogo/protobuf/proto"
-	"github.com/ironcore-dev/ironcore/iri/apis/machine"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
-	"github.com/ironcore-dev/ironcore/poollet/irievent"
 	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"spheric.cloud/spheric/poollet/srievent"
+	"spheric.cloud/spheric/sri/apis/machine"
+	sri "spheric.cloud/spheric/sri/apis/machine/v1alpha1"
 )
 
 type capabilities struct {
@@ -25,10 +27,10 @@ type capabilities struct {
 	memoryBytes int64
 }
 
-func getCapabilities(iriCaps *iri.MachineClassCapabilities) capabilities {
+func getCapabilities(sriCaps *sri.MachineClassCapabilities) capabilities {
 	return capabilities{
-		cpuMillis:   iriCaps.CpuMillis,
-		memoryBytes: iriCaps.MemoryBytes,
+		cpuMillis:   sriCaps.CpuMillis,
+		memoryBytes: sriCaps.MemoryBytes,
 	}
 }
 
@@ -40,15 +42,15 @@ type Generic struct {
 
 	listener sets.Set[*listener]
 
-	machineClassByName         map[string]*iri.MachineClassStatus
-	machineClassByCapabilities map[capabilities][]*iri.MachineClassStatus
+	machineClassByName         map[string]*sri.MachineClassStatus
+	machineClassByCapabilities map[capabilities][]*sri.MachineClassStatus
 
 	machineRuntime machine.RuntimeService
 
 	relistPeriod time.Duration
 }
 
-func (g *Generic) AddListener(handler irievent.Listener) (irievent.ListenerRegistration, error) {
+func (g *Generic) AddListener(handler srievent.Listener) (srievent.ListenerRegistration, error) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 
@@ -61,7 +63,7 @@ func (g *Generic) AddListener(handler irievent.Listener) (irievent.ListenerRegis
 	}, nil
 }
 
-func (g *Generic) RemoveListener(listener irievent.ListenerRegistration) error {
+func (g *Generic) RemoveListener(listener srievent.ListenerRegistration) error {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 
@@ -75,7 +77,7 @@ func (g *Generic) RemoveListener(listener irievent.ListenerRegistration) error {
 	return nil
 }
 
-func shouldNotify(oldMachineClassByName map[string]*iri.MachineClassStatus, class *iri.MachineClassStatus) bool {
+func shouldNotify(oldMachineClassByName map[string]*sri.MachineClassStatus, class *sri.MachineClassStatus) bool {
 	oldMachineClass, ok := oldMachineClassByName[class.MachineClass.Name]
 	if !ok {
 		return true
@@ -86,7 +88,7 @@ func shouldNotify(oldMachineClassByName map[string]*iri.MachineClassStatus, clas
 
 func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
 	log.V(1).Info("Relisting machine classes")
-	res, err := g.machineRuntime.Status(ctx, &iri.StatusRequest{})
+	res, err := g.machineRuntime.Status(ctx, &sri.StatusRequest{})
 	if err != nil {
 		return fmt.Errorf("error listing machine classes: %w", err)
 	}
@@ -147,7 +149,7 @@ func (g *Generic) Start(ctx context.Context) error {
 	return nil
 }
 
-func (g *Generic) GetMachineClassFor(ctx context.Context, name string, caps *iri.MachineClassCapabilities) (*iri.MachineClass, int64, error) {
+func (g *Generic) GetMachineClassFor(ctx context.Context, name string, caps *sri.MachineClassCapabilities) (*sri.MachineClass, int64, error) {
 	g.mu.RLock()
 	defer g.mu.RUnlock()
 
@@ -194,8 +196,8 @@ func NewGeneric(runtime machine.RuntimeService, opts GenericOptions) MachineClas
 	setGenericOptionsDefaults(&opts)
 	return &Generic{
 		synced:                     make(chan struct{}),
-		machineClassByName:         map[string]*iri.MachineClassStatus{},
-		machineClassByCapabilities: map[capabilities][]*iri.MachineClassStatus{},
+		machineClassByName:         map[string]*sri.MachineClassStatus{},
+		machineClassByCapabilities: map[capabilities][]*sri.MachineClassStatus{},
 		listener:                   sets.New[*listener](),
 		machineRuntime:             runtime,
 		relistPeriod:               opts.RelistPeriod,
@@ -203,7 +205,7 @@ func NewGeneric(runtime machine.RuntimeService, opts GenericOptions) MachineClas
 }
 
 type listener struct {
-	irievent.Listener
+	srievent.Listener
 }
 
 type listenerRegistration struct {

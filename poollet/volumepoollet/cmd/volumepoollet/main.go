@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -6,8 +8,8 @@ package main
 import (
 	"os"
 
-	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/cmd/volumepoollet/app"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"spheric.cloud/spheric/poollet/volumepoollet/cmd/volumepoollet/app"
 )
 
 func main() {

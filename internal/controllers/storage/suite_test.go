@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,13 +12,6 @@ import (
 	"time"
 
 	"github.com/ironcore-dev/controller-utils/buildutils"
-	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
-	computeclient "github.com/ironcore-dev/ironcore/internal/client/compute"
-	storageclient "github.com/ironcore-dev/ironcore/internal/client/storage"
-	"github.com/ironcore-dev/ironcore/internal/controllers/storage/scheduler"
-	utilsenvtest "github.com/ironcore-dev/ironcore/utils/envtest"
-	"github.com/ironcore-dev/ironcore/utils/envtest/apiserver"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/record"
@@ -24,10 +19,16 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 	metricserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
+	computev1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
+	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
+	computeclient "spheric.cloud/spheric/internal/client/compute"
+	storageclient "spheric.cloud/spheric/internal/client/storage"
+	"spheric.cloud/spheric/internal/controllers/storage/scheduler"
+	utilsenvtest "spheric.cloud/spheric/utils/envtest"
+	"spheric.cloud/spheric/utils/envtest/apiserver"
 
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	storagev1alpha1 "spheric.cloud/spheric/api/storage/v1alpha1"
 
-	. "github.com/ironcore-dev/ironcore/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -36,6 +37,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	. "spheric.cloud/spheric/utils/testing"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -97,7 +99,7 @@ var _ = BeforeSuite(func() {
 	komega.SetClient(k8sClient)
 
 	apiSrv, err := apiserver.New(cfg, apiserver.Options{
-		MainPath:     "github.com/ironcore-dev/ironcore/cmd/ironcore-apiserver",
+		MainPath:     "spheric.cloud/spheric/cmd/apiserver",
 		BuildOptions: []buildutils.BuildOption{buildutils.ModModeMod},
 		ETCDServers:  []string{testEnv.ControlPlane.Etcd.URL.String()},
 		Host:         testEnvExt.APIServiceInstallOptions.LocalServingHost,

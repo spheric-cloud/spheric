@@ -1,6 +1,6 @@
 FROM squidfunk/mkdocs-material:latest
 
-LABEL project=ironcore_documentation
+LABEL project=spheric_documentation
 
 WORKDIR /docs
 

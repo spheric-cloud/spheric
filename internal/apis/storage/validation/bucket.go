@@ -1,14 +1,16 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
 package validation
 
 import (
-	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
-	"github.com/ironcore-dev/ironcore/internal/apis/storage"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	sphericvalidation "spheric.cloud/spheric/internal/api/validation"
+	"spheric.cloud/spheric/internal/apis/storage"
 )
 
 func ValidateBucket(bucket *storage.Bucket) field.ErrorList {
@@ -66,8 +68,8 @@ func ValidateBucketUpdate(newBucket, oldBucket *storage.Bucket) field.ErrorList 
 func validateBucketSpecUpdate(newSpec, oldSpec *storage.BucketSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableField(newSpec.BucketClassRef, oldSpec.BucketClassRef, fldPath.Child("bucketClassRef"))...)
-	allErrs = append(allErrs, ironcorevalidation.ValidateSetOnceField(newSpec.BucketPoolRef, oldSpec.BucketPoolRef, fldPath.Child("bucketPoolRef"))...)
+	allErrs = append(allErrs, sphericvalidation.ValidateImmutableField(newSpec.BucketClassRef, oldSpec.BucketClassRef, fldPath.Child("bucketClassRef"))...)
+	allErrs = append(allErrs, sphericvalidation.ValidateSetOnceField(newSpec.BucketPoolRef, oldSpec.BucketPoolRef, fldPath.Child("bucketPoolRef"))...)
 
 	return allErrs
 }

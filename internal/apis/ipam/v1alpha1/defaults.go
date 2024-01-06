@@ -1,12 +1,14 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
 package v1alpha1
 
 import (
-	"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"spheric.cloud/spheric/api/ipam/v1alpha1"
 )
 
 func addDefaultingFuncs(scheme *runtime.Scheme) error {

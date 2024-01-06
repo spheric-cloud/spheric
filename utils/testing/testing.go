@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,8 +12,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ironcore-dev/ironcore/utils/generic"
-	"github.com/ironcore-dev/ironcore/utils/klog"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 	"github.com/onsi/gomega/gcustom"
@@ -19,6 +19,8 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"spheric.cloud/spheric/utils/generic"
+	"spheric.cloud/spheric/utils/klog"
 )
 
 type DelegatingContext struct {

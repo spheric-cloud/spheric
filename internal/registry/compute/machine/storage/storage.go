@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -9,9 +11,6 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/ironcore-dev/ironcore/internal/apis/compute"
-	"github.com/ironcore-dev/ironcore/internal/machinepoollet/client"
-	"github.com/ironcore-dev/ironcore/internal/registry/compute/machine"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/proxy"
@@ -20,6 +19,9 @@ import (
 	"k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/apiserver/pkg/storage"
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
+	"spheric.cloud/spheric/internal/apis/compute"
+	"spheric.cloud/spheric/internal/machinepoollet/client"
+	"spheric.cloud/spheric/internal/registry/compute/machine"
 )
 
 type MachineStorage struct {

@@ -1,21 +1,23 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
 package controllers_test
 
 import (
-	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
-	"github.com/ironcore-dev/ironcore/iri/testing/machine"
-	testingmachine "github.com/ironcore-dev/ironcore/iri/testing/machine"
-	"github.com/ironcore-dev/ironcore/utils/quota"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
+	computev1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
+	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
+	sri "spheric.cloud/spheric/sri/apis/machine/v1alpha1"
+	"spheric.cloud/spheric/sri/testing/machine"
+	testingmachine "spheric.cloud/spheric/sri/testing/machine"
+	"spheric.cloud/spheric/utils/quota"
 )
 
 var _ = Describe("MachinePoolController", func() {
@@ -40,10 +42,10 @@ var _ = Describe("MachinePoolController", func() {
 
 		srv.SetMachineClasses([]*testingmachine.FakeMachineClassStatus{
 			{
-				MachineClassStatus: iri.MachineClassStatus{
-					MachineClass: &iri.MachineClass{
+				MachineClassStatus: sri.MachineClassStatus{
+					MachineClass: &sri.MachineClass{
 						Name: machineClass.Name,
-						Capabilities: &iri.MachineClassCapabilities{
+						Capabilities: &sri.MachineClassCapabilities{
 							CpuMillis:   machineClass.Capabilities.CPU().MilliValue(),
 							MemoryBytes: machineClass.Capabilities.Memory().Value(),
 						},
@@ -52,10 +54,10 @@ var _ = Describe("MachinePoolController", func() {
 				},
 			},
 			{
-				MachineClassStatus: iri.MachineClassStatus{
-					MachineClass: &iri.MachineClass{
+				MachineClassStatus: sri.MachineClassStatus{
+					MachineClass: &sri.MachineClass{
 						Name: machineClass2.Name,
-						Capabilities: &iri.MachineClassCapabilities{
+						Capabilities: &sri.MachineClassCapabilities{
 							CpuMillis:   machineClass2.Capabilities.CPU().MilliValue(),
 							MemoryBytes: machineClass2.Capabilities.Memory().Value(),
 						},
@@ -147,10 +149,10 @@ var _ = Describe("MachinePoolController", func() {
 
 		srv.SetMachineClasses([]*machine.FakeMachineClassStatus{
 			{
-				MachineClassStatus: iri.MachineClassStatus{
-					MachineClass: &iri.MachineClass{
+				MachineClassStatus: sri.MachineClassStatus{
+					MachineClass: &sri.MachineClass{
 						Name: machineClass.Name,
-						Capabilities: &iri.MachineClassCapabilities{
+						Capabilities: &sri.MachineClassCapabilities{
 							CpuMillis:   machineClass.Capabilities.CPU().MilliValue(),
 							MemoryBytes: machineClass.Capabilities.Memory().Value(),
 						},
@@ -186,10 +188,10 @@ var _ = Describe("MachinePoolController", func() {
 
 		srv.SetMachineClasses([]*machine.FakeMachineClassStatus{
 			{
-				MachineClassStatus: iri.MachineClassStatus{
-					MachineClass: &iri.MachineClass{
+				MachineClassStatus: sri.MachineClassStatus{
+					MachineClass: &sri.MachineClass{
 						Name: machineClass.Name,
-						Capabilities: &iri.MachineClassCapabilities{
+						Capabilities: &sri.MachineClassCapabilities{
 							CpuMillis:   machineClass.Capabilities.CPU().MilliValue(),
 							MemoryBytes: machineClass.Capabilities.Memory().Value(),
 						},
@@ -197,10 +199,10 @@ var _ = Describe("MachinePoolController", func() {
 				},
 			},
 			{
-				MachineClassStatus: iri.MachineClassStatus{
-					MachineClass: &iri.MachineClass{
+				MachineClassStatus: sri.MachineClassStatus{
+					MachineClass: &sri.MachineClass{
 						Name: machineClass2.Name,
-						Capabilities: &iri.MachineClassCapabilities{
+						Capabilities: &sri.MachineClassCapabilities{
 							CpuMillis:   machineClass2.Capabilities.CPU().MilliValue(),
 							MemoryBytes: machineClass2.Capabilities.Memory().Value(),
 						},

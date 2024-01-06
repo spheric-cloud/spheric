@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -6,16 +8,16 @@ package compute
 import (
 	"context"
 
-	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
-	"github.com/ironcore-dev/ironcore/client-go/informers"
-	"github.com/ironcore-dev/ironcore/client-go/ironcore"
-	"github.com/ironcore-dev/ironcore/internal/quota/evaluator/generic"
-	utilsgeneric "github.com/ironcore-dev/ironcore/utils/generic"
-	"github.com/ironcore-dev/ironcore/utils/quota"
-	"github.com/ironcore-dev/ironcore/utils/quota/resourceaccess"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	computev1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
+	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
+	"spheric.cloud/spheric/client-go/informers"
+	"spheric.cloud/spheric/client-go/spheric"
+	"spheric.cloud/spheric/internal/quota/evaluator/generic"
+	utilsgeneric "spheric.cloud/spheric/utils/generic"
+	"spheric.cloud/spheric/utils/quota"
+	"spheric.cloud/spheric/utils/quota/resourceaccess"
 )
 
 func NewEvaluators(capabilities generic.CapabilitiesReader) []quota.Evaluator {
@@ -36,7 +38,7 @@ func NewClientMachineCapabilitiesReader(c client.Client) generic.CapabilitiesRea
 	)
 }
 
-func NewPrimeLRUMachineClassCapabilitiesReader(c ironcore.Interface, f informers.SharedInformerFactory) generic.CapabilitiesReader {
+func NewPrimeLRUMachineClassCapabilitiesReader(c spheric.Interface, f informers.SharedInformerFactory) generic.CapabilitiesReader {
 	getter := resourceaccess.NewPrimeLRUGetter[*computev1alpha1.MachineClass, string](
 		func(ctx context.Context, className string) (*computev1alpha1.MachineClass, error) {
 			return c.ComputeV1alpha1().MachineClasses().Get(ctx, className, metav1.GetOptions{})

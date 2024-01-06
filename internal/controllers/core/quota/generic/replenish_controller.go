@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -9,9 +11,6 @@ import (
 	"strings"
 
 	"github.com/go-logr/logr"
-	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
-	"github.com/ironcore-dev/ironcore/internal/controllers/core"
-	"github.com/ironcore-dev/ironcore/utils/quota"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -20,6 +19,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
+	"spheric.cloud/spheric/internal/controllers/core"
+	"spheric.cloud/spheric/utils/quota"
 )
 
 type ReplenishReconciler struct {

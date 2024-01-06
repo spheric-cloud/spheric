@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -6,17 +8,17 @@ package apiserver
 import (
 	"fmt"
 
-	"github.com/ironcore-dev/ironcore/internal/machinepoollet/client"
-	computerest "github.com/ironcore-dev/ironcore/internal/registry/compute/rest"
-	corerest "github.com/ironcore-dev/ironcore/internal/registry/core/rest"
-	ipamrest "github.com/ironcore-dev/ironcore/internal/registry/ipam/rest"
-	networkingrest "github.com/ironcore-dev/ironcore/internal/registry/networking/rest"
-	storagerest "github.com/ironcore-dev/ironcore/internal/registry/storage/rest"
 	"k8s.io/apimachinery/pkg/version"
 	"k8s.io/apiserver/pkg/registry/generic"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	serverstorage "k8s.io/apiserver/pkg/server/storage"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"spheric.cloud/spheric/internal/machinepoollet/client"
+	computerest "spheric.cloud/spheric/internal/registry/compute/rest"
+	corerest "spheric.cloud/spheric/internal/registry/core/rest"
+	ipamrest "spheric.cloud/spheric/internal/registry/ipam/rest"
+	networkingrest "spheric.cloud/spheric/internal/registry/networking/rest"
+	storagerest "spheric.cloud/spheric/internal/registry/storage/rest"
 )
 
 var (
@@ -35,8 +37,8 @@ type Config struct {
 	ExtraConfig   ExtraConfig
 }
 
-// IronCoreAPIServer contains state for a Kubernetes cluster master/api server.
-type IronCoreAPIServer struct {
+// SphericAPIServer contains state for a Kubernetes cluster master/api server.
+type SphericAPIServer struct {
 	GenericAPIServer *genericapiserver.GenericAPIServer
 }
 
@@ -70,14 +72,14 @@ type RESTStorageProvider interface {
 	NewRESTStorage(apiResourceConfigSource serverstorage.APIResourceConfigSource, restOptionsGetter generic.RESTOptionsGetter) (genericapiserver.APIGroupInfo, bool, error)
 }
 
-// New returns a new instance of IronCoreAPIServer from the given config.
-func (c completedConfig) New() (*IronCoreAPIServer, error) {
+// New returns a new instance of SphericAPIServer from the given config.
+func (c completedConfig) New() (*SphericAPIServer, error) {
 	genericServer, err := c.GenericConfig.New("sample-apiserver", genericapiserver.NewEmptyDelegate())
 	if err != nil {
 		return nil, err
 	}
 
-	s := &IronCoreAPIServer{
+	s := &SphericAPIServer{
 		GenericAPIServer: genericServer,
 	}
 

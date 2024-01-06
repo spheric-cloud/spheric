@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -15,8 +17,6 @@ import (
 	"time"
 
 	"github.com/ironcore-dev/controller-utils/conditionutils"
-	"github.com/ironcore-dev/ironcore/utils/envtest/internal/testing/addr"
-	"github.com/ironcore-dev/ironcore/utils/envtest/internal/testing/certs"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -30,6 +30,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
+	"spheric.cloud/spheric/utils/envtest/internal/testing/addr"
+	"spheric.cloud/spheric/utils/envtest/internal/testing/certs"
 )
 
 const (
@@ -310,7 +312,7 @@ func (o *APIServiceInstallOptions) Stop() error {
 	return nil
 }
 
-const fieldOwner = client.FieldOwner("envtest.ironcore.ironcore.dev")
+const fieldOwner = client.FieldOwner("envtest.spheric.spheric.cloud")
 
 func (o *APIServerInstallOptions) ApplyAPIServices(cfg *rest.Config) error {
 	ctx := context.TODO()

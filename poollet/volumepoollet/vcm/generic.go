@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -11,13 +13,13 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/gogo/protobuf/proto"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
-	"github.com/ironcore-dev/ironcore/poollet/irievent"
 	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"spheric.cloud/spheric/poollet/srievent"
+	sri "spheric.cloud/spheric/sri/apis/volume/v1alpha1"
 )
 
 type capabilities struct {
@@ -25,10 +27,10 @@ type capabilities struct {
 	iops int64
 }
 
-func getCapabilities(iriCaps *iri.VolumeClassCapabilities) capabilities {
+func getCapabilities(sriCaps *sri.VolumeClassCapabilities) capabilities {
 	return capabilities{
-		tps:  iriCaps.Tps,
-		iops: iriCaps.Iops,
+		tps:  sriCaps.Tps,
+		iops: sriCaps.Iops,
 	}
 }
 
@@ -40,15 +42,15 @@ type Generic struct {
 
 	listener sets.Set[*listener]
 
-	volumeClassByName         map[string]*iri.VolumeClassStatus
-	volumeClassByCapabilities map[capabilities][]*iri.VolumeClassStatus
+	volumeClassByName         map[string]*sri.VolumeClassStatus
+	volumeClassByCapabilities map[capabilities][]*sri.VolumeClassStatus
 
-	volumeRuntime iri.VolumeRuntimeClient
+	volumeRuntime sri.VolumeRuntimeClient
 
 	relistPeriod time.Duration
 }
 
-func (g *Generic) AddListener(handler irievent.Listener) (irievent.ListenerRegistration, error) {
+func (g *Generic) AddListener(handler srievent.Listener) (srievent.ListenerRegistration, error) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 
@@ -61,7 +63,7 @@ func (g *Generic) AddListener(handler irievent.Listener) (irievent.ListenerRegis
 	}, nil
 }
 
-func (g *Generic) RemoveListener(listener irievent.ListenerRegistration) error {
+func (g *Generic) RemoveListener(listener srievent.ListenerRegistration) error {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 
@@ -75,7 +77,7 @@ func (g *Generic) RemoveListener(listener irievent.ListenerRegistration) error {
 	return nil
 }
 
-func shouldNotify(oldVolumeClassByName map[string]*iri.VolumeClassStatus, class *iri.VolumeClassStatus) bool {
+func shouldNotify(oldVolumeClassByName map[string]*sri.VolumeClassStatus, class *sri.VolumeClassStatus) bool {
 	oldVolumeClass, ok := oldVolumeClassByName[class.VolumeClass.Name]
 	if !ok {
 		return true
@@ -86,7 +88,7 @@ func shouldNotify(oldVolumeClassByName map[string]*iri.VolumeClassStatus, class 
 
 func (g *Generic) relist(ctx context.Context, log logr.Logger) error {
 	log.V(1).Info("Relisting volume classes")
-	res, err := g.volumeRuntime.Status(ctx, &iri.StatusRequest{})
+	res, err := g.volumeRuntime.Status(ctx, &sri.StatusRequest{})
 	if err != nil {
 		return fmt.Errorf("error listing volume classes: %w", err)
 	}
@@ -134,7 +136,7 @@ func (g *Generic) Start(ctx context.Context) error {
 	return nil
 }
 
-func (g *Generic) GetVolumeClassFor(ctx context.Context, name string, caps *iri.VolumeClassCapabilities) (*iri.VolumeClass, *resource.Quantity, error) {
+func (g *Generic) GetVolumeClassFor(ctx context.Context, name string, caps *sri.VolumeClassCapabilities) (*sri.VolumeClass, *resource.Quantity, error) {
 	g.mu.RLock()
 	defer g.mu.RUnlock()
 
@@ -177,12 +179,12 @@ func setGenericOptionsDefaults(o *GenericOptions) {
 	}
 }
 
-func NewGeneric(runtime iri.VolumeRuntimeClient, opts GenericOptions) VolumeClassMapper {
+func NewGeneric(runtime sri.VolumeRuntimeClient, opts GenericOptions) VolumeClassMapper {
 	setGenericOptionsDefaults(&opts)
 	return &Generic{
 		synced:                    make(chan struct{}),
-		volumeClassByName:         map[string]*iri.VolumeClassStatus{},
-		volumeClassByCapabilities: map[capabilities][]*iri.VolumeClassStatus{},
+		volumeClassByName:         map[string]*sri.VolumeClassStatus{},
+		volumeClassByCapabilities: map[capabilities][]*sri.VolumeClassStatus{},
 		listener:                  sets.New[*listener](),
 		volumeRuntime:             runtime,
 		relistPeriod:              opts.RelistPeriod,
@@ -190,7 +192,7 @@ func NewGeneric(runtime iri.VolumeRuntimeClient, opts GenericOptions) VolumeClas
 }
 
 type listener struct {
-	irievent.Listener
+	srievent.Listener
 }
 
 type listenerRegistration struct {

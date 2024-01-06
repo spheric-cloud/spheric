@@ -37,7 +37,7 @@ difference of not exposing the selected service to the public internet.
 
 ## Motivation
 
-In `ironcore`, we need to be able to make services highly available internally. Currently,
+In `spheric`, we need to be able to make services highly available internally. Currently,
 we can only allocate IP addresses for `NetworkInterface`s and target them, however, as soon as the
 backing `Machine` fails, the service would become unavailable.
 
@@ -73,7 +73,7 @@ flexibility with internal IPs as we have already with the `NetworkInterface` typ
 Example manifest:
 
 ```yaml
-apiVersion: networking.ironcore.dev/v1alpha1
+apiVersion: networking.spheric.cloud/v1alpha1
 kind: LoadBalancer
 metadata:
   name: my-loadbalancer

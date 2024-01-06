@@ -1,13 +1,15 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
 package install
 
 import (
-	"github.com/ironcore-dev/ironcore/internal/apis/ipam"
-	"github.com/ironcore-dev/ironcore/internal/apis/ipam/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"spheric.cloud/spheric/internal/apis/ipam"
+	"spheric.cloud/spheric/internal/apis/ipam/v1alpha1"
 )
 
 func Install(scheme *runtime.Scheme) {

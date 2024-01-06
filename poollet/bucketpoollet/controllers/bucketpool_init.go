@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -7,11 +9,11 @@ import (
 	"context"
 	"fmt"
 
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	bucketpoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/bucketpoollet/api/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	storagev1alpha1 "spheric.cloud/spheric/api/storage/v1alpha1"
+	bucketpoolletv1alpha1 "spheric.cloud/spheric/poollet/bucketpoollet/api/v1alpha1"
 )
 
 type BucketPoolInit struct {
@@ -24,7 +26,7 @@ type BucketPoolInit struct {
 	OnFailed      func(ctx context.Context, reason error) error
 }
 
-//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=bucketpools,verbs=get;list;create;update;patch
+//+kubebuilder:rbac:groups=storage.spheric.cloud,resources=bucketpools,verbs=get;list;create;update;patch
 
 func (i *BucketPoolInit) Start(ctx context.Context) error {
 	log := ctrl.LoggerFrom(ctx).WithName("bucketpool").WithName("init")

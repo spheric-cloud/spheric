@@ -1,8 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: ironcore-system
-  name: ironcore-apiserver
+  namespace: spheric-system
+  name: spheric-apiserver
 spec:
   template:
     spec:

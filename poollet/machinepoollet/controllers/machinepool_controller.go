@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -9,14 +11,6 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
-	computeclient "github.com/ironcore-dev/ironcore/internal/client/compute"
-	"github.com/ironcore-dev/ironcore/iri/apis/machine"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
-	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mcm"
-	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
-	"github.com/ironcore-dev/ironcore/utils/quota"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -24,6 +18,14 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	computev1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
+	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
+	computeclient "spheric.cloud/spheric/internal/client/compute"
+	"spheric.cloud/spheric/poollet/machinepoollet/mcm"
+	"spheric.cloud/spheric/sri/apis/machine"
+	sri "spheric.cloud/spheric/sri/apis/machine/v1alpha1"
+	sphericclient "spheric.cloud/spheric/utils/client"
+	"spheric.cloud/spheric/utils/quota"
 )
 
 type MachinePoolReconciler struct {
@@ -40,9 +42,9 @@ type MachinePoolReconciler struct {
 	MachineClassMapper mcm.MachineClassMapper
 }
 
-//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machinepools,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machinepools/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machineclasses,verbs=get;list;watch
+//+kubebuilder:rbac:groups=compute.spheric.cloud,resources=machinepools,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=compute.spheric.cloud,resources=machinepools/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=compute.spheric.cloud,resources=machineclasses,verbs=get;list;watch
 
 func (r *MachinePoolReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
@@ -67,13 +69,13 @@ func (r *MachinePoolReconciler) delete(ctx context.Context, log logr.Logger, mac
 	return ctrl.Result{}, nil
 }
 
-func (r *MachinePoolReconciler) supportsMachineClass(ctx context.Context, log logr.Logger, machineClass *computev1alpha1.MachineClass) (*iri.MachineClass, int64, error) {
-	iriCapabilities, err := getIRIMachineClassCapabilities(machineClass)
+func (r *MachinePoolReconciler) supportsMachineClass(ctx context.Context, log logr.Logger, machineClass *computev1alpha1.MachineClass) (*sri.MachineClass, int64, error) {
+	sriCapabilities, err := getSRIMachineClassCapabilities(machineClass)
 	if err != nil {
-		return nil, 0, fmt.Errorf("error getting iri mahchine class capabilities: %w", err)
+		return nil, 0, fmt.Errorf("error getting sri mahchine class capabilities: %w", err)
 	}
 
-	class, quantity, err := r.MachineClassMapper.GetMachineClassFor(ctx, machineClass.Name, iriCapabilities)
+	class, quantity, err := r.MachineClassMapper.GetMachineClassFor(ctx, machineClass.Name, sriCapabilities)
 	if err != nil {
 		if !errors.Is(err, mcm.ErrNoMatchingMachineClass) && !errors.Is(err, mcm.ErrAmbiguousMatchingMachineClass) {
 			return nil, 0, fmt.Errorf("error getting machine class for %s: %w", machineClass.Name, err)
@@ -145,7 +147,7 @@ func (r *MachinePoolReconciler) reconcile(ctx context.Context, log logr.Logger, 
 	log.V(1).Info("Reconcile")
 
 	log.V(1).Info("Ensuring no reconcile annotation")
-	modified, err := ironcoreclient.PatchEnsureNoReconcileAnnotation(ctx, r.Client, machinePool)
+	modified, err := sphericclient.PatchEnsureNoReconcileAnnotation(ctx, r.Client, machinePool)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error ensuring no reconcile annotation: %w", err)
 	}

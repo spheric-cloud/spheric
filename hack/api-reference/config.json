@@ -24,8 +24,8 @@
       "docsURLTemplate": "https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#{{lower .TypeIdentifier}}-{{arrIndex .PackageSegments -1}}-{{arrIndex .PackageSegments -2}}"
     },
     {
-      "typeMatchPrefix": "^github\\.com/ironcore-dev/ironcore/api/",
-      "docsURLTemplate": "../{{arrIndex .PackageSegments -2}}/#{{arrIndex .PackageSegments -2}}.ironcore.dev/{{arrIndex .PackageSegments -1}}.{{.TypeIdentifier}}"
+      "typeMatchPrefix": "^spheric\\.cloud/spheric/api/",
+      "docsURLTemplate": "../{{arrIndex .PackageSegments -2}}/#{{arrIndex .PackageSegments -2}}.spheric.cloud/{{arrIndex .PackageSegments -1}}.{{.TypeIdentifier}}"
     }
   ],
   "typeDisplayNamePrefixOverrides": {

@@ -1,13 +1,15 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
 package validation
 
 import (
-	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
-	"github.com/ironcore-dev/ironcore/internal/apis/core"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	sphericvalidation "spheric.cloud/spheric/internal/api/validation"
+	"spheric.cloud/spheric/internal/apis/core"
 )
 
 func ValidateResourceQuota(resourceQuota *core.ResourceQuota) field.ErrorList {
@@ -23,7 +25,7 @@ func validateResourceQuotaSpec(spec *core.ResourceQuotaSpec, fldPath *field.Path
 	var allErrs field.ErrorList
 
 	for name, quantity := range spec.Hard {
-		allErrs = append(allErrs, ironcorevalidation.ValidateNonNegativeQuantity(quantity, fldPath.Child("hard").Key(string(name)))...)
+		allErrs = append(allErrs, sphericvalidation.ValidateNonNegativeQuantity(quantity, fldPath.Child("hard").Key(string(name)))...)
 	}
 
 	return allErrs

@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -6,13 +8,13 @@ package validation
 import (
 	"fmt"
 
-	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
-	commonvalidation "github.com/ironcore-dev/ironcore/internal/apis/common/validation"
-	"github.com/ironcore-dev/ironcore/internal/apis/ipam"
-	"github.com/ironcore-dev/ironcore/utils/equality"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	sphericvalidation "spheric.cloud/spheric/internal/api/validation"
+	commonvalidation "spheric.cloud/spheric/internal/apis/common/validation"
+	"spheric.cloud/spheric/internal/apis/ipam"
+	"spheric.cloud/spheric/utils/equality"
 )
 
 func ValidatePrefixAllocation(prefixAllocation *ipam.PrefixAllocation) field.ErrorList {
@@ -80,7 +82,7 @@ func validatePrefixAllocationSpecUpdate(newSpec, oldSpec *ipam.PrefixAllocationS
 		oldSpecCopy.PrefixRef = newSpecCopy.PrefixRef
 	}
 
-	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableFieldWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)
+	allErrs = append(allErrs, sphericvalidation.ValidateImmutableFieldWithDiff(newSpecCopy, oldSpecCopy, fldPath)...)
 
 	return allErrs
 }

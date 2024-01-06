@@ -1,8 +1,10 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
 // Package v1alpha1 contains API Schema definitions for the common v1alpha1 API group
-// +groupName=core.ironcore.dev
+// +groupName=core.spheric.cloud
 package v1alpha1
 
 import (
@@ -13,7 +15,7 @@ import (
 
 var (
 	// SchemeGroupVersion is group version used to register these objects
-	SchemeGroupVersion = schema.GroupVersion{Group: "core.ironcore.dev", Version: "v1alpha1"}
+	SchemeGroupVersion = schema.GroupVersion{Group: "core.spheric.cloud", Version: "v1alpha1"}
 
 	// SchemeBuilder is used to add go types to the GroupVersionKind scheme
 	SchemeBuilder = runtime.NewSchemeBuilder(addKnownTypes)

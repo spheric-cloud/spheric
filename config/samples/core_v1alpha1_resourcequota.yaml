@@ -1,4 +1,4 @@
-apiVersion: core.ironcore.dev/v1alpha1
+apiVersion: core.spheric.cloud/v1alpha1
 kind: ResourceQuota
 metadata:
   name: resource-quota-sample

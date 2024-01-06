@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -11,17 +13,6 @@ import (
 	"time"
 
 	"github.com/ironcore-dev/controller-utils/configutils"
-	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
-	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	storageclient "github.com/ironcore-dev/ironcore/internal/client/storage"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
-	iriremotevolume "github.com/ironcore-dev/ironcore/iri/remote/volume"
-	"github.com/ironcore-dev/ironcore/poollet/irievent"
-	volumepoolletconfig "github.com/ironcore-dev/ironcore/poollet/volumepoollet/client/config"
-	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers"
-	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
-	"github.com/ironcore-dev/ironcore/utils/client/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"
@@ -33,6 +24,17 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
+	ipamv1alpha1 "spheric.cloud/spheric/api/ipam/v1alpha1"
+	networkingv1alpha1 "spheric.cloud/spheric/api/networking/v1alpha1"
+	storagev1alpha1 "spheric.cloud/spheric/api/storage/v1alpha1"
+	storageclient "spheric.cloud/spheric/internal/client/storage"
+	"spheric.cloud/spheric/poollet/srievent"
+	volumepoolletconfig "spheric.cloud/spheric/poollet/volumepoollet/client/config"
+	"spheric.cloud/spheric/poollet/volumepoollet/controllers"
+	"spheric.cloud/spheric/poollet/volumepoollet/vcm"
+	sri "spheric.cloud/spheric/sri/apis/volume/v1alpha1"
+	sriremotevolume "spheric.cloud/spheric/sri/remote/volume"
+	"spheric.cloud/spheric/utils/client/config"
 )
 
 var (
@@ -128,7 +130,7 @@ func Run(ctx context.Context, opts Options) error {
 		os.Exit(1)
 	}
 
-	endpoint, err := iriremotevolume.GetAddressWithTimeout(opts.VolumeRuntimeSocketDiscoveryTimeout, opts.VolumeRuntimeEndpoint)
+	endpoint, err := sriremotevolume.GetAddressWithTimeout(opts.VolumeRuntimeSocketDiscoveryTimeout, opts.VolumeRuntimeEndpoint)
 	if err != nil {
 		return fmt.Errorf("error detecting volume runtime endpoint: %w", err)
 	}
@@ -145,7 +147,7 @@ func Run(ctx context.Context, opts Options) error {
 		}
 	}()
 
-	volumeRuntime := iri.NewVolumeRuntimeClient(conn)
+	volumeRuntime := sri.NewVolumeRuntimeClient(conn)
 
 	cfg, configCtrl, err := getter.GetConfig(ctx, &opts.GetConfigOptions)
 	if err != nil {
@@ -165,7 +167,7 @@ func Run(ctx context.Context, opts Options) error {
 		Metrics:                 metricsserver.Options{BindAddress: opts.MetricsAddr},
 		HealthProbeBindAddress:  opts.ProbeAddr,
 		LeaderElection:          opts.EnableLeaderElection,
-		LeaderElectionID:        "dfffbeaa.ironcore.dev",
+		LeaderElectionID:        "dfffbeaa.spheric.cloud",
 		LeaderElectionNamespace: opts.LeaderElectionNamespace,
 		LeaderElectionConfig:    leaderElectionCfg,
 	})
@@ -181,13 +183,13 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error adding volume class mapper: %w", err)
 	}
 
-	volumeEvents := irievent.NewGenerator(func(ctx context.Context) ([]*iri.Volume, error) {
-		res, err := volumeRuntime.ListVolumes(ctx, &iri.ListVolumesRequest{})
+	volumeEvents := srievent.NewGenerator(func(ctx context.Context) ([]*sri.Volume, error) {
+		res, err := volumeRuntime.ListVolumes(ctx, &sri.ListVolumesRequest{})
 		if err != nil {
 			return nil, err
 		}
 		return res.Volumes, nil
-	}, irievent.GeneratorOptions{})
+	}, srievent.GeneratorOptions{})
 	if err := mgr.Add(volumeEvents); err != nil {
 		return fmt.Errorf("error adding volume event generator: %w", err)
 	}

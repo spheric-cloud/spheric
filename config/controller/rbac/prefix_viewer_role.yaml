@@ -5,7 +5,7 @@ metadata:
   name: prefix-viewer-role
 rules:
   - apiGroups:
-      - ipam.ironcore.dev
+      - ipam.spheric.cloud
     resources:
       - prefixes
     verbs:
@@ -13,7 +13,7 @@ rules:
       - list
       - watch
   - apiGroups:
-      - ipam.ironcore.dev
+      - ipam.spheric.cloud
     resources:
       - prefixes/status
     verbs:

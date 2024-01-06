@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -6,8 +8,6 @@ package storage
 import (
 	"context"
 
-	"github.com/ironcore-dev/ironcore/internal/apis/storage"
-	"github.com/ironcore-dev/ironcore/internal/registry/storage/volume"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apiserver/pkg/registry/generic"
@@ -15,6 +15,8 @@ import (
 	"k8s.io/apiserver/pkg/registry/rest"
 	apisrvstorage "k8s.io/apiserver/pkg/storage"
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
+	"spheric.cloud/spheric/internal/apis/storage"
+	"spheric.cloud/spheric/internal/registry/storage/volume"
 )
 
 type VolumeStorage struct {

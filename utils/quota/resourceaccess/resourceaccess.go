@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -7,22 +9,22 @@ import (
 	"context"
 	"time"
 
-	ironcoreutilruntime "github.com/ironcore-dev/ironcore/utils/runtime"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/utils/lru"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	sphericutilruntime "spheric.cloud/spheric/utils/runtime"
 )
 
-type liveLookupEntry[T ironcoreutilruntime.DeepCopier[T]] struct {
+type liveLookupEntry[T sphericutilruntime.DeepCopier[T]] struct {
 	expiry time.Time
 	item   T
 }
 
-type Getter[T ironcoreutilruntime.DeepCopier[T], K any] interface {
+type Getter[T sphericutilruntime.DeepCopier[T], K any] interface {
 	Get(ctx context.Context, key K) (T, error)
 }
 
-type liveCachedGetter[T ironcoreutilruntime.DeepCopier[T], K any] struct {
+type liveCachedGetter[T sphericutilruntime.DeepCopier[T], K any] struct {
 	getLive   func(ctx context.Context, key K) (T, error)
 	getCached func(ctx context.Context, key K) (T, error)
 
@@ -30,7 +32,7 @@ type liveCachedGetter[T ironcoreutilruntime.DeepCopier[T], K any] struct {
 	liveTTL         time.Duration
 }
 
-func NewPrimeLRUGetter[T ironcoreutilruntime.DeepCopier[T], K any](
+func NewPrimeLRUGetter[T sphericutilruntime.DeepCopier[T], K any](
 	getLive func(ctx context.Context, key K) (T, error),
 	getCached func(ctx context.Context, key K) (T, error),
 ) Getter[T, K] {
@@ -77,7 +79,7 @@ func (g *liveCachedGetter[T, K]) Get(ctx context.Context, key K) (T, error) {
 
 type Object[T any] interface {
 	client.Object
-	ironcoreutilruntime.DeepCopier[T]
+	sphericutilruntime.DeepCopier[T]
 }
 
 type clientGetter[T Object[T]] struct {

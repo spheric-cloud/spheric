@@ -2,10 +2,5 @@ resources:
 - manager.yaml
 - service.yaml
 
-configMapGenerator:
-- name: irictl-machine-config
-  files:
-  - config=irictl-machine-config.yaml
-
 generatorOptions:
   disableNameSuffixHash: true

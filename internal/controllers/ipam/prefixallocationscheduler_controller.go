@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -9,8 +11,6 @@ import (
 	"math/rand"
 
 	"github.com/go-logr/logr"
-	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
-	"github.com/ironcore-dev/ironcore/internal/client/ipam"
 	"go4.org/netipx"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -21,6 +21,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
+	ipamv1alpha1 "spheric.cloud/spheric/api/ipam/v1alpha1"
+	"spheric.cloud/spheric/internal/client/ipam"
 )
 
 type PrefixAllocationScheduler struct {
@@ -30,9 +32,9 @@ type PrefixAllocationScheduler struct {
 }
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
-//+kubebuilder:rbac:groups=ipam.ironcore.dev,resources=prefixes,verbs=get;list;watch
-//+kubebuilder:rbac:groups=ipam.ironcore.dev,resources=prefixallocations,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=ipam.ironcore.dev,resources=prefixallocations/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=ipam.spheric.cloud,resources=prefixes,verbs=get;list;watch
+//+kubebuilder:rbac:groups=ipam.spheric.cloud,resources=prefixallocations,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=ipam.spheric.cloud,resources=prefixallocations/status,verbs=get;update;patch
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.

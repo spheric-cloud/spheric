@@ -1,0 +1,9 @@
+metadata:
+  annotations:
+    foo: bar
+  labels:
+    bar: baz
+spec:
+  class: small
+  image:
+    image: ghcr.io/spheric-cloud/spheric-image/gardenlinux:latest

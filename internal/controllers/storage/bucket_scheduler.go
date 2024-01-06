@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -9,9 +11,6 @@ import (
 	"math/rand"
 
 	"github.com/go-logr/logr"
-	"github.com/ironcore-dev/ironcore/api/common/v1alpha1"
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	storageclient "github.com/ironcore-dev/ironcore/internal/client/storage"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -22,6 +21,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"spheric.cloud/spheric/api/common/v1alpha1"
+	storagev1alpha1 "spheric.cloud/spheric/api/storage/v1alpha1"
+	storageclient "spheric.cloud/spheric/internal/client/storage"
 )
 
 type BucketScheduler struct {
@@ -30,9 +32,9 @@ type BucketScheduler struct {
 }
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
-//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=buckets,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=buckets/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=bucketpools,verbs=get;list;watch
+//+kubebuilder:rbac:groups=storage.spheric.cloud,resources=buckets,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=storage.spheric.cloud,resources=buckets/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=storage.spheric.cloud,resources=bucketpools,verbs=get;list;watch
 
 // Reconcile reconciles the desired with the actual state.
 func (s *BucketScheduler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {

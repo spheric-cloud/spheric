@@ -1,24 +1,26 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
 package initializer
 
 import (
-	ironcoreinformers "github.com/ironcore-dev/ironcore/client-go/informers"
-	"github.com/ironcore-dev/ironcore/client-go/ironcore"
-	"github.com/ironcore-dev/ironcore/utils/quota"
 	"k8s.io/apiserver/pkg/admission"
+	sphericinformers "spheric.cloud/spheric/client-go/informers"
+	"spheric.cloud/spheric/client-go/spheric"
+	"spheric.cloud/spheric/utils/quota"
 )
 
 type initializer struct {
-	externalClient    ironcore.Interface
-	externalInformers ironcoreinformers.SharedInformerFactory
+	externalClient    spheric.Interface
+	externalInformers sphericinformers.SharedInformerFactory
 	quotaRegistry     quota.Registry
 }
 
 func New(
-	externalClient ironcore.Interface,
-	externalInformers ironcoreinformers.SharedInformerFactory,
+	externalClient spheric.Interface,
+	externalInformers sphericinformers.SharedInformerFactory,
 	quotaRegistry quota.Registry,
 ) admission.PluginInitializer {
 	return &initializer{
@@ -29,12 +31,12 @@ func New(
 }
 
 func (i *initializer) Initialize(plugin admission.Interface) {
-	if wants, ok := plugin.(WantsExternalIronCoreClientSet); ok {
-		wants.SetExternalIronCoreClientSet(i.externalClient)
+	if wants, ok := plugin.(WantsExternalSphericClientSet); ok {
+		wants.SetExternalSphericClientSet(i.externalClient)
 	}
 
 	if wants, ok := plugin.(WantsExternalInformers); ok {
-		wants.SetExternalIronCoreInformerFactory(i.externalInformers)
+		wants.SetExternalSphericInformerFactory(i.externalInformers)
 	}
 
 	if wants, ok := plugin.(WantsQuotaRegistry); ok {
@@ -42,13 +44,13 @@ func (i *initializer) Initialize(plugin admission.Interface) {
 	}
 }
 
-type WantsExternalIronCoreClientSet interface {
-	SetExternalIronCoreClientSet(client ironcore.Interface)
+type WantsExternalSphericClientSet interface {
+	SetExternalSphericClientSet(client spheric.Interface)
 	admission.InitializationValidator
 }
 
 type WantsExternalInformers interface {
-	SetExternalIronCoreInformerFactory(f ironcoreinformers.SharedInformerFactory)
+	SetExternalSphericInformerFactory(f sphericinformers.SharedInformerFactory)
 	admission.InitializationValidator
 }
 

@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,11 +12,11 @@ import (
 	"os"
 	"time"
 
-	"github.com/ironcore-dev/ironcore/utils/certificate"
 	utilnet "k8s.io/apimachinery/pkg/util/net"
 	"k8s.io/client-go/rest"
 	certutil "k8s.io/client-go/util/cert"
 	"k8s.io/client-go/util/connrotation"
+	"spheric.cloud/spheric/utils/certificate"
 )
 
 func ConfigWithCertificate(cfg *rest.Config, cert *tls.Certificate) (*rest.Config, error) {

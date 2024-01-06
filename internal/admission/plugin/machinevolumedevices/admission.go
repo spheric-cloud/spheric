@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -8,10 +10,10 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/ironcore-dev/ironcore/internal/admission/plugin/machinevolumedevices/device"
-	"github.com/ironcore-dev/ironcore/internal/apis/compute"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apiserver/pkg/admission"
+	"spheric.cloud/spheric/internal/admission/plugin/machinevolumedevices/device"
+	"spheric.cloud/spheric/internal/apis/compute"
 )
 
 // PluginName indicates name of admission plugin.
@@ -55,7 +57,7 @@ func (d *MachineVolumeDevices) Admit(ctx context.Context, a admission.Attributes
 			continue
 		}
 
-		newDevice, err := namer.Generate(device.IronCorePrefix) // TODO: We should have a better way for a device prefix.
+		newDevice, err := namer.Generate(device.SphericPrefix) // TODO: We should have a better way for a device prefix.
 		if err != nil {
 			return apierrors.NewBadRequest("No device names left for machine")
 		}

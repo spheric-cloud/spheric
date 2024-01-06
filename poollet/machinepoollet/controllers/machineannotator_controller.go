@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -8,12 +10,6 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
-	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
-	"github.com/ironcore-dev/ironcore/poollet/irievent"
-	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
-	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -22,12 +18,18 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/source"
+	computev1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
+	machinepoolletv1alpha1 "spheric.cloud/spheric/poollet/machinepoollet/api/v1alpha1"
+	"spheric.cloud/spheric/poollet/srievent"
+	sri "spheric.cloud/spheric/sri/apis/machine/v1alpha1"
+	srimeta "spheric.cloud/spheric/sri/apis/meta/v1alpha1"
+	sphericclient "spheric.cloud/spheric/utils/client"
 )
 
 type MachineAnnotatorReconciler struct {
 	client.Client
 
-	MachineEvents irievent.Source[*iri.Machine]
+	MachineEvents srievent.Source[*sri.Machine]
 }
 
 func (r *MachineAnnotatorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -38,14 +40,14 @@ func (r *MachineAnnotatorReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		},
 	}
 
-	if err := ironcoreclient.PatchAddReconcileAnnotation(ctx, r.Client, machine); client.IgnoreNotFound(err) != nil {
+	if err := sphericclient.PatchAddReconcileAnnotation(ctx, r.Client, machine); client.IgnoreNotFound(err) != nil {
 		return ctrl.Result{}, fmt.Errorf("error patching machine: %w", err)
 	}
 	return ctrl.Result{}, nil
 }
 
-func machineAnnotatorEventHandler[O irimeta.Object](log logr.Logger, c chan<- event.GenericEvent) irievent.HandlerFuncs[O] {
-	handleEvent := func(obj irimeta.Object) {
+func machineAnnotatorEventHandler[O srimeta.Object](log logr.Logger, c chan<- event.GenericEvent) srievent.HandlerFuncs[O] {
+	handleEvent := func(obj srimeta.Object) {
 		namespace, ok := obj.GetMetadata().Labels[machinepoolletv1alpha1.MachineNamespaceLabel]
 		if !ok {
 			return
@@ -70,17 +72,17 @@ func machineAnnotatorEventHandler[O irimeta.Object](log logr.Logger, c chan<- ev
 		}
 	}
 
-	return irievent.HandlerFuncs[O]{
-		CreateFunc: func(event irievent.CreateEvent[O]) {
+	return srievent.HandlerFuncs[O]{
+		CreateFunc: func(event srievent.CreateEvent[O]) {
 			handleEvent(event.Object)
 		},
-		UpdateFunc: func(event irievent.UpdateEvent[O]) {
+		UpdateFunc: func(event srievent.UpdateEvent[O]) {
 			handleEvent(event.ObjectNew)
 		},
-		DeleteFunc: func(event irievent.DeleteEvent[O]) {
+		DeleteFunc: func(event srievent.DeleteEvent[O]) {
 			handleEvent(event.Object)
 		},
-		GenericFunc: func(event irievent.GenericEvent[O]) {
+		GenericFunc: func(event srievent.GenericEvent[O]) {
 			handleEvent(event.Object)
 		},
 	}
@@ -94,7 +96,7 @@ func (r *MachineAnnotatorReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		return err
 	}
 
-	src, err := r.iriMachineEventSource(mgr)
+	src, err := r.sriMachineEventSource(mgr)
 	if err != nil {
 		return err
 	}
@@ -106,19 +108,19 @@ func (r *MachineAnnotatorReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return nil
 }
 
-func (r *MachineAnnotatorReconciler) iriMachineEventSource(mgr ctrl.Manager) (source.Source, error) {
+func (r *MachineAnnotatorReconciler) sriMachineEventSource(mgr ctrl.Manager) (source.Source, error) {
 	ch := make(chan event.GenericEvent, 1024)
 
 	if err := mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
-		log := ctrl.LoggerFrom(ctx).WithName("machineannotator").WithName("irieventhandlers")
+		log := ctrl.LoggerFrom(ctx).WithName("machineannotator").WithName("srieventhandlers")
 
-		registrationFuncs := []func() (irievent.HandlerRegistration, error){
-			func() (irievent.HandlerRegistration, error) {
-				return r.MachineEvents.AddHandler(machineAnnotatorEventHandler[*iri.Machine](log, ch))
+		registrationFuncs := []func() (srievent.HandlerRegistration, error){
+			func() (srievent.HandlerRegistration, error) {
+				return r.MachineEvents.AddHandler(machineAnnotatorEventHandler[*sri.Machine](log, ch))
 			},
 		}
 
-		var handles []irievent.HandlerRegistration
+		var handles []srievent.HandlerRegistration
 		defer func() {
 			log.V(1).Info("Removing handles")
 			for _, handle := range handles {

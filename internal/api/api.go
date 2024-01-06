@@ -1,19 +1,21 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
 package api
 
 import (
-	computeinstall "github.com/ironcore-dev/ironcore/internal/apis/compute/install"
-	coreinstall "github.com/ironcore-dev/ironcore/internal/apis/core/install"
-	ipaminstall "github.com/ironcore-dev/ironcore/internal/apis/ipam/install"
-	networkinginstall "github.com/ironcore-dev/ironcore/internal/apis/networking/install"
-	storageinstall "github.com/ironcore-dev/ironcore/internal/apis/storage/install"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	computeinstall "spheric.cloud/spheric/internal/apis/compute/install"
+	coreinstall "spheric.cloud/spheric/internal/apis/core/install"
+	ipaminstall "spheric.cloud/spheric/internal/apis/ipam/install"
+	networkinginstall "spheric.cloud/spheric/internal/apis/networking/install"
+	storageinstall "spheric.cloud/spheric/internal/apis/storage/install"
 
 	autoscalingv1 "k8s.io/api/autoscaling/v1"
 )

@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -15,24 +17,24 @@ import (
 )
 
 const (
-	// WatchLabel is a label that can be applied to any ironcore resource.
+	// WatchLabel is a label that can be applied to any spheric resource.
 	//
 	// Provider controllers that allow for selective reconciliation may check this label and proceed
 	// with reconciliation of the object only if this label and a configured value are present.
-	WatchLabel = "common.ironcore.dev/watch-filter"
+	WatchLabel = "common.spheric.cloud/watch-filter"
 
 	// ReconcileRequestAnnotation is an annotation that requested a reconciliation at a specific time.
-	ReconcileRequestAnnotation = "reconcile.common.ironcore.dev/requested-at"
+	ReconcileRequestAnnotation = "reconcile.common.spheric.cloud/requested-at"
 
 	// ManagedByAnnotation is an annotation that can be applied to resources to signify that
 	// some external system is managing the resource.
-	ManagedByAnnotation = "common.ironcore.dev/managed-by"
+	ManagedByAnnotation = "common.spheric.cloud/managed-by"
 
 	// EphemeralManagedByAnnotation is an annotation that can be applied to resources to signify that
 	// some ephemeral controller is managing the resource.
-	EphemeralManagedByAnnotation = "common.ironcore.dev/ephemeral-managed-by"
+	EphemeralManagedByAnnotation = "common.spheric.cloud/ephemeral-managed-by"
 
-	// DefaultEphemeralManager is the default ironcoreephemeral manager.
+	// DefaultEphemeralManager is the default spheric ephemeral manager.
 	DefaultEphemeralManager = "ephemeral-manager"
 )
 

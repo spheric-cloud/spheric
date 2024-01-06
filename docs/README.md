@@ -1,6 +1,6 @@
-# IronCore Documentation
+# Spheric Documentation
 
-This page contains the documentation of the [ironcore](https://github.com/ironcore-dev/ironcore) project which is part 
-of the [ironcore-dev](https://github.com/ironcore-dev) organization.
+This page contains the documentation of the [spheric](https://github.com/spheric-cloud/spheric) project which is part 
+of the [spheric-cloud](https://github.com/spheric-cloud) organization.
 
 --8<-- "hack/docs/abbreviations.md"

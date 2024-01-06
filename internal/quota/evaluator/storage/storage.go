@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -6,16 +8,16 @@ package storage
 import (
 	"context"
 
-	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	"github.com/ironcore-dev/ironcore/client-go/informers"
-	"github.com/ironcore-dev/ironcore/client-go/ironcore"
-	"github.com/ironcore-dev/ironcore/internal/quota/evaluator/generic"
-	utilsgeneric "github.com/ironcore-dev/ironcore/utils/generic"
-	"github.com/ironcore-dev/ironcore/utils/quota"
-	"github.com/ironcore-dev/ironcore/utils/quota/resourceaccess"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
+	storagev1alpha1 "spheric.cloud/spheric/api/storage/v1alpha1"
+	"spheric.cloud/spheric/client-go/informers"
+	"spheric.cloud/spheric/client-go/spheric"
+	"spheric.cloud/spheric/internal/quota/evaluator/generic"
+	utilsgeneric "spheric.cloud/spheric/utils/generic"
+	"spheric.cloud/spheric/utils/quota"
+	"spheric.cloud/spheric/utils/quota/resourceaccess"
 )
 
 func NewEvaluators(volumeClassCapabilities, bucketClassCapabilities generic.CapabilitiesReader) []quota.Evaluator {
@@ -37,7 +39,7 @@ func NewClientVolumeCapabilitiesReader(c client.Client) generic.CapabilitiesRead
 	)
 }
 
-func NewPrimeLRUVolumeClassCapabilitiesReader(c ironcore.Interface, f informers.SharedInformerFactory) generic.CapabilitiesReader {
+func NewPrimeLRUVolumeClassCapabilitiesReader(c spheric.Interface, f informers.SharedInformerFactory) generic.CapabilitiesReader {
 	getter := resourceaccess.NewPrimeLRUGetter[*storagev1alpha1.VolumeClass, string](
 		func(ctx context.Context, className string) (*storagev1alpha1.VolumeClass, error) {
 			return c.StorageV1alpha1().VolumeClasses().Get(ctx, className, metav1.GetOptions{})
@@ -61,7 +63,7 @@ func NewClientBucketCapabilitiesReader(c client.Client) generic.CapabilitiesRead
 	)
 }
 
-func NewPrimeLRUBucketClassCapabilitiesReader(c ironcore.Interface, f informers.SharedInformerFactory) generic.CapabilitiesReader {
+func NewPrimeLRUBucketClassCapabilitiesReader(c spheric.Interface, f informers.SharedInformerFactory) generic.CapabilitiesReader {
 	getter := resourceaccess.NewPrimeLRUGetter[*storagev1alpha1.BucketClass, string](
 		func(ctx context.Context, className string) (*storagev1alpha1.BucketClass, error) {
 			return c.StorageV1alpha1().BucketClasses().Get(ctx, className, metav1.GetOptions{})

@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -13,10 +15,6 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/controller-utils/clientutils"
-	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
-	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
-	ipamclient "github.com/ironcore-dev/ironcore/internal/client/ipam"
-	"github.com/ironcore-dev/ironcore/utils/equality"
 	"go4.org/netipx"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -27,11 +25,15 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
+	commonv1alpha1 "spheric.cloud/spheric/api/common/v1alpha1"
+	ipamv1alpha1 "spheric.cloud/spheric/api/ipam/v1alpha1"
+	ipamclient "spheric.cloud/spheric/internal/client/ipam"
+	"spheric.cloud/spheric/utils/equality"
 )
 
 const (
-	prefixFinalizer                   = "ipam.ironcore.dev/prefix"
-	prefixAllocationRequesterUIDLabel = "ipam.ironcore.dev/requester-uid"
+	prefixFinalizer                   = "ipam.spheric.cloud/prefix"
+	prefixAllocationRequesterUIDLabel = "ipam.spheric.cloud/requester-uid"
 )
 
 func (r *PrefixReconciler) acquireAllocation(
@@ -98,11 +100,11 @@ func (r *PrefixReconciler) forgetAllocationBackoffFor(key client.ObjectKey) {
 	r.allocationLimiter.Forget(key)
 }
 
-//+kubebuilder:rbac:groups=ipam.ironcore.dev,resources=prefixes,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=ipam.ironcore.dev,resources=prefixes/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=ipam.ironcore.dev,resources=prefixes/finalizers,verbs=update
-//+kubebuilder:rbac:groups=ipam.ironcore.dev,resources=prefixallocations,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=ipam.ironcore.dev,resources=prefixallocations/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=ipam.spheric.cloud,resources=prefixes,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=ipam.spheric.cloud,resources=prefixes/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=ipam.spheric.cloud,resources=prefixes/finalizers,verbs=update
+//+kubebuilder:rbac:groups=ipam.spheric.cloud,resources=prefixallocations,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=ipam.spheric.cloud,resources=prefixallocations/status,verbs=get;update;patch
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.

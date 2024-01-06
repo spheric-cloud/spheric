@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -9,13 +11,9 @@ import (
 	"fmt"
 	"maps"
 
-	"github.com/ironcore-dev/ironcore/utils/annotations"
+	"spheric.cloud/spheric/utils/annotations"
 
 	"github.com/go-logr/logr"
-	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
-	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	networkingclient "github.com/ironcore-dev/ironcore/internal/client/networking"
-	klogutils "github.com/ironcore-dev/ironcore/utils/klog"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/klog/v2"
@@ -24,14 +22,18 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	ipamv1alpha1 "spheric.cloud/spheric/api/ipam/v1alpha1"
+	networkingv1alpha1 "spheric.cloud/spheric/api/networking/v1alpha1"
+	networkingclient "spheric.cloud/spheric/internal/client/networking"
+	klogutils "spheric.cloud/spheric/utils/klog"
 )
 
 type LoadBalancerEphemeralPrefixReconciler struct {
 	client.Client
 }
 
-//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=loadbalancers,verbs=get;list;watch
-//+kubebuilder:rbac:groups=ipam.ironcore.dev,resources=prefixes,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=networking.spheric.cloud,resources=loadbalancers,verbs=get;list;watch
+//+kubebuilder:rbac:groups=ipam.spheric.cloud,resources=prefixes,verbs=get;list;watch;create;update;patch;delete
 
 func (r *LoadBalancerEphemeralPrefixReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)

@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -7,14 +9,6 @@ import (
 	"fmt"
 
 	"github.com/gogo/protobuf/proto"
-	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
-	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
-	testingmachine "github.com/ironcore-dev/ironcore/iri/testing/machine"
-	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
-	machinepoolletmachine "github.com/ironcore-dev/ironcore/poollet/machinepoollet/machine"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
@@ -22,6 +16,14 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
+	commonv1alpha1 "spheric.cloud/spheric/api/common/v1alpha1"
+	computev1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
+	networkingv1alpha1 "spheric.cloud/spheric/api/networking/v1alpha1"
+	storagev1alpha1 "spheric.cloud/spheric/api/storage/v1alpha1"
+	machinepoolletv1alpha1 "spheric.cloud/spheric/poollet/machinepoollet/api/v1alpha1"
+	machinepoolletmachine "spheric.cloud/spheric/poollet/machinepoollet/machine"
+	sri "spheric.cloud/spheric/sri/apis/machine/v1alpha1"
+	testingmachine "spheric.cloud/spheric/sri/testing/machine"
 )
 
 var _ = Describe("MachineController", func() {
@@ -116,47 +118,47 @@ var _ = Describe("MachineController", func() {
 		Eventually(srv).Should(SatisfyAll(
 			HaveField("Machines", HaveLen(1)),
 		))
-		_, iriMachine := GetSingleMapEntry(srv.Machines)
+		_, sriMachine := GetSingleMapEntry(srv.Machines)
 
-		By("inspecting the iri machine")
-		Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(machinepoolletv1alpha1.DownwardAPILabel(fooDownwardAPILabel), fooAnnotationValue))
-		Expect(iriMachine.Spec.Class).To(Equal(mc.Name))
-		Expect(iriMachine.Spec.Power).To(Equal(iri.Power_POWER_ON))
-		Expect(iriMachine.Spec.Volumes).To(ConsistOf(&iri.Volume{
+		By("inspecting the sri machine")
+		Expect(sriMachine.Metadata.Labels).To(HaveKeyWithValue(machinepoolletv1alpha1.DownwardAPILabel(fooDownwardAPILabel), fooAnnotationValue))
+		Expect(sriMachine.Spec.Class).To(Equal(mc.Name))
+		Expect(sriMachine.Spec.Power).To(Equal(sri.Power_POWER_ON))
+		Expect(sriMachine.Spec.Volumes).To(ConsistOf(&sri.Volume{
 			Name:   "primary",
 			Device: "oda",
-			Connection: &iri.VolumeConnection{
+			Connection: &sri.VolumeConnection{
 				Driver: "test",
 				Handle: "testhandle",
 			},
 		}))
-		Expect(iriMachine.Spec.NetworkInterfaces).To(ConsistOf(&iri.NetworkInterface{
+		Expect(sriMachine.Spec.NetworkInterfaces).To(ConsistOf(&sri.NetworkInterface{
 			Name:      "primary",
 			NetworkId: "foo",
 			Ips:       []string{"10.0.0.1"},
 		}))
 
-		By("waiting for the ironcore machine status to be up-to-date")
-		expectedMachineID := machinepoolletmachine.MakeID(testingmachine.FakeRuntimeName, iriMachine.Metadata.Id)
+		By("waiting for the spheric machine status to be up-to-date")
+		expectedMachineID := machinepoolletmachine.MakeID(testingmachine.FakeRuntimeName, sriMachine.Metadata.Id)
 		Eventually(Object(machine)).Should(SatisfyAll(
 			HaveField("Status.MachineID", expectedMachineID.String()),
 			HaveField("Status.ObservedGeneration", machine.Generation),
 		))
 
 		By("setting the network interface id in the machine status")
-		iriMachine = &testingmachine.FakeMachine{Machine: *proto.Clone(&iriMachine.Machine).(*iri.Machine)}
-		iriMachine.Metadata.Generation = 1
-		iriMachine.Status.ObservedGeneration = 1
-		iriMachine.Status.NetworkInterfaces = []*iri.NetworkInterfaceStatus{
+		sriMachine = &testingmachine.FakeMachine{Machine: *proto.Clone(&sriMachine.Machine).(*sri.Machine)}
+		sriMachine.Metadata.Generation = 1
+		sriMachine.Status.ObservedGeneration = 1
+		sriMachine.Status.NetworkInterfaces = []*sri.NetworkInterfaceStatus{
 			{
 				Name:   "primary",
 				Handle: "primary-handle",
-				State:  iri.NetworkInterfaceState_NETWORK_INTERFACE_ATTACHED,
+				State:  sri.NetworkInterfaceState_NETWORK_INTERFACE_ATTACHED,
 			},
 		}
-		srv.SetMachines([]*testingmachine.FakeMachine{iriMachine})
+		srv.SetMachines([]*testingmachine.FakeMachine{sriMachine})
 
-		By("waiting for the ironcore network interface to have a provider id set")
+		By("waiting for the spheric network interface to have a provider id set")
 		Eventually(Object(nic)).Should(HaveField("Spec.ProviderID", "primary-handle"))
 		Eventually(Object(machine)).Should(HaveField("Status.NetworkInterfaces", ConsistOf(MatchFields(IgnoreExtras, Fields{
 			"Name":   Equal("primary"),
@@ -183,16 +185,16 @@ var _ = Describe("MachineController", func() {
 		Eventually(srv).Should(HaveField("Machines", HaveLen(1)))
 
 		By("inspecting the machine")
-		_, iriMachine := GetSingleMapEntry(srv.Machines)
-		Expect(iriMachine.Spec.Power).To(Equal(iri.Power_POWER_ON))
+		_, sriMachine := GetSingleMapEntry(srv.Machines)
+		Expect(sriMachine.Spec.Power).To(Equal(sri.Power_POWER_ON))
 
 		By("updating the machine power")
 		base := machine.DeepCopy()
 		machine.Spec.Power = computev1alpha1.PowerOff
 		Expect(k8sClient.Patch(ctx, machine, client.MergeFrom(base))).To(Succeed())
 
-		By("waiting for the iri machine to be updated")
-		Eventually(iriMachine).Should(HaveField("Spec.Power", Equal(iri.Power_POWER_OFF)))
+		By("waiting for the sri machine to be updated")
+		Eventually(sriMachine).Should(HaveField("Spec.Power", Equal(sri.Power_POWER_OFF)))
 	})
 })
 

@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2024 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
@@ -11,21 +13,6 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/controller-utils/clientutils"
-	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
-	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	irimachine "github.com/ironcore-dev/ironcore/iri/apis/machine"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
-	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
-	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
-	machinepoolletclient "github.com/ironcore-dev/ironcore/poollet/machinepoollet/client"
-	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers/events"
-	machinepoolletmachine "github.com/ironcore-dev/ironcore/poollet/machinepoollet/machine"
-	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mcm"
-	utilclient "github.com/ironcore-dev/ironcore/utils/client"
-	utilmaps "github.com/ironcore-dev/ironcore/utils/maps"
-	"github.com/ironcore-dev/ironcore/utils/predicates"
 	"golang.org/x/exp/maps"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -41,13 +28,28 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	commonv1alpha1 "spheric.cloud/spheric/api/common/v1alpha1"
+	computev1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
+	networkingv1alpha1 "spheric.cloud/spheric/api/networking/v1alpha1"
+	storagev1alpha1 "spheric.cloud/spheric/api/storage/v1alpha1"
+	"spheric.cloud/spheric/poollet/machinepoollet/api/v1alpha1"
+	machinepoolletclient "spheric.cloud/spheric/poollet/machinepoollet/client"
+	"spheric.cloud/spheric/poollet/machinepoollet/controllers/events"
+	machinepoolletmachine "spheric.cloud/spheric/poollet/machinepoollet/machine"
+	"spheric.cloud/spheric/poollet/machinepoollet/mcm"
+	srimachine "spheric.cloud/spheric/sri/apis/machine"
+	sri "spheric.cloud/spheric/sri/apis/machine/v1alpha1"
+	srimeta "spheric.cloud/spheric/sri/apis/meta/v1alpha1"
+	utilclient "spheric.cloud/spheric/utils/client"
+	utilmaps "spheric.cloud/spheric/utils/maps"
+	"spheric.cloud/spheric/utils/predicates"
 )
 
 type MachineReconciler struct {
 	record.EventRecorder
 	client.Client
 
-	MachineRuntime        irimachine.RuntimeService
+	MachineRuntime        srimachine.RuntimeService
 	MachineRuntimeName    string
 	MachineRuntimeVersion string
 
@@ -76,13 +78,13 @@ func (r *MachineReconciler) machineUIDLabelSelector(machineUID types.UID) map[st
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 //+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch
-//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machines,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machines/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machines/finalizers,verbs=update
-//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumes,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networkinterfaces,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networks,verbs=get;list;watch
-//+kubebuilder:rbac:groups=ipam.ironcore.dev,resources=prefixes,verbs=get;list;watch
+//+kubebuilder:rbac:groups=compute.spheric.cloud,resources=machines,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=compute.spheric.cloud,resources=machines/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=compute.spheric.cloud,resources=machines/finalizers,verbs=update
+//+kubebuilder:rbac:groups=storage.spheric.cloud,resources=volumes,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=networking.spheric.cloud,resources=networkinterfaces,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=networking.spheric.cloud,resources=networks,verbs=get;list;watch
+//+kubebuilder:rbac:groups=ipam.spheric.cloud,resources=prefixes,verbs=get;list;watch
 
 func (r *MachineReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
@@ -96,9 +98,9 @@ func (r *MachineReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	return r.reconcileExists(ctx, log, machine)
 }
 
-func (r *MachineReconciler) getIRIMachinesForMachine(ctx context.Context, machine *computev1alpha1.Machine) ([]*iri.Machine, error) {
-	res, err := r.MachineRuntime.ListMachines(ctx, &iri.ListMachinesRequest{
-		Filter: &iri.MachineFilter{LabelSelector: r.machineUIDLabelSelector(machine.UID)},
+func (r *MachineReconciler) getSRIMachinesForMachine(ctx context.Context, machine *computev1alpha1.Machine) ([]*sri.Machine, error) {
+	res, err := r.MachineRuntime.ListMachines(ctx, &sri.ListMachinesRequest{
+		Filter: &sri.MachineFilter{LabelSelector: r.machineUIDLabelSelector(machine.UID)},
 	})
 	if err != nil {
 		return nil, fmt.Errorf("error listing machines by machine uid: %w", err)
@@ -106,9 +108,9 @@ func (r *MachineReconciler) getIRIMachinesForMachine(ctx context.Context, machin
 	return res.Machines, nil
 }
 
-func (r *MachineReconciler) listMachinesByMachineKey(ctx context.Context, machineKey client.ObjectKey) ([]*iri.Machine, error) {
-	res, err := r.MachineRuntime.ListMachines(ctx, &iri.ListMachinesRequest{
-		Filter: &iri.MachineFilter{LabelSelector: r.machineKeyLabelSelector(machineKey)},
+func (r *MachineReconciler) listMachinesByMachineKey(ctx context.Context, machineKey client.ObjectKey) ([]*sri.Machine, error) {
+	res, err := r.MachineRuntime.ListMachines(ctx, &sri.ListMachinesRequest{
+		Filter: &sri.MachineFilter{LabelSelector: r.machineKeyLabelSelector(machineKey)},
 	})
 	if err != nil {
 		return nil, fmt.Errorf("error listing machines by machine key: %w", err)
@@ -116,9 +118,9 @@ func (r *MachineReconciler) listMachinesByMachineKey(ctx context.Context, machin
 	return res.Machines, nil
 }
 
-func (r *MachineReconciler) getMachineByID(ctx context.Context, id string) (*iri.Machine, error) {
-	res, err := r.MachineRuntime.ListMachines(ctx, &iri.ListMachinesRequest{
-		Filter: &iri.MachineFilter{Id: id},
+func (r *MachineReconciler) getMachineByID(ctx context.Context, id string) (*sri.Machine, error) {
+	res, err := r.MachineRuntime.ListMachines(ctx, &sri.ListMachinesRequest{
+		Filter: &sri.MachineFilter{Id: id},
 	})
 	if err != nil {
 		return nil, fmt.Errorf("error listing machines filtering by id: %w", err)
@@ -134,7 +136,7 @@ func (r *MachineReconciler) getMachineByID(ctx context.Context, id string) (*iri
 	}
 }
 
-func (r *MachineReconciler) deleteMachines(ctx context.Context, log logr.Logger, machines []*iri.Machine) (bool, error) {
+func (r *MachineReconciler) deleteMachines(ctx context.Context, log logr.Logger, machines []*sri.Machine) (bool, error) {
 	var (
 		errs        []error
 		deletingIDs []string
@@ -143,7 +145,7 @@ func (r *MachineReconciler) deleteMachines(ctx context.Context, log logr.Logger,
 		machineID := machine.Metadata.Id
 		log := log.WithValues("MachineID", machineID)
 		log.V(1).Info("Deleting matching machine")
-		if _, err := r.MachineRuntime.DeleteMachine(ctx, &iri.DeleteMachineRequest{
+		if _, err := r.MachineRuntime.DeleteMachine(ctx, &sri.DeleteMachineRequest{
 			MachineId: machineID,
 		}); err != nil {
 			if status.Code(err) != codes.NotFound {
@@ -217,7 +219,7 @@ func (r *MachineReconciler) delete(ctx context.Context, log logr.Logger, machine
 		return ctrl.Result{Requeue: true}, nil
 	}
 
-	log.V(1).Info("Deleted iri machines by UID, removing finalizer")
+	log.V(1).Info("Deleted sri machines by UID, removing finalizer")
 	if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, machine, v1alpha1.MachineFinalizer); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error removing finalizer: %w", err)
 	}
@@ -228,8 +230,8 @@ func (r *MachineReconciler) delete(ctx context.Context, log logr.Logger, machine
 
 func (r *MachineReconciler) deleteMachinesByMachineUID(ctx context.Context, log logr.Logger, machineUID types.UID) (bool, error) {
 	log.V(1).Info("Listing machines")
-	res, err := r.MachineRuntime.ListMachines(ctx, &iri.ListMachinesRequest{
-		Filter: &iri.MachineFilter{
+	res, err := r.MachineRuntime.ListMachines(ctx, &sri.ListMachinesRequest{
+		Filter: &sri.MachineFilter{
 			LabelSelector: map[string]string{
 				v1alpha1.MachineUIDLabel: string(machineUID),
 			},
@@ -248,7 +250,7 @@ func (r *MachineReconciler) deleteMachinesByMachineUID(ctx context.Context, log 
 		machineID := machine.Metadata.Id
 		log := log.WithValues("MachineID", machineID)
 		log.V(1).Info("Deleting machine")
-		_, err := r.MachineRuntime.DeleteMachine(ctx, &iri.DeleteMachineRequest{
+		_, err := r.MachineRuntime.DeleteMachine(ctx, &sri.DeleteMachineRequest{
 			MachineId: machineID,
 		})
 		if err != nil {
@@ -309,23 +311,23 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 		return ctrl.Result{}, fmt.Errorf("error getting volumes for machine: %w", err)
 	}
 
-	iriMachines, err := r.getIRIMachinesForMachine(ctx, machine)
+	sriMachines, err := r.getSRIMachinesForMachine(ctx, machine)
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error getting IRI machines for machine: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error getting SRI machines for machine: %w", err)
 	}
 
-	switch len(iriMachines) {
+	switch len(sriMachines) {
 	case 0:
 		return r.create(ctx, log, machine, nics, volumes)
 	case 1:
-		iriMachine := iriMachines[0]
-		return r.update(ctx, log, machine, iriMachine, nics, volumes)
+		sriMachine := sriMachines[0]
+		return r.update(ctx, log, machine, sriMachine, nics, volumes)
 	default:
-		panic("unhandled: multiple IRI machines")
+		panic("unhandled: multiple SRI machines")
 	}
 }
 
-func (r *MachineReconciler) iriMachineLabels(machine *computev1alpha1.Machine) (map[string]string, error) {
+func (r *MachineReconciler) sriMachineLabels(machine *computev1alpha1.Machine) (map[string]string, error) {
 	annotations := map[string]string{
 		v1alpha1.MachineUIDLabel:       string(machine.UID),
 		v1alpha1.MachineNamespaceLabel: machine.Namespace,
@@ -343,9 +345,9 @@ func (r *MachineReconciler) iriMachineLabels(machine *computev1alpha1.Machine) (
 	return annotations, nil
 }
 
-func (r *MachineReconciler) iriMachineAnnotations(
+func (r *MachineReconciler) sriMachineAnnotations(
 	machine *computev1alpha1.Machine,
-	iriMachineGeneration int64,
+	sriMachineGeneration int64,
 	nicMappings map[string]v1alpha1.ObjectUIDRef,
 ) (map[string]string, error) {
 	nicMappingString, err := v1alpha1.EncodeNetworkInterfaceMapping(nicMappings)
@@ -355,7 +357,7 @@ func (r *MachineReconciler) iriMachineAnnotations(
 
 	annotations := map[string]string{
 		v1alpha1.MachineGenerationAnnotation:       strconv.FormatInt(machine.Generation, 10),
-		v1alpha1.IRIMachineGenerationAnnotation:    strconv.FormatInt(iriMachineGeneration, 10),
+		v1alpha1.SRIMachineGenerationAnnotation:    strconv.FormatInt(sriMachineGeneration, 10),
 		v1alpha1.NetworkInterfaceMappingAnnotation: nicMappingString,
 	}
 
@@ -381,9 +383,9 @@ func (r *MachineReconciler) create(
 	log.V(1).Info("Create")
 
 	log.V(1).Info("Getting machine config")
-	iriMachine, ok, err := r.prepareIRIMachine(ctx, machine, nics, volumes)
+	sriMachine, ok, err := r.prepareSRIMachine(ctx, machine, nics, volumes)
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error preparing iri machine: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error preparing sri machine: %w", err)
 	}
 	if !ok {
 		log.V(1).Info("Machine is not yet ready")
@@ -391,8 +393,8 @@ func (r *MachineReconciler) create(
 	}
 
 	log.V(1).Info("Creating machine")
-	res, err := r.MachineRuntime.CreateMachine(ctx, &iri.CreateMachineRequest{
-		Machine: iriMachine,
+	res, err := r.MachineRuntime.CreateMachine(ctx, &sri.CreateMachineRequest{
+		Machine: sriMachine,
 	})
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error creating machine: %w", err)
@@ -408,22 +410,22 @@ func (r *MachineReconciler) create(
 	return ctrl.Result{}, nil
 }
 
-func (r *MachineReconciler) getMachineGeneration(iriMachine *iri.Machine) (int64, error) {
-	return getAndParseFromStringMap(iriMachine.GetMetadata().GetAnnotations(),
+func (r *MachineReconciler) getMachineGeneration(sriMachine *sri.Machine) (int64, error) {
+	return getAndParseFromStringMap(sriMachine.GetMetadata().GetAnnotations(),
 		v1alpha1.MachineGenerationAnnotation,
 		parseInt64,
 	)
 }
 
-func (r *MachineReconciler) getIRIMachineGeneration(iriMachine *iri.Machine) (int64, error) {
-	return getAndParseFromStringMap(iriMachine.GetMetadata().GetAnnotations(),
-		v1alpha1.IRIMachineGenerationAnnotation,
+func (r *MachineReconciler) getSRIMachineGeneration(sriMachine *sri.Machine) (int64, error) {
+	return getAndParseFromStringMap(sriMachine.GetMetadata().GetAnnotations(),
+		v1alpha1.SRIMachineGenerationAnnotation,
 		parseInt64,
 	)
 }
 
-func (r *MachineReconciler) getNetworkInterfaceMapping(iriMachine *iri.Machine) (map[string]v1alpha1.ObjectUIDRef, error) {
-	return getAndParseFromStringMap(iriMachine.GetMetadata().GetAnnotations(),
+func (r *MachineReconciler) getNetworkInterfaceMapping(sriMachine *sri.Machine) (map[string]v1alpha1.ObjectUIDRef, error) {
+	return getAndParseFromStringMap(sriMachine.GetMetadata().GetAnnotations(),
 		v1alpha1.NetworkInterfaceMappingAnnotation,
 		v1alpha1.DecodeNetworkInterfaceMapping,
 	)
@@ -433,32 +435,32 @@ func (r *MachineReconciler) updateStatus(
 	ctx context.Context,
 	log logr.Logger,
 	machine *computev1alpha1.Machine,
-	iriMachine *iri.Machine,
+	sriMachine *sri.Machine,
 	nics []networkingv1alpha1.NetworkInterface,
 ) error {
-	requiredIRIGeneration, err := r.getIRIMachineGeneration(iriMachine)
+	requiredSRIGeneration, err := r.getSRIMachineGeneration(sriMachine)
 	if err != nil {
 		return err
 	}
 
-	iriGeneration := iriMachine.Metadata.Generation
-	observedIRIGeneration := iriMachine.Status.ObservedGeneration
+	sriGeneration := sriMachine.Metadata.Generation
+	observedSRIGeneration := sriMachine.Status.ObservedGeneration
 
-	if observedIRIGeneration < requiredIRIGeneration {
-		log.V(1).Info("IRI machine was not observed at the latest generation",
-			"IRIGeneration", iriGeneration,
-			"ObservedIRIGeneration", observedIRIGeneration,
-			"RequiredIRIGeneration", requiredIRIGeneration,
+	if observedSRIGeneration < requiredSRIGeneration {
+		log.V(1).Info("SRI machine was not observed at the latest generation",
+			"SRIGeneration", sriGeneration,
+			"ObservedSRIGeneration", observedSRIGeneration,
+			"RequiredSRIGeneration", requiredSRIGeneration,
 		)
 		return nil
 	}
 
 	var errs []error
 
-	if err := r.updateMachineStatus(ctx, machine, iriMachine); err != nil {
+	if err := r.updateMachineStatus(ctx, machine, sriMachine); err != nil {
 		errs = append(errs, err)
 	}
-	if err := r.updateNetworkInterfaceStatus(ctx, iriMachine, nics); err != nil {
+	if err := r.updateNetworkInterfaceStatus(ctx, sriMachine, nics); err != nil {
 		errs = append(errs, err)
 	}
 
@@ -480,10 +482,10 @@ func (r *MachineReconciler) updateNetworkInterfaceProviderID(
 
 func (r *MachineReconciler) updateNetworkInterfaceStatus(
 	ctx context.Context,
-	iriMachine *iri.Machine,
+	sriMachine *sri.Machine,
 	nics []networkingv1alpha1.NetworkInterface,
 ) error {
-	nicMapping, err := r.getNetworkInterfaceMapping(iriMachine)
+	nicMapping, err := r.getNetworkInterfaceMapping(sriMachine)
 	if err != nil {
 		return err
 	}
@@ -493,8 +495,8 @@ func (r *MachineReconciler) updateNetworkInterfaceStatus(
 		errs              []error
 	)
 
-	for _, iriNicStatus := range iriMachine.GetStatus().GetNetworkInterfaces() {
-		ref, ok := nicMapping[iriNicStatus.Name]
+	for _, sriNicStatus := range sriMachine.GetStatus().GetNetworkInterfaces() {
+		ref, ok := nicMapping[sriNicStatus.Name]
 		if !ok {
 			continue
 		}
@@ -504,8 +506,8 @@ func (r *MachineReconciler) updateNetworkInterfaceStatus(
 			continue
 		}
 
-		if nic.Spec.ProviderID != iriNicStatus.Handle {
-			if err := r.updateNetworkInterfaceProviderID(ctx, nic, iriNicStatus.Handle); err != nil {
+		if nic.Spec.ProviderID != sriNicStatus.Handle {
+			if err := r.updateNetworkInterfaceProviderID(ctx, nic, sriNicStatus.Handle); err != nil {
 				errs = append(errs, err)
 			}
 		}
@@ -522,27 +524,27 @@ func (r *MachineReconciler) updateNetworkInterfaceStatus(
 	return errors.Join(errs...)
 }
 
-func (r *MachineReconciler) updateMachineStatus(ctx context.Context, machine *computev1alpha1.Machine, iriMachine *iri.Machine) error {
+func (r *MachineReconciler) updateMachineStatus(ctx context.Context, machine *computev1alpha1.Machine, sriMachine *sri.Machine) error {
 	now := metav1.Now()
 
-	generation, err := r.getMachineGeneration(iriMachine)
+	generation, err := r.getMachineGeneration(sriMachine)
 	if err != nil {
 		return err
 	}
 
-	machineID := machinepoolletmachine.MakeID(r.MachineRuntimeName, iriMachine.Metadata.Id)
+	machineID := machinepoolletmachine.MakeID(r.MachineRuntimeName, sriMachine.Metadata.Id)
 
-	state, err := r.convertIRIMachineState(iriMachine.Status.State)
+	state, err := r.convertSRIMachineState(sriMachine.Status.State)
 	if err != nil {
 		return err
 	}
 
-	volumeStatuses, err := r.getVolumeStatusesForMachine(machine, iriMachine, now)
+	volumeStatuses, err := r.getVolumeStatusesForMachine(machine, sriMachine, now)
 	if err != nil {
 		return fmt.Errorf("error getting volume statuses: %w", err)
 	}
 
-	nicStatuses, err := r.getNetworkInterfaceStatusesForMachine(machine, iriMachine, now)
+	nicStatuses, err := r.getNetworkInterfaceStatusesForMachine(machine, sriMachine, now)
 	if err != nil {
 		return fmt.Errorf("error getting network interface statuses: %w", err)
 	}
@@ -561,22 +563,22 @@ func (r *MachineReconciler) updateMachineStatus(ctx context.Context, machine *co
 	return nil
 }
 
-func (r *MachineReconciler) prepareIRIPower(power computev1alpha1.Power) (iri.Power, error) {
+func (r *MachineReconciler) prepareSRIPower(power computev1alpha1.Power) (sri.Power, error) {
 	switch power {
 	case computev1alpha1.PowerOn:
-		return iri.Power_POWER_ON, nil
+		return sri.Power_POWER_ON, nil
 	case computev1alpha1.PowerOff:
-		return iri.Power_POWER_OFF, nil
+		return sri.Power_POWER_OFF, nil
 	default:
 		return 0, fmt.Errorf("unknown power %q", power)
 	}
 }
 
-func (r *MachineReconciler) updateIRIPower(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine, iriMachine *iri.Machine) error {
-	actualPower := iriMachine.Spec.Power
-	desiredPower, err := r.prepareIRIPower(machine.Spec.Power)
+func (r *MachineReconciler) updateSRIPower(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine, sriMachine *sri.Machine) error {
+	actualPower := sriMachine.Spec.Power
+	desiredPower, err := r.prepareSRIPower(machine.Spec.Power)
 	if err != nil {
-		return fmt.Errorf("error preparing iri power state: %w", err)
+		return fmt.Errorf("error preparing sri power state: %w", err)
 	}
 
 	if actualPower == desiredPower {
@@ -584,8 +586,8 @@ func (r *MachineReconciler) updateIRIPower(ctx context.Context, log logr.Logger,
 		return nil
 	}
 
-	if _, err := r.MachineRuntime.UpdateMachinePower(ctx, &iri.UpdateMachinePowerRequest{
-		MachineId: iriMachine.Metadata.Id,
+	if _, err := r.MachineRuntime.UpdateMachinePower(ctx, &sri.UpdateMachinePowerRequest{
+		MachineId: sriMachine.Metadata.Id,
 		Power:     desiredPower,
 	}); err != nil {
 		return fmt.Errorf("error updating machine power state: %w", err)
@@ -597,7 +599,7 @@ func (r *MachineReconciler) update(
 	ctx context.Context,
 	log logr.Logger,
 	machine *computev1alpha1.Machine,
-	iriMachine *iri.Machine,
+	sriMachine *sri.Machine,
 	nics []networkingv1alpha1.NetworkInterface,
 	volumes []storagev1alpha1.Volume,
 ) (ctrl.Result, error) {
@@ -606,18 +608,18 @@ func (r *MachineReconciler) update(
 	var errs []error
 
 	log.V(1).Info("Updating network interfaces")
-	iriNics, err := r.updateIRINetworkInterfaces(ctx, log, machine, iriMachine, nics)
+	sriNics, err := r.updateSRINetworkInterfaces(ctx, log, machine, sriMachine, nics)
 	if err != nil {
 		errs = append(errs, fmt.Errorf("error updating network interfaces: %w", err))
 	}
 
 	log.V(1).Info("Updating volumes")
-	if err := r.updateIRIVolumes(ctx, log, machine, iriMachine, volumes); err != nil {
+	if err := r.updateSRIVolumes(ctx, log, machine, sriMachine, volumes); err != nil {
 		errs = append(errs, fmt.Errorf("error updating volumes: %w", err))
 	}
 
 	log.V(1).Info("Updating power state")
-	if err := r.updateIRIPower(ctx, log, machine, iriMachine); err != nil {
+	if err := r.updateSRIPower(ctx, log, machine, sriMachine); err != nil {
 		errs = append(errs, fmt.Errorf("error updating power state: %w", err))
 	}
 
@@ -626,19 +628,19 @@ func (r *MachineReconciler) update(
 	}
 
 	log.V(1).Info("Updating annotations")
-	nicMapping := r.computeNetworkInterfaceMapping(machine, nics, iriNics)
-	if err := r.updateIRIAnnotations(ctx, log, machine, iriMachine, nicMapping); err != nil {
+	nicMapping := r.computeNetworkInterfaceMapping(machine, nics, sriNics)
+	if err := r.updateSRIAnnotations(ctx, log, machine, sriMachine, nicMapping); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error updating annotations: %w", err)
 	}
 
-	log.V(1).Info("Getting iri machine")
-	iriMachine, err = r.getMachineByID(ctx, iriMachine.Metadata.Id)
+	log.V(1).Info("Getting sri machine")
+	sriMachine, err = r.getMachineByID(ctx, sriMachine.Metadata.Id)
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error getting iri machine: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error getting sri machine: %w", err)
 	}
 
 	log.V(1).Info("Updating machine status")
-	if err := r.updateStatus(ctx, log, machine, iriMachine, nics); err != nil {
+	if err := r.updateStatus(ctx, log, machine, sriMachine, nics); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error updating status: %w", err)
 	}
 
@@ -646,27 +648,27 @@ func (r *MachineReconciler) update(
 	return ctrl.Result{}, nil
 }
 
-func (r *MachineReconciler) updateIRIAnnotations(
+func (r *MachineReconciler) updateSRIAnnotations(
 	ctx context.Context,
 	log logr.Logger,
 	machine *computev1alpha1.Machine,
-	iriMachine *iri.Machine,
+	sriMachine *sri.Machine,
 	nicMapping map[string]v1alpha1.ObjectUIDRef,
 ) error {
-	desiredAnnotations, err := r.iriMachineAnnotations(machine, iriMachine.GetMetadata().GetGeneration(), nicMapping)
+	desiredAnnotations, err := r.sriMachineAnnotations(machine, sriMachine.GetMetadata().GetGeneration(), nicMapping)
 	if err != nil {
-		return fmt.Errorf("error getting iri machine annotations: %w", err)
+		return fmt.Errorf("error getting sri machine annotations: %w", err)
 	}
 
-	actualAnnotations := iriMachine.Metadata.Annotations
+	actualAnnotations := sriMachine.Metadata.Annotations
 
 	if maps.Equal(desiredAnnotations, actualAnnotations) {
 		log.V(1).Info("Annotations are up-to-date", "Annotations", desiredAnnotations)
 		return nil
 	}
 
-	if _, err := r.MachineRuntime.UpdateMachineAnnotations(ctx, &iri.UpdateMachineAnnotationsRequest{
-		MachineId:   iriMachine.Metadata.Id,
+	if _, err := r.MachineRuntime.UpdateMachineAnnotations(ctx, &sri.UpdateMachineAnnotationsRequest{
+		MachineId:   sriMachine.Metadata.Id,
 		Annotations: desiredAnnotations,
 	}); err != nil {
 		return fmt.Errorf("error updating machine annotations: %w", err)
@@ -674,21 +676,21 @@ func (r *MachineReconciler) updateIRIAnnotations(
 	return nil
 }
 
-var iriMachineStateToMachineState = map[iri.MachineState]computev1alpha1.MachineState{
-	iri.MachineState_MACHINE_PENDING:    computev1alpha1.MachineStatePending,
-	iri.MachineState_MACHINE_RUNNING:    computev1alpha1.MachineStateRunning,
-	iri.MachineState_MACHINE_SUSPENDED:  computev1alpha1.MachineStateShutdown,
-	iri.MachineState_MACHINE_TERMINATED: computev1alpha1.MachineStateTerminated,
+var sriMachineStateToMachineState = map[sri.MachineState]computev1alpha1.MachineState{
+	sri.MachineState_MACHINE_PENDING:    computev1alpha1.MachineStatePending,
+	sri.MachineState_MACHINE_RUNNING:    computev1alpha1.MachineStateRunning,
+	sri.MachineState_MACHINE_SUSPENDED:  computev1alpha1.MachineStateShutdown,
+	sri.MachineState_MACHINE_TERMINATED: computev1alpha1.MachineStateTerminated,
 }
 
-func (r *MachineReconciler) convertIRIMachineState(state iri.MachineState) (computev1alpha1.MachineState, error) {
-	if res, ok := iriMachineStateToMachineState[state]; ok {
+func (r *MachineReconciler) convertSRIMachineState(state sri.MachineState) (computev1alpha1.MachineState, error) {
+	if res, ok := sriMachineStateToMachineState[state]; ok {
 		return res, nil
 	}
 	return "", fmt.Errorf("unknown machine state %v", state)
 }
 
-func (r *MachineReconciler) prepareIRIMachineClass(ctx context.Context, machine *computev1alpha1.Machine, machineClassName string) (string, bool, error) {
+func (r *MachineReconciler) prepareSRIMachineClass(ctx context.Context, machine *computev1alpha1.Machine, machineClassName string) (string, bool, error) {
 	machineClass := &computev1alpha1.MachineClass{}
 	machineClassKey := client.ObjectKey{Name: machineClassName}
 	if err := r.Get(ctx, machineClassKey, machineClass); err != nil {
@@ -700,9 +702,9 @@ func (r *MachineReconciler) prepareIRIMachineClass(ctx context.Context, machine 
 		return "", false, nil
 	}
 
-	caps, err := getIRIMachineClassCapabilities(machineClass)
+	caps, err := getSRIMachineClassCapabilities(machineClass)
 	if err != nil {
-		return "", false, fmt.Errorf("error getting iri machine class capabilities: %w", err)
+		return "", false, fmt.Errorf("error getting sri machine class capabilities: %w", err)
 	}
 
 	class, _, err := r.MachineClassMapper.GetMachineClassFor(ctx, machineClassName, caps)
@@ -712,17 +714,17 @@ func (r *MachineReconciler) prepareIRIMachineClass(ctx context.Context, machine 
 	return class.Name, true, nil
 }
 
-func getIRIMachineClassCapabilities(machineClass *computev1alpha1.MachineClass) (*iri.MachineClassCapabilities, error) {
+func getSRIMachineClassCapabilities(machineClass *computev1alpha1.MachineClass) (*sri.MachineClassCapabilities, error) {
 	cpu := machineClass.Capabilities.CPU()
 	memory := machineClass.Capabilities.Memory()
 
-	return &iri.MachineClassCapabilities{
+	return &sri.MachineClassCapabilities{
 		CpuMillis:   cpu.MilliValue(),
 		MemoryBytes: memory.Value(),
 	}, nil
 }
 
-func (r *MachineReconciler) prepareIRIIgnitionData(ctx context.Context, machine *computev1alpha1.Machine, ignitionRef *commonv1alpha1.SecretKeySelector) ([]byte, bool, error) {
+func (r *MachineReconciler) prepareSRIIgnitionData(ctx context.Context, machine *computev1alpha1.Machine, ignitionRef *commonv1alpha1.SecretKeySelector) ([]byte, bool, error) {
 	ignitionSecret := &corev1.Secret{}
 	ignitionSecretKey := client.ObjectKey{Namespace: machine.Namespace, Name: ignitionRef.Name}
 	if err := r.Get(ctx, ignitionSecretKey, ignitionSecret); err != nil {
@@ -748,38 +750,38 @@ func (r *MachineReconciler) prepareIRIIgnitionData(ctx context.Context, machine 
 	return data, true, nil
 }
 
-func (r *MachineReconciler) prepareIRIMachine(
+func (r *MachineReconciler) prepareSRIMachine(
 	ctx context.Context,
 	machine *computev1alpha1.Machine,
 	nics []networkingv1alpha1.NetworkInterface,
 	volumes []storagev1alpha1.Volume,
-) (*iri.Machine, bool, error) {
+) (*sri.Machine, bool, error) {
 	var (
 		ok   = true
 		errs []error
 	)
 
-	class, classOK, err := r.prepareIRIMachineClass(ctx, machine, machine.Spec.MachineClassRef.Name)
+	class, classOK, err := r.prepareSRIMachineClass(ctx, machine, machine.Spec.MachineClassRef.Name)
 	switch {
 	case err != nil:
-		errs = append(errs, fmt.Errorf("error preparing iri machine class: %w", err))
+		errs = append(errs, fmt.Errorf("error preparing sri machine class: %w", err))
 	case !classOK:
 		ok = false
 	}
 
-	var imageSpec *iri.ImageSpec
+	var imageSpec *sri.ImageSpec
 	if image := machine.Spec.Image; image != "" {
-		imageSpec = &iri.ImageSpec{
+		imageSpec = &sri.ImageSpec{
 			Image: image,
 		}
 	}
 
 	var ignitionData []byte
 	if ignitionRef := machine.Spec.IgnitionRef; ignitionRef != nil {
-		data, ignitionSpecOK, err := r.prepareIRIIgnitionData(ctx, machine, ignitionRef)
+		data, ignitionSpecOK, err := r.prepareSRIIgnitionData(ctx, machine, ignitionRef)
 		switch {
 		case err != nil:
-			errs = append(errs, fmt.Errorf("error preparing iri ignition spec: %w", err))
+			errs = append(errs, fmt.Errorf("error preparing sri ignition spec: %w", err))
 		case !ignitionSpecOK:
 			ok = false
 		default:
@@ -787,30 +789,30 @@ func (r *MachineReconciler) prepareIRIMachine(
 		}
 	}
 
-	machineNics, machineNicMappings, machineNicsOK, err := r.prepareIRINetworkInterfacesForMachine(ctx, machine, nics)
+	machineNics, machineNicMappings, machineNicsOK, err := r.prepareSRINetworkInterfacesForMachine(ctx, machine, nics)
 	switch {
 	case err != nil:
-		errs = append(errs, fmt.Errorf("error preparing iri machine network interfaces: %w", err))
+		errs = append(errs, fmt.Errorf("error preparing sri machine network interfaces: %w", err))
 	case !machineNicsOK:
 		ok = false
 	}
 
-	machineVolumes, machineVolumesOK, err := r.prepareIRIVolumes(ctx, machine, volumes)
+	machineVolumes, machineVolumesOK, err := r.prepareSRIVolumes(ctx, machine, volumes)
 	switch {
 	case err != nil:
-		errs = append(errs, fmt.Errorf("error preparing iri machine volumes: %w", err))
+		errs = append(errs, fmt.Errorf("error preparing sri machine volumes: %w", err))
 	case !machineVolumesOK:
 		ok = false
 	}
 
-	labels, err := r.iriMachineLabels(machine)
+	labels, err := r.sriMachineLabels(machine)
 	if err != nil {
-		errs = append(errs, fmt.Errorf("error preparing iri machine labels: %w", err))
+		errs = append(errs, fmt.Errorf("error preparing sri machine labels: %w", err))
 	}
 
-	annotations, err := r.iriMachineAnnotations(machine, 1, machineNicMappings)
+	annotations, err := r.sriMachineAnnotations(machine, 1, machineNicMappings)
 	if err != nil {
-		errs = append(errs, fmt.Errorf("error preparing iri machine annotations: %w", err))
+		errs = append(errs, fmt.Errorf("error preparing sri machine annotations: %w", err))
 	}
 
 	switch {
@@ -819,12 +821,12 @@ func (r *MachineReconciler) prepareIRIMachine(
 	case !ok:
 		return nil, false, nil
 	default:
-		return &iri.Machine{
-			Metadata: &irimeta.ObjectMetadata{
+		return &sri.Machine{
+			Metadata: &srimeta.ObjectMetadata{
 				Labels:      labels,
 				Annotations: annotations,
 			},
-			Spec: &iri.MachineSpec{
+			Spec: &sri.MachineSpec{
 				Image:             imageSpec,
 				Class:             class,
 				IgnitionData:      ignitionData,
