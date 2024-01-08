@@ -16,6 +16,8 @@ import (
 	"strings"
 	"time"
 
+	"k8s.io/utils/ptr"
+
 	"github.com/ironcore-dev/controller-utils/conditionutils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -25,7 +27,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/rest"
 	apiregistrationv1 "k8s.io/kube-aggregator/pkg/apis/apiregistration/v1"
-	"k8s.io/utils/pointer"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
@@ -223,7 +224,7 @@ func (o *APIServerInstallOptions) ModifyAPIServiceDefinitions(cfg *rest.Config) 
 		apiService.Spec.Service = &apiregistrationv1.ServiceReference{
 			Namespace: svcNamespace,
 			Name:      svcName,
-			Port:      pointer.Int32(int32(port)),
+			Port:      ptr.To(int32(port)),
 		}
 	}
 	return nil

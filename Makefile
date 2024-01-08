@@ -105,7 +105,7 @@ vet: ## Run go vet against code.
 
 .PHONY: lint
 lint: golangci-lint ## Run golangci-lint on the code.
-	$(GOLANGCI_LINT) run ./...
+	$(GOLANGCI_LINT) run --max-same-issues=0 ./...
 
 .PHONY: clean
 clean: ## Clean any artifacts that can be regenerated.
@@ -154,9 +154,10 @@ test-only: envtest ## Run *only* the tests - no generation, linting etc.
 .PHONY: extract-openapi
 extract-openapi: envtest openapi-extractor
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" $(OPENAPI_EXTRACTOR) \
-		--apiserver-package="spheric.cloud/spheric/cmd/spheric-apiserver" \
+		--apiserver-package="spheric.cloud/spheric/cmd/apiserver" \
 		--apiserver-build-opts=mod \
 		--apiservices="./config/apiserver/apiservice/bases" \
+		--attach-control-plane-output \
 		--output="./gen"
 
 ##@ Build
@@ -341,7 +342,7 @@ GOLANGCI_LINT ?= $(LOCALBIN)/golangci-lint
 
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v5.1.1
-CODE_GENERATOR_VERSION ?= v0.28.2
+CODE_GENERATOR_VERSION ?= v0.29.0
 VGOPATH_VERSION ?= v0.1.3
 CONTROLLER_TOOLS_VERSION ?= v0.13.0
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= v0.3.0

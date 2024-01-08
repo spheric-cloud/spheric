@@ -11,7 +11,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	computev1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
 	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
@@ -73,7 +73,7 @@ var _ = Describe("Compute", func() {
 			Expect(machine.Spec.Volumes).To(Equal([]computev1alpha1.Volume{
 				{
 					Name:   "foo",
-					Device: pointer.String("oda"),
+					Device: ptr.To("oda"),
 					VolumeSource: computev1alpha1.VolumeSource{
 						EmptyDisk: &computev1alpha1.EmptyDiskVolumeSource{},
 					},
@@ -114,14 +114,14 @@ var _ = Describe("Compute", func() {
 			Expect(machine.Spec.Volumes).To(Equal([]computev1alpha1.Volume{
 				{
 					Name:   "foo",
-					Device: pointer.String("oda"),
+					Device: ptr.To("oda"),
 					VolumeSource: computev1alpha1.VolumeSource{
 						EmptyDisk: &computev1alpha1.EmptyDiskVolumeSource{},
 					},
 				},
 				{
 					Name:   "bar",
-					Device: pointer.String("odb"),
+					Device: ptr.To("odb"),
 					VolumeSource: computev1alpha1.VolumeSource{
 						EmptyDisk: &computev1alpha1.EmptyDiskVolumeSource{},
 					},
@@ -156,7 +156,7 @@ var _ = Describe("Compute", func() {
 			Expect(machine.Spec.Volumes).To(Equal([]computev1alpha1.Volume{
 				{
 					Name:   "bar",
-					Device: pointer.String("odb"),
+					Device: ptr.To("odb"),
 					VolumeSource: computev1alpha1.VolumeSource{
 						EmptyDisk: &computev1alpha1.EmptyDiskVolumeSource{},
 					},

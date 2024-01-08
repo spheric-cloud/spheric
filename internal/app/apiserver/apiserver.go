@@ -20,7 +20,6 @@ import (
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apiserver/pkg/admission"
 	"k8s.io/apiserver/pkg/endpoints/openapi"
-	"k8s.io/apiserver/pkg/features"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	genericoptions "k8s.io/apiserver/pkg/server/options"
 	serverstorage "k8s.io/apiserver/pkg/server/storage"
@@ -183,8 +182,6 @@ func (o *SphericAPIServerOptions) Config() (*apiserver.Config, error) {
 		return nil, fmt.Errorf("error creating self-signed certificates: %w", err)
 	}
 
-	o.RecommendedOptions.Etcd.StorageConfig.Paging = utilfeature.DefaultFeatureGate.Enabled(features.APIListChunking)
-
 	o.RecommendedOptions.ExtraAdmissionInitializers = func(c *genericapiserver.RecommendedConfig) ([]admission.PluginInitializer, error) {
 		sphericClient, err := clientset.NewForConfig(c.LoopbackClientConfig)
 		if err != nil {
@@ -212,11 +209,9 @@ func (o *SphericAPIServerOptions) Config() (*apiserver.Config, error) {
 	serverConfig.OpenAPIConfig.Info.Title = "spheric-api"
 	serverConfig.OpenAPIConfig.Info.Version = "0.1"
 
-	if utilfeature.DefaultFeatureGate.Enabled(features.OpenAPIV3) {
-		serverConfig.OpenAPIV3Config = genericapiserver.DefaultOpenAPIV3Config(sphericopenapi.GetOpenAPIDefinitions, openapi.NewDefinitionNamer(api.Scheme))
-		serverConfig.OpenAPIV3Config.Info.Title = "spheric-api"
-		serverConfig.OpenAPIV3Config.Info.Version = "0.1"
-	}
+	serverConfig.OpenAPIV3Config = genericapiserver.DefaultOpenAPIV3Config(sphericopenapi.GetOpenAPIDefinitions, openapi.NewDefinitionNamer(api.Scheme))
+	serverConfig.OpenAPIV3Config.Info.Title = "spheric-api"
+	serverConfig.OpenAPIV3Config.Info.Version = "0.1"
 
 	if err := o.RecommendedOptions.ApplyTo(serverConfig); err != nil {
 		return nil, err

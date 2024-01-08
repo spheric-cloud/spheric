@@ -12,6 +12,8 @@ import (
 	"sync/atomic"
 	"time"
 
+	"k8s.io/utils/ptr"
+
 	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -22,7 +24,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	"spheric.cloud/spheric/utils/certificate"
@@ -64,7 +65,7 @@ var _ = Describe("ConfigRotator", func() {
 		By("creating a rotator")
 		template := &x509.CertificateRequest{}
 		signerName := "rotator-signer.spheric.cloud"
-		requestedDuration := pointer.Duration(1 * time.Hour)
+		requestedDuration := ptr.To(1 * time.Hour)
 		rotatorName := "rotator"
 		r, err := NewConfigRotator(nil, bootstrapUser.Config(), ConfigRotatorOptions{
 			Name:              rotatorName,
@@ -167,7 +168,7 @@ var _ = Describe("ConfigRotator", func() {
 		By("creating a rotator")
 		template := &x509.CertificateRequest{}
 		signerName := "rotator-signer.spheric.cloud"
-		requestedDuration := pointer.Duration(1 * time.Hour)
+		requestedDuration := ptr.To(1 * time.Hour)
 		rotatorName := "rotator"
 
 		var newClient func(*tls.Certificate) (client.WithWatch, error)
