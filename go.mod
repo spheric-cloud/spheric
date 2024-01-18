@@ -17,10 +17,10 @@ require (
 	golang.org/x/exp v0.0.0-20240103183307-be819d1f06fc
 	golang.org/x/sys v0.16.0
 	google.golang.org/grpc v1.60.1
-	k8s.io/api v0.29.0
-	k8s.io/apimachinery v0.29.0
+	k8s.io/api v0.29.1
+	k8s.io/apimachinery v0.29.1
 	k8s.io/apiserver v0.29.0
-	k8s.io/client-go v0.29.0
+	k8s.io/client-go v0.29.1
 	k8s.io/component-base v0.29.0
 	k8s.io/klog/v2 v2.110.1
 	k8s.io/kube-aggregator v0.29.0
@@ -106,7 +106,7 @@ require (
 	golang.org/x/term v0.15.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
-	golang.org/x/tools v0.16.0 // indirect
+	golang.org/x/tools v0.16.1 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.4.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/genproto v0.0.0-20231002182017-d307bd883b97 // indirect
