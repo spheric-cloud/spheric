@@ -22,7 +22,7 @@ require (
 	k8s.io/apiserver v0.29.0
 	k8s.io/client-go v0.29.0
 	k8s.io/component-base v0.29.0
-	k8s.io/klog/v2 v2.110.1
+	k8s.io/klog/v2 v2.120.1
 	k8s.io/kube-aggregator v0.29.0
 	k8s.io/kube-openapi v0.0.0-20240105020646-a37d4de58910
 	k8s.io/kubectl v0.29.0
