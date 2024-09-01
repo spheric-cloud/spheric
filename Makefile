@@ -1,15 +1,10 @@
 # Image URL to use all building/pushing image targets
 CONTROLLER_IMG ?= controller:latest
 APISERVER_IMG ?= apiserver:latest
-MACHINEPOOLLET_IMG ?= machinepoollet:latest
-SRICTL_MACHINE_IMG ?= srictl-machine:latest
-VOLUMEPOOLLET_IMG ?= volumepoollet:latest
-SRICTL_VOLUME_IMG ?= srictl-volume:latest
-BUCKETPOOLLET_IMG ?= bucketpoollet:latest
-SRICTL_BUCKET_IMG ?= srictl-bucket:latest
+SPHERELET_IMG ?= spherelet:latest
 
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
-ENVTEST_K8S_VERSION = 1.28.0
+ENVTEST_K8S_VERSION = 1.30.0
 
 # Docker image name for the mkdocs based local development setup
 IMAGE=spheric/documentation
@@ -54,29 +49,8 @@ manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and Cust
 	# controller-manager
 	$(CONTROLLER_GEN) rbac:roleName=manager-role webhook paths="./internal/controllers/...;./api/..." output:rbac:artifacts:config=config/controller/rbac
 
-	# machinepoollet
-	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./poollet/machinepoollet/controllers/..." output:rbac:artifacts:config=config/machinepoollet-broker/poollet-rbac
-	./hack/replace.sh config/machinepoollet-broker/broker-rbac/role.yaml 's/ClusterRole/Role/g'
-
-	# volumepoollet-broker
-	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./poollet/volumepoollet/controllers/..." output:rbac:artifacts:config=config/volumepoollet-broker/poollet-rbac
-	./hack/replace.sh config/volumepoollet-broker/broker-rbac/role.yaml 's/ClusterRole/Role/g'
-
-	# bucketpoollet-broker
-	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./poollet/bucketpoollet/controllers/..." output:rbac:artifacts:config=config/bucketpoollet-broker/poollet-rbac
-	./hack/replace.sh config/bucketpoollet-broker/broker-rbac/role.yaml 's/ClusterRole/Role/g'
-
-	# poollet system roles
-	cp config/machinepoollet-broker/poollet-rbac/role.yaml config/apiserver/rbac/machinepool_role.yaml
-	./hack/replace.sh config/apiserver/rbac/machinepool_role.yaml 's/manager-role/compute.spheric.cloud:system:machinepools/g'
-	cp config/volumepoollet-broker/poollet-rbac/role.yaml config/apiserver/rbac/volumepool_role.yaml
-	./hack/replace.sh config/apiserver/rbac/volumepool_role.yaml 's/manager-role/storage.spheric.cloud:system:volumepools/g'
-	cp config/bucketpoollet-broker/poollet-rbac/role.yaml config/apiserver/rbac/bucketpool_role.yaml
-	./hack/replace.sh config/apiserver/rbac/bucketpool_role.yaml 's/manager-role/storage.spheric.cloud:system:bucketpools/g'
-
 .PHONY: generate
-generate: vgopath models-schema deepcopy-gen client-gen lister-gen informer-gen defaulter-gen conversion-gen openapi-gen applyconfiguration-gen
-	VGOPATH=$(VGOPATH) \
+generate: models-schema deepcopy-gen client-gen lister-gen informer-gen defaulter-gen conversion-gen openapi-gen applyconfiguration-gen
 	MODELS_SCHEMA=$(MODELS_SCHEMA) \
 	DEEPCOPY_GEN=$(DEEPCOPY_GEN) \
 	CLIENT_GEN=$(CLIENT_GEN) \
@@ -89,11 +63,11 @@ generate: vgopath models-schema deepcopy-gen client-gen lister-gen informer-gen 
 	./hack/update-codegen.sh
 
 .PHONY: proto
-proto: goimports vgopath protoc-gen-gogo
-	VGOPATH=$(VGOPATH) \
-	PROTOC_GEN_GOGO=$(PROTOC_GEN_GOGO) \
+proto: goimports protoc-gen-go protoc-gen-go-grpc
+	PROTOC_GEN_GO=$(PROTOC_GEN_GO) \
+	PROTOC_GEN_GO_GRPC=$(PROTOC_GEN_GO_GRPC) \
 	./hack/update-proto.sh
-	$(GOIMPORTS) -w ./sri
+	$(GOIMPORTS) -w ./iri-api
 
 .PHONY: fmt
 fmt: goimports ## Run goimports against code.
@@ -105,7 +79,7 @@ vet: ## Run go vet against code.
 
 .PHONY: lint
 lint: golangci-lint ## Run golangci-lint on the code.
-	$(GOLANGCI_LINT) run --max-same-issues=0 ./...
+	$(GOLANGCI_LINT) run ./...
 
 .PHONY: clean
 clean: ## Clean any artifacts that can be regenerated.
@@ -128,12 +102,7 @@ check: generate manifests add-license fmt lint test # Generate manifests, code, 
 
 .PHONY: docs
 docs: gen-crd-api-reference-docs ## Run go generate to generate API reference documentation.
-	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/common/v1alpha1 -config ./hack/api-reference/config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/common.md
 	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/core/v1alpha1 -config ./hack/api-reference/config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/core.md
-	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/storage/v1alpha1 -config ./hack/api-reference/config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/storage.md
-	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/networking/v1alpha1 -config ./hack/api-reference/config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/networking.md
-	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/ipam/v1alpha1 -config ./hack/api-reference/config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/ipam.md
-	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/compute/v1alpha1 -config ./hack/api-reference/config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/compute.md
 
 .PHONY: start-docs
 start-docs: ## Start the local mkdocs based development environment.
@@ -173,9 +142,7 @@ run: manifests generate fmt vet ## Run a controller from your host.
 .PHONY: docker-build
 docker-build: \
 	docker-build-spheric-apiserver docker-build-spheric-controller-manager \
-	docker-build-machinepoollet docker-build-srictl-machine \
-	docker-build-volumepoollet docker-build-srictl-volume \
-	docker-build-bucketpoollet docker-build-srictl-bucket ## Build docker image with the manager.
+	docker-build-spherelet ## Build docker image with the manager.
 
 .PHONY: docker-build-spheric-apiserver
 docker-build-spheric-apiserver: ## Build apiserver.
@@ -183,31 +150,15 @@ docker-build-spheric-apiserver: ## Build apiserver.
 
 .PHONY: docker-build-spheric-controller-manager
 docker-build-spheric-controller-manager: ## Build controller-manager.
-	docker build --target manager -t ${CONTROLLER_IMG} .
+	docker build --target controller-manager -t ${CONTROLLER_IMG} .
 
-.PHONY: docker-build-machinepoollet
-docker-build-machinepoollet: ## Build machinepoollet image.
-	docker build --target machinepoollet -t ${MACHINEPOOLLET_IMG} .
+.PHONY: docker-build-spherelet
+docker-build-spherelet: ## Build spherelet image.
+	docker build --target spherelet -t ${SPHERELET_IMG} .
 
 .PHONY: docker-build-srictl-machine
 docker-build-srictl-machine: ## Build srictl-machine image.
 	docker build --target srictl-machine -t ${SRICTL_MACHINE_IMG} .
-
-.PHONY: docker-build-volumepoollet
-docker-build-volumepoollet: ## Build volumepoollet image.
-	docker build --target volumepoollet -t ${VOLUMEPOOLLET_IMG} .
-
-.PHONY: docker-build-srictl-volume
-docker-build-srictl-volume: ## Build srictl-volume image.
-	docker build --target srictl-volume -t ${SRICTL_VOLUME_IMG} .
-
-.PHONY: docker-build-bucketpoollet
-docker-build-bucketpoollet: ## Build bucketpoollet image.
-	docker build --target bucketpoollet -t ${BUCKETPOOLLET_IMG} .
-
-.PHONY: docker-build-srictl-bucket
-docker-build-srictl-bucket: ## Build srictl-bucket image.
-	docker build --target srictl-bucket -t ${SRICTL_BUCKET_IMG} .
 
 .PHONY: docker-push
 docker-push: ## Push docker image with the manager.
@@ -255,17 +206,9 @@ kind-load-apiserver: ## Load the apiserver image into the kind cluster.
 kind-load-controller: ## Load the controller image into the kind cluster.
 	kind load docker-image controller
 
-.PHONY: kind-load-machinepoollet
-kind-load-machinepoollet:
-	kind load docker-image ${MACHINEPOOLLET_IMG}
-
-.PHONY: kind-load-volumepoollet
-kind-load-volumepoollet:
-	kind load docker-image ${VOLUMEPOOLLET_IMG}
-
-.PHONY: kind-load-bucketpoollet
-kind-load-bucketpoollet:
-	kind load docker-image ${BUCKETPOOLLET_IMG}
+.PHONY: kind-load-spherelet
+kind-load-spherelet:
+	kind load docker-image ${SPHERELET_IMG}
 
 .PHONY: kind-load
 kind-load: kind-load-apiserver kind-load-controller ## Load the apiserver and controller in kind.
@@ -332,24 +275,25 @@ DEFAULTER_GEN ?= $(LOCALBIN)/defaulter-gen
 CONVERSION_GEN ?= $(LOCALBIN)/conversion-gen
 OPENAPI_GEN ?= $(LOCALBIN)/openapi-gen
 APPLYCONFIGURATION_GEN ?= $(LOCALBIN)/applyconfiguration-gen
-VGOPATH ?= $(LOCALBIN)/vgopath
 GEN_CRD_API_REFERENCE_DOCS ?= $(LOCALBIN)/gen-crd-api-reference-docs
 ADDLICENSE ?= $(LOCALBIN)/addlicense
-PROTOC_GEN_GOGO ?= $(LOCALBIN)/protoc-gen-gogo
+PROTOC_GEN_GO ?= $(LOCALBIN)/protoc-gen-go
+PROTOC_GEN_GO_GRPC ?= $(LOCALBIN)/protoc-gen-go-grpc
 MODELS_SCHEMA ?= $(LOCALBIN)/models-schema
 GOIMPORTS ?= $(LOCALBIN)/goimports
 GOLANGCI_LINT ?= $(LOCALBIN)/golangci-lint
 
 ## Tool Versions
-KUSTOMIZE_VERSION ?= v5.1.1
-CODE_GENERATOR_VERSION ?= v0.29.0
-VGOPATH_VERSION ?= v0.1.3
-CONTROLLER_TOOLS_VERSION ?= v0.13.0
+KUSTOMIZE_VERSION ?= v5.4.3
+CODE_GENERATOR_VERSION ?= v0.31.0
+CONTROLLER_TOOLS_VERSION ?= v0.16.1
+OPENAPI_GEN_VERSION ?= f7e401e7b4c2199f15e2cf9e37a2faa2209f286a # Unfortunately, no tagged releases - watch https://github.com/kubernetes/kube-openapi/issues/383 for changes.
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= v0.3.0
 ADDLICENSE_VERSION ?= v1.1.1
-PROTOC_GEN_GOGO_VERSION ?= v1.3.2
-GOIMPORTS_VERSION ?= v0.13.0
-GOLANGCI_LINT_VERSION ?= v1.55.2
+PROTOC_GEN_GO_VERSION ?= v1.34.2
+PROTOC_GEN_GO_GRPC_VERSION ?= v1.5.1
+GOIMPORTS_VERSION ?= v0.24.0
+GOLANGCI_LINT_VERSION ?= v1.60.3
 
 KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
 .PHONY: kustomize
@@ -400,22 +344,12 @@ $(CONVERSION_GEN): $(LOCALBIN)
 .PHONY: openapi-gen
 openapi-gen: $(OPENAPI_GEN) ## Download openapi-gen locally if necessary.
 $(OPENAPI_GEN): $(LOCALBIN)
-	test -s $(LOCALBIN)/openapi-gen || GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/openapi-gen@$(CODE_GENERATOR_VERSION)
+	test -s $(LOCALBIN)/openapi-gen || GOBIN=$(LOCALBIN) go install k8s.io/kube-openapi/cmd/openapi-gen@$(OPENAPI_GEN_VERSION)
 
 .PHONY: applyconfiguration-gen
 applyconfiguration-gen: $(APPLYCONFIGURATION_GEN) ## Download applyconfiguration-gen locally if necessary.
 $(APPLYCONFIGURATION_GEN): $(LOCALBIN)
 	test -s $(LOCALBIN)/applyconfiguration-gen || GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/applyconfiguration-gen@$(CODE_GENERATOR_VERSION)
-
-.PHONY: vgopath
-vgopath: $(VGOPATH) ## Download vgopath locally if necessary.
-.PHONY: $(VGOPATH)
-$(VGOPATH): $(LOCALBIN)
-	@if test -x $(LOCALBIN)/vgopath && ! $(LOCALBIN)/vgopath version | grep -q $(VGOPATH_VERSION); then \
-		echo "$(LOCALBIN)/vgopath version is not expected $(VGOPATH_VERSION). Removing it before installing."; \
-		rm -rf $(LOCALBIN)/vgopath; \
-	fi
-	test -s $(LOCALBIN)/vgopath || GOBIN=$(LOCALBIN) go install github.com/ironcore-dev/vgopath@$(VGOPATH_VERSION)
 
 .PHONY: envtest
 envtest: $(ENVTEST) ## Download envtest-setup locally if necessary.
@@ -437,10 +371,15 @@ addlicense: $(ADDLICENSE) ## Download addlicense locally if necessary.
 $(ADDLICENSE): $(LOCALBIN)
 	test -s $(LOCALBIN)/addlicense || GOBIN=$(LOCALBIN) go install github.com/google/addlicense@$(ADDLICENSE_VERSION)
 
-.PHONY: protoc-gen-gogo
-protoc-gen-gogo: $(PROTOC_GEN_GOGO) ## Download protoc-gen-gogo locally if necessary.
-$(PROTOC_GEN_GOGO): $(LOCALBIN)
-	test -s $(LOCALBIN)/protoc-gen-gogo || GOBIN=$(LOCALBIN) go install github.com/gogo/protobuf/protoc-gen-gogo@$(PROTOC_GEN_GOGO_VERSION)
+.PHONY: protoc-gen-go
+protoc-gen-go: $(PROTOC_GEN_GO) ## Download protoc-gen-go locally if necessary.
+$(PROTOC_GEN_GO): $(LOCALBIN)
+	test -s $(LOCALBIN)/protoc-gen-go || GOBIN=$(LOCALBIN) go install google.golang.org/protobuf/cmd/protoc-gen-go@$(PROTOC_GEN_GO_VERSION)
+
+.PHONY: protoc-gen-go-grpc
+protoc-gen-go-grpc: $(PROTOC_GEN_GO_GRPC) ## Download protoc-gen-go-grpc locally if necessary.
+$(PROTOC_GEN_GO_GRPC): $(LOCALBIN)
+	test -s $(LOCALBIN)/protoc-gen-go-grpc || GOBIN=$(LOCALBIN) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@$(PROTOC_GEN_GO_GRPC_VERSION)
 
 .PHONY: models-schema
 models-schema: $(MODELS_SCHEMA) ## Install models-schema locally if necessary.

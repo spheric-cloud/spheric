@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: machinepoollet-system
+  namespace: spherelet-system
   name: machinepoollet-controller-manager
 spec:
   template:

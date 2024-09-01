@@ -12,16 +12,8 @@ import (
 	fakediscovery "k8s.io/client-go/discovery/fake"
 	"k8s.io/client-go/testing"
 	clientset "spheric.cloud/spheric/client-go/spheric"
-	computev1alpha1 "spheric.cloud/spheric/client-go/spheric/typed/compute/v1alpha1"
-	fakecomputev1alpha1 "spheric.cloud/spheric/client-go/spheric/typed/compute/v1alpha1/fake"
 	corev1alpha1 "spheric.cloud/spheric/client-go/spheric/typed/core/v1alpha1"
 	fakecorev1alpha1 "spheric.cloud/spheric/client-go/spheric/typed/core/v1alpha1/fake"
-	ipamv1alpha1 "spheric.cloud/spheric/client-go/spheric/typed/ipam/v1alpha1"
-	fakeipamv1alpha1 "spheric.cloud/spheric/client-go/spheric/typed/ipam/v1alpha1/fake"
-	networkingv1alpha1 "spheric.cloud/spheric/client-go/spheric/typed/networking/v1alpha1"
-	fakenetworkingv1alpha1 "spheric.cloud/spheric/client-go/spheric/typed/networking/v1alpha1/fake"
-	storagev1alpha1 "spheric.cloud/spheric/client-go/spheric/typed/storage/v1alpha1"
-	fakestoragev1alpha1 "spheric.cloud/spheric/client-go/spheric/typed/storage/v1alpha1/fake"
 )
 
 // NewSimpleClientset returns a clientset that will respond with the provided objects.
@@ -74,27 +66,7 @@ var (
 	_ testing.FakeClient  = &Clientset{}
 )
 
-// ComputeV1alpha1 retrieves the ComputeV1alpha1Client
-func (c *Clientset) ComputeV1alpha1() computev1alpha1.ComputeV1alpha1Interface {
-	return &fakecomputev1alpha1.FakeComputeV1alpha1{Fake: &c.Fake}
-}
-
 // CoreV1alpha1 retrieves the CoreV1alpha1Client
 func (c *Clientset) CoreV1alpha1() corev1alpha1.CoreV1alpha1Interface {
 	return &fakecorev1alpha1.FakeCoreV1alpha1{Fake: &c.Fake}
-}
-
-// IpamV1alpha1 retrieves the IpamV1alpha1Client
-func (c *Clientset) IpamV1alpha1() ipamv1alpha1.IpamV1alpha1Interface {
-	return &fakeipamv1alpha1.FakeIpamV1alpha1{Fake: &c.Fake}
-}
-
-// NetworkingV1alpha1 retrieves the NetworkingV1alpha1Client
-func (c *Clientset) NetworkingV1alpha1() networkingv1alpha1.NetworkingV1alpha1Interface {
-	return &fakenetworkingv1alpha1.FakeNetworkingV1alpha1{Fake: &c.Fake}
-}
-
-// StorageV1alpha1 retrieves the StorageV1alpha1Client
-func (c *Clientset) StorageV1alpha1() storagev1alpha1.StorageV1alpha1Interface {
-	return &fakestoragev1alpha1.FakeStorageV1alpha1{Fake: &c.Fake}
 }

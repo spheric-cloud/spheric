@@ -61,7 +61,6 @@ nav:
 - Proposals: proposals/README.md
 - API Reference:
   - Overview: api-reference/overview.md
-  - IPAM: api-reference/ipam.md
   - Core: api-reference/core.md
   - Compute: api-reference/compute.md
   - Networking: api-reference/networking.md

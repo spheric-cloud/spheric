@@ -34,6 +34,8 @@ var (
 	scheme = runtime.NewScheme()
 )
 
+type workKey struct{}
+
 func init() {
 	utilruntime.Must(certificatesv1.AddToScheme(scheme))
 }
@@ -57,7 +59,7 @@ type rotator struct {
 	forceInitial bool
 	certificate  atomic.Pointer[tls.Certificate]
 
-	queue workqueue.RateLimitingInterface
+	queue workqueue.TypedRateLimitingInterface[workKey]
 }
 
 type Rotator interface {
@@ -278,8 +280,8 @@ func (r *rotator) rotate(ctx context.Context) error {
 	return nil
 }
 
-func (r *rotator) enqueue(key interface{}) {
-	// If we want a forced initial rotation, respect it / reset it afterwards.
+func (r *rotator) enqueue(key workKey) {
+	// If we want a forced initial rotation, respect it / reset it afterward.
 	force := r.forceInitial
 	if force {
 		r.forceInitial = false
@@ -339,8 +341,6 @@ func (r *rotator) Init(ctx context.Context, force bool) error {
 	return nil
 }
 
-const workItemKey = "key"
-
 func (r *rotator) Start(ctx context.Context) error {
 	r.startedMu.Lock()
 	if r.started {
@@ -349,7 +349,7 @@ func (r *rotator) Start(ctx context.Context) error {
 	}
 
 	r.started = true
-	r.queue = workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
+	r.queue = workqueue.NewTypedRateLimitingQueue[workKey](workqueue.DefaultTypedControllerRateLimiter[workKey]())
 	r.startedMu.Unlock()
 
 	var wg sync.WaitGroup
@@ -366,7 +366,7 @@ func (r *rotator) Start(ctx context.Context) error {
 	}()
 
 	// Kick off initial enqueue
-	r.enqueue(workItemKey)
+	r.enqueue(workKey{})
 
 	wg.Wait()
 	return nil

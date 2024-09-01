@@ -6,18 +6,13 @@
 package api
 
 import (
+	autoscalingv1 "k8s.io/api/autoscaling/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
-	computeinstall "spheric.cloud/spheric/internal/apis/compute/install"
 	coreinstall "spheric.cloud/spheric/internal/apis/core/install"
-	ipaminstall "spheric.cloud/spheric/internal/apis/ipam/install"
-	networkinginstall "spheric.cloud/spheric/internal/apis/networking/install"
-	storageinstall "spheric.cloud/spheric/internal/apis/storage/install"
-
-	autoscalingv1 "k8s.io/api/autoscaling/v1"
 )
 
 var (
@@ -29,11 +24,7 @@ var (
 )
 
 func init() {
-	ipaminstall.Install(Scheme)
-	computeinstall.Install(Scheme)
 	coreinstall.Install(Scheme)
-	networkinginstall.Install(Scheme)
-	storageinstall.Install(Scheme)
 
 	utilruntime.Must(autoscalingv1.AddToScheme(Scheme))
 

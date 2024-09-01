@@ -312,6 +312,7 @@ func (a *APIServer) createCmd() *exec.Cmd {
 		"bind-address":                 []string{a.host},
 		"secure-port":                  []string{strconv.Itoa(a.port)},
 		"enable-priority-and-fairness": []string{"false"},
+		"disable-admission-plugins":    []string{"ValidatingAdmissionPolicy"},
 		"audit-log-path":               []string{"-"},
 		"audit-log-maxage":             []string{"0"},
 		"audit-log-maxbackup":          []string{"0"},

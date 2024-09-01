@@ -35,9 +35,18 @@ func Cast[E any](v any) (E, error) {
 	return e, nil
 }
 
+func MustCast[E any](v any) E {
+	e, err := Cast[E](v)
+	if err != nil {
+		panic(err)
+	}
+	return e
+}
+
 func ReflectType[E any]() reflect.Type {
-	var ePtr *E // use a pointer to avoid initializing the entire type
-	return reflect.TypeOf(ePtr).Elem()
+	ePtr := (*E)(nil)         // use a pointer to avoid initializing the entire type
+	t := reflect.TypeOf(ePtr) // get the pointer type
+	return t.Elem()           // return the element type (the actual requested type)
 }
 
 // Pointer returns a pointer for the given value.
@@ -45,41 +54,47 @@ func Pointer[E any](e E) *E {
 	return &e
 }
 
-// ZeroPointer returns a pointer to a zero value of type E.
-func ZeroPointer[E any]() *E {
-	var zero E
-	return &zero
+func PointerOrElse[E any](e *E, defaultFunc func() *E) *E {
+	if e != nil {
+		return e
+	}
+	return defaultFunc()
 }
 
-// DerefFunc returns the value e points to if it's non-nil. Otherwise, it returns the result of calling defaultFunc.
-func DerefFunc[E any](e *E, defaultFunc func() E) E {
+func PointerOr[E any](e *E, defaultPtr *E) *E {
+	return PointerOrElse(e, func() *E {
+		return defaultPtr
+	})
+}
+
+func PointerOrNew[E any](e *E) *E {
+	return PointerOrElse(e, func() *E {
+		return new(E)
+	})
+}
+
+// DerefOrElse returns the value e points to if it's non-nil. Otherwise, it returns the result of calling defaultFunc.
+func DerefOrElse[E any](e *E, defaultFunc func() E) E {
 	if e != nil {
 		return *e
 	}
 	return defaultFunc()
 }
 
-// Deref returns the value e points to if it's non-nil. Otherwise, it returns the defaultValue.
-func Deref[E any](e *E, defaultValue E) E {
-	return DerefFunc(e, func() E {
+// DerefOr returns the value e points to if it's non-nil. Otherwise, it returns the defaultValue.
+func DerefOr[E any](e *E, defaultValue E) E {
+	return DerefOrElse(e, func() E {
 		return defaultValue
 	})
 }
 
-// DerefZero returns the value e points to if it's non-nil. Otherwise, it returns the zero value for type E.
-func DerefZero[E any](e *E) E {
+// DerefOrZero returns the value e points to if it's non-nil. Otherwise, it returns the zero value for type E.
+func DerefOrZero[E any](e *E) E {
 	if e != nil {
 		return *e
 	}
 	var zero E
 	return zero
-}
-
-func PipeMap[E any](e E, fs ...func(E) E) E {
-	for _, f := range fs {
-		e = f(e)
-	}
-	return e
 }
 
 // TODO is a function to create holes when stubbing out more complex mechanisms.

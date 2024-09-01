@@ -1,0 +1,242 @@
+syntax = "proto3";
+
+package runtime.v1alpha1;
+option go_package = "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1";
+
+service RuntimeService {
+  rpc Version(VersionRequest) returns (VersionResponse) {};
+
+  rpc ListInstances(ListInstancesRequest) returns (ListInstancesResponse) {};
+  rpc CreateInstance(CreateInstanceRequest) returns (CreateInstanceResponse) {};
+  rpc DeleteInstance(DeleteInstanceRequest) returns (DeleteInstanceResponse) {};
+  rpc UpdateInstanceAnnotations(UpdateInstanceAnnotationsRequest) returns (UpdateInstanceAnnotationsResponse);
+  rpc UpdateInstancePower(UpdateInstancePowerRequest) returns (UpdateInstancePowerResponse);
+  rpc AttachDisk(AttachDiskRequest) returns (AttachDiskResponse) {};
+  rpc DetachDisk(DetachDiskRequest) returns (DetachDiskResponse) {};
+  rpc AttachNetworkInterface(AttachNetworkInterfaceRequest) returns (AttachNetworkInterfaceResponse);
+  rpc DetachNetworkInterface(DetachNetworkInterfaceRequest) returns (DetachNetworkInterfaceResponse);
+
+  rpc Status(StatusRequest) returns (StatusResponse);
+
+  rpc Exec(ExecRequest) returns (ExecResponse);
+}
+
+message ObjectMetadata {
+  string id = 1;
+  map<string, string> annotations = 2;
+  map<string, string> labels = 3;
+  int64 generation = 4;
+  int64 created_at = 5;
+  int64 deleted_at = 6;
+}
+
+message DiskSpec {
+  string driver = 1;
+  string handle = 2;
+  map<string, string> attributes = 3;
+  map<string, bytes> secret_data = 4;
+}
+
+message InstanceFilter {
+  string id = 1;
+  map<string, string> label_selector = 2;
+}
+
+message Instance {
+  ObjectMetadata metadata = 1;
+  InstanceSpec spec = 2;
+  InstanceStatus status = 3;
+}
+
+message ImageSpec {
+  string image = 1;
+}
+
+message EmptyDisk {
+  int64 size_bytes = 1;
+}
+
+message DiskConnection {
+  string driver = 1;
+  string handle = 2;
+  map<string, string> attributes = 3;
+  map<string, bytes> secret_data = 4;
+}
+
+message Disk {
+  string name = 1;
+  string device = 2;
+  EmptyDisk empty_disk = 4;
+  DiskConnection connection = 5;
+}
+
+message NetworkInterfaceSubnetMetadata {
+  string network_name = 1;
+  string network_uid = 2;
+  string subnet_name = 3;
+  string subnet_uid = 4;
+}
+
+message NetworkInterface {
+  string name = 1;
+  NetworkInterfaceSubnetMetadata subnet_metadata = 2;
+  repeated string ips = 3;
+  repeated string subnet_cidrs = 4;
+}
+
+enum Power {
+  POWER_ON = 0;
+  POWER_OFF = 1;
+}
+
+message InstanceSpec {
+  Power power = 1;
+  ImageSpec image = 2;
+  string type = 3;
+  int64 cpu_count = 4;
+  uint64 memory_bytes = 5;
+  bytes ignition_data = 6;
+  repeated Disk disks = 7;
+  repeated NetworkInterface network_interfaces = 8;
+}
+
+message InstanceStatus {
+  int64 observed_generation = 1;
+  InstanceState state = 2;
+  string image_ref = 3;
+  repeated DiskStatus disks = 4;
+  repeated NetworkInterfaceStatus network_interfaces = 5;
+}
+
+message DiskStatus {
+  string name = 1;
+  DiskState state = 2;
+}
+
+enum DiskState {
+  DISK_PENDING = 0;
+  DISK_ATTACHED = 1;
+}
+
+message NetworkInterfaceStatus {
+  string name = 1;
+  string handle = 2;
+  NetworkInterfaceState state = 3;
+}
+
+enum NetworkInterfaceState {
+  NETWORK_INTERFACE_PENDING = 0;
+  NETWORK_INTERFACE_ATTACHED = 1;
+}
+
+enum InstanceState {
+  INSTANCE_PENDING = 0;
+  INSTANCE_RUNNING = 1;
+  INSTANCE_SUSPENDED = 2;
+  INSTANCE_TERMINATED = 3;
+}
+
+message VersionRequest {
+  string version = 1;
+}
+
+message VersionResponse {
+  // Name of the instance runtime.
+  string runtime_name = 1;
+  // Version of the instance runtime. The string must be
+  // semver-compatible.
+  string runtime_version = 2;
+}
+
+message ListInstancesRequest {
+  InstanceFilter filter = 1;
+}
+
+message ListInstancesResponse {
+  repeated Instance instances = 1;
+}
+
+message CreateInstanceRequest {
+  Instance instance = 1;
+}
+
+message CreateInstanceResponse {
+  Instance instance = 1;
+}
+
+message DeleteInstanceRequest {
+  string instance_id = 1;
+}
+
+message DeleteInstanceResponse {
+}
+
+message UpdateInstanceAnnotationsRequest {
+  string instance_id = 1;
+  map<string, string> annotations = 2;
+}
+
+message UpdateInstanceAnnotationsResponse {
+}
+
+message UpdateInstancePowerRequest {
+  string instance_id = 1;
+  Power power = 2;
+}
+
+message UpdateInstancePowerResponse {
+}
+
+message AttachDiskRequest {
+  string instance_id = 1;
+  Disk disk = 2;
+}
+
+message AttachDiskResponse {
+}
+
+message DetachDiskRequest {
+  string instance_id = 1;
+  string name = 2;
+}
+
+message DetachDiskResponse {
+}
+
+message AttachNetworkInterfaceRequest {
+  string instance_id = 1;
+  NetworkInterface network_interface = 2;
+}
+
+message AttachNetworkInterfaceResponse {
+}
+
+message DetachNetworkInterfaceRequest {
+  string instance_id = 1;
+  string name = 2;
+}
+
+message DetachNetworkInterfaceResponse {
+}
+
+message StatusRequest {
+}
+
+message RuntimeResources {
+  int64 cpu_count = 1;
+  uint64 memory_bytes = 2;
+  map<string, int64> instance_quantities = 3;
+}
+
+message StatusResponse {
+  RuntimeResources capacity = 1;
+  RuntimeResources allocatable = 2;
+}
+
+message ExecRequest {
+  string instance_id = 1;
+}
+
+message ExecResponse {
+  string url = 1;
+}

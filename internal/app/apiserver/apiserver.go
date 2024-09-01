@@ -11,13 +11,17 @@ import (
 	"net"
 	"time"
 
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/apimachinery/pkg/util/version"
+	utilversion "k8s.io/apiserver/pkg/util/version"
+	"k8s.io/component-base/featuregate"
+	baseversion "k8s.io/component-base/version"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
-	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apiserver/pkg/admission"
 	"k8s.io/apiserver/pkg/endpoints/openapi"
 	genericapiserver "k8s.io/apiserver/pkg/server"
@@ -25,48 +29,45 @@ import (
 	serverstorage "k8s.io/apiserver/pkg/server/storage"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	netutils "k8s.io/utils/net"
-	computev1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
 	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
-	ipamv1alpha1 "spheric.cloud/spheric/api/ipam/v1alpha1"
-	networkingv1alpha1 "spheric.cloud/spheric/api/networking/v1alpha1"
-	storagev1alpha1 "spheric.cloud/spheric/api/storage/v1alpha1"
 	"spheric.cloud/spheric/client-go/informers"
 	sphericopenapi "spheric.cloud/spheric/client-go/openapi"
 	clientset "spheric.cloud/spheric/client-go/spheric"
 	sphericinitializer "spheric.cloud/spheric/internal/admission/initializer"
-	"spheric.cloud/spheric/internal/admission/plugin/machinevolumedevices"
-	"spheric.cloud/spheric/internal/admission/plugin/resourcequota"
-	"spheric.cloud/spheric/internal/admission/plugin/volumeresizepolicy"
+	"spheric.cloud/spheric/internal/admission/plugin/instancediskdevices"
 	"spheric.cloud/spheric/internal/api"
-	"spheric.cloud/spheric/internal/apis/compute"
+	"spheric.cloud/spheric/internal/apis/core"
 	"spheric.cloud/spheric/internal/apiserver"
-	"spheric.cloud/spheric/internal/machinepoollet/client"
-	"spheric.cloud/spheric/internal/quota/evaluator/spheric"
-	apiequality "spheric.cloud/spheric/utils/equality"
-	"spheric.cloud/spheric/utils/quota"
+	"spheric.cloud/spheric/internal/spherelet/client"
 )
 
 const defaultEtcdPathPrefix = "/registry/spheric.cloud"
 
-func init() {
-	utilruntime.Must(apiequality.AddFuncs(equality.Semantic))
-}
-
 func NewResourceConfig() *serverstorage.ResourceConfig {
 	cfg := serverstorage.NewResourceConfig()
 	cfg.EnableVersions(
-		computev1alpha1.SchemeGroupVersion,
 		corev1alpha1.SchemeGroupVersion,
-		storagev1alpha1.SchemeGroupVersion,
-		networkingv1alpha1.SchemeGroupVersion,
-		ipamv1alpha1.SchemeGroupVersion,
 	)
 	return cfg
 }
 
+func SphericVersionToKubeVersion(ver *version.Version) *version.Version {
+	if ver.Major() != 1 {
+		return nil
+	}
+	kubeVer := utilversion.DefaultKubeEffectiveVersion().BinaryVersion()
+	// "1.2" maps to kubeVer
+	offset := int(ver.Minor()) - 2
+	mappedVer := kubeVer.OffsetMinor(offset)
+	if mappedVer.GreaterThan(kubeVer) {
+		return kubeVer
+	}
+	return mappedVer
+}
+
 type SphericAPIServerOptions struct {
-	RecommendedOptions   *genericoptions.RecommendedOptions
-	MachinePoolletConfig client.MachinePoolletClientConfig
+	RecommendedOptions *genericoptions.RecommendedOptions
+	SphereletConfig    client.SphereletClientConfig
 
 	SharedInformerFactory informers.SharedInformerFactory
 }
@@ -74,20 +75,20 @@ type SphericAPIServerOptions struct {
 func (o *SphericAPIServerOptions) AddFlags(fs *pflag.FlagSet) {
 	o.RecommendedOptions.AddFlags(fs)
 
-	// machinepoollet related flags:
-	fs.StringSliceVar(&o.MachinePoolletConfig.PreferredAddressTypes, "machinepoollet-preferred-address-types", o.MachinePoolletConfig.PreferredAddressTypes,
-		"List of the preferred MachinePoolAddressTypes to use for machinepoollet connections.")
+	// spherelet related flags:
+	fs.StringSliceVar(&o.SphereletConfig.PreferredAddressTypes, "spherelet-preferred-address-types", o.SphereletConfig.PreferredAddressTypes,
+		"List of the preferred FleetAddressTypes to use for spherelet connections.")
 
-	fs.DurationVar(&o.MachinePoolletConfig.HTTPTimeout, "machinepoollet-timeout", o.MachinePoolletConfig.HTTPTimeout,
-		"Timeout for machinepoollet operations.")
+	fs.DurationVar(&o.SphereletConfig.HTTPTimeout, "spherelet-timeout", o.SphereletConfig.HTTPTimeout,
+		"Timeout for spherelet operations.")
 
-	fs.StringVar(&o.MachinePoolletConfig.CertFile, "machinepoollet-client-certificate", o.MachinePoolletConfig.CertFile,
+	fs.StringVar(&o.SphereletConfig.CertFile, "spherelet-client-certificate", o.SphereletConfig.CertFile,
 		"Path to a client cert file for TLS.")
 
-	fs.StringVar(&o.MachinePoolletConfig.KeyFile, "machinepoollet-client-key", o.MachinePoolletConfig.KeyFile,
+	fs.StringVar(&o.SphereletConfig.KeyFile, "spherelet-client-key", o.SphereletConfig.KeyFile,
 		"Path to a client key file for TLS.")
 
-	fs.StringVar(&o.MachinePoolletConfig.CAFile, "machinepoollet-certificate-authority", o.MachinePoolletConfig.CAFile,
+	fs.StringVar(&o.SphereletConfig.CAFile, "spherelet-certificate-authority", o.SphereletConfig.CAFile,
 		"Path to a cert file for the certificate authority.")
 }
 
@@ -96,37 +97,29 @@ func NewSphericAPIServerOptions() *SphericAPIServerOptions {
 		RecommendedOptions: genericoptions.NewRecommendedOptions(
 			defaultEtcdPathPrefix,
 			api.Codecs.LegacyCodec(
-				computev1alpha1.SchemeGroupVersion,
 				corev1alpha1.SchemeGroupVersion,
-				storagev1alpha1.SchemeGroupVersion,
-				networkingv1alpha1.SchemeGroupVersion,
-				ipamv1alpha1.SchemeGroupVersion,
 			),
 		),
-		MachinePoolletConfig: client.MachinePoolletClientConfig{
+		SphereletConfig: client.SphereletClientConfig{
 			Port:         12319,
 			ReadOnlyPort: 12320,
 			PreferredAddressTypes: []string{
-				string(compute.MachinePoolHostName),
+				string(core.FleetHostName),
 
 				// internal, preferring DNS if reported
-				string(compute.MachinePoolInternalDNS),
-				string(compute.MachinePoolInternalIP),
+				string(core.FleetInternalDNS),
+				string(core.FleetInternalIP),
 
 				// external, preferring DNS if reported
-				string(compute.MachinePoolExternalDNS),
-				string(compute.MachinePoolExternalIP),
+				string(core.FleetExternalDNS),
+				string(core.FleetExternalIP),
 			},
 			HTTPTimeout: time.Duration(5) * time.Second,
 		},
 	}
 	o.RecommendedOptions.Etcd.StorageConfig.EncodeVersioner = runtime.NewMultiGroupVersioner(
-		computev1alpha1.SchemeGroupVersion,
-		schema.GroupKind{Group: computev1alpha1.SchemeGroupVersion.Group},
-		schema.GroupKind{Group: corev1alpha1.SchemeGroupVersion.Group},
-		schema.GroupKind{Group: storagev1alpha1.SchemeGroupVersion.Group},
-		schema.GroupKind{Group: networkingv1alpha1.SchemeGroupVersion.Group},
-		schema.GroupKind{Group: ipamv1alpha1.SchemeGroupVersion.Group},
+		corev1alpha1.SchemeGroupVersion,
+		schema.GroupKind{Group: corev1alpha1.GroupName},
 	)
 	return o
 }
@@ -134,8 +127,8 @@ func NewSphericAPIServerOptions() *SphericAPIServerOptions {
 func NewCommandStartSphericAPIServer(ctx context.Context, defaults *SphericAPIServerOptions) *cobra.Command {
 	o := *defaults
 	cmd := &cobra.Command{
-		Short: "Launch an sphericAPI server",
-		Long:  "Launch an sphericAPI server",
+		Short: "Launch a spheric API server",
+		Long:  "Launch a spheric API server",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := o.Complete(); err != nil {
 				return err
@@ -149,9 +142,25 @@ func NewCommandStartSphericAPIServer(ctx context.Context, defaults *SphericAPISe
 			return nil
 		},
 	}
+	cmd.SetContext(ctx)
 
-	o.AddFlags(cmd.Flags())
-	utilfeature.DefaultMutableFeatureGate.AddFlag(cmd.Flags())
+	flags := cmd.Flags()
+	o.AddFlags(flags)
+
+	utilversion.DefaultComponentGlobalsRegistry.AddFlags(flags)
+
+	defaultSphericVersion := "1.2"
+
+	_, sphericFeatureGate := utilversion.DefaultComponentGlobalsRegistry.ComponentGlobalsOrRegister(
+		apiserver.SphericComponentName, utilversion.NewEffectiveVersion(defaultSphericVersion),
+		featuregate.NewVersionedFeatureGate(version.MustParse(defaultSphericVersion)))
+
+	utilruntime.Must(sphericFeatureGate.AddVersioned(map[featuregate.Feature]featuregate.VersionedSpecs{}))
+
+	_, _ = utilversion.DefaultComponentGlobalsRegistry.ComponentGlobalsOrRegister(utilversion.DefaultKubeComponent,
+		utilversion.NewEffectiveVersion(baseversion.DefaultKubeBinaryVersion), utilfeature.DefaultMutableFeatureGate)
+
+	utilruntime.Must(utilversion.DefaultComponentGlobalsRegistry.SetEmulationVersionMapping(apiserver.SphericComponentName, utilversion.DefaultKubeComponent, SphericVersionToKubeVersion))
 
 	return cmd
 }
@@ -159,19 +168,17 @@ func NewCommandStartSphericAPIServer(ctx context.Context, defaults *SphericAPISe
 func (o *SphericAPIServerOptions) Validate(args []string) error {
 	var errors []error
 	errors = append(errors, o.RecommendedOptions.Validate()...)
+	errors = append(errors, utilfeature.DefaultMutableFeatureGate.Validate()...)
+	errors = append(errors, utilversion.DefaultComponentGlobalsRegistry.Validate()...)
 	return utilerrors.NewAggregate(errors)
 }
 
 func (o *SphericAPIServerOptions) Complete() error {
-	machinevolumedevices.Register(o.RecommendedOptions.Admission.Plugins)
-	resourcequota.Register(o.RecommendedOptions.Admission.Plugins)
-	volumeresizepolicy.Register(o.RecommendedOptions.Admission.Plugins)
+	instancediskdevices.Register(o.RecommendedOptions.Admission.Plugins)
 
 	o.RecommendedOptions.Admission.RecommendedPluginOrder = append(
 		o.RecommendedOptions.Admission.RecommendedPluginOrder,
-		machinevolumedevices.PluginName,
-		resourcequota.PluginName,
-		volumeresizepolicy.PluginName,
+		instancediskdevices.PluginName,
 	)
 
 	return nil
@@ -191,12 +198,7 @@ func (o *SphericAPIServerOptions) Config() (*apiserver.Config, error) {
 		informerFactory := informers.NewSharedInformerFactory(sphericClient, c.LoopbackClientConfig.Timeout)
 		o.SharedInformerFactory = informerFactory
 
-		quotaRegistry := quota.NewRegistry(api.Scheme)
-		if err := quota.AddAllToRegistry(quotaRegistry, spheric.NewEvaluatorsForAdmission(sphericClient, informerFactory)); err != nil {
-			return nil, fmt.Errorf("error initializing quota registry: %w", err)
-		}
-
-		genericInitializer := sphericinitializer.New(sphericClient, informerFactory, quotaRegistry)
+		genericInitializer := sphericinitializer.New(sphericClient, informerFactory)
 
 		return []admission.PluginInitializer{
 			genericInitializer,
@@ -213,6 +215,9 @@ func (o *SphericAPIServerOptions) Config() (*apiserver.Config, error) {
 	serverConfig.OpenAPIV3Config.Info.Title = "spheric-api"
 	serverConfig.OpenAPIV3Config.Info.Version = "0.1"
 
+	serverConfig.FeatureGate = utilversion.DefaultComponentGlobalsRegistry.FeatureGateFor(utilversion.DefaultKubeComponent)
+	serverConfig.EffectiveVersion = utilversion.DefaultComponentGlobalsRegistry.EffectiveVersionFor(apiserver.SphericComponentName)
+
 	if err := o.RecommendedOptions.ApplyTo(serverConfig); err != nil {
 		return nil, err
 	}
@@ -223,13 +228,13 @@ func (o *SphericAPIServerOptions) Config() (*apiserver.Config, error) {
 		GenericConfig: serverConfig,
 		ExtraConfig: apiserver.ExtraConfig{
 			APIResourceConfigSource: apiResourceConfig,
-			MachinePoolletConfig:    o.MachinePoolletConfig,
+			SphereletConfig:         o.SphereletConfig,
 		},
 	}
 
 	if config.GenericConfig.EgressSelector != nil {
-		// Use the config.GenericConfig.EgressSelector lookup to find the dialer to connect to the machinepoollet
-		config.ExtraConfig.MachinePoolletConfig.Lookup = config.GenericConfig.EgressSelector.Lookup
+		// Use the config.GenericConfig.EgressSelector lookup to find the dialer to connect to the spherelet
+		config.ExtraConfig.SphereletConfig.Lookup = config.GenericConfig.EgressSelector.Lookup
 	}
 
 	return config, nil
@@ -247,10 +252,10 @@ func (o *SphericAPIServerOptions) Run(ctx context.Context) error {
 	}
 
 	server.GenericAPIServer.AddPostStartHookOrDie("start-spheric-api-server-informers", func(context genericapiserver.PostStartHookContext) error {
-		config.GenericConfig.SharedInformerFactory.Start(context.StopCh)
-		o.SharedInformerFactory.Start(context.StopCh)
+		config.GenericConfig.SharedInformerFactory.Start(context.Done())
+		o.SharedInformerFactory.Start(context.Done())
 		return nil
 	})
 
-	return server.GenericAPIServer.PrepareRun().Run(ctx.Done())
+	return server.GenericAPIServer.PrepareRun().RunWithContext(ctx)
 }

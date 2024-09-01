@@ -11,8 +11,20 @@ import (
 
 // Interface provides access to all the informers in this group version.
 type Interface interface {
-	// ResourceQuotas returns a ResourceQuotaInformer.
-	ResourceQuotas() ResourceQuotaInformer
+	// Disks returns a DiskInformer.
+	Disks() DiskInformer
+	// DiskTypes returns a DiskTypeInformer.
+	DiskTypes() DiskTypeInformer
+	// Fleets returns a FleetInformer.
+	Fleets() FleetInformer
+	// Instances returns a InstanceInformer.
+	Instances() InstanceInformer
+	// InstanceTypes returns a InstanceTypeInformer.
+	InstanceTypes() InstanceTypeInformer
+	// Networks returns a NetworkInformer.
+	Networks() NetworkInformer
+	// Subnets returns a SubnetInformer.
+	Subnets() SubnetInformer
 }
 
 type version struct {
@@ -26,7 +38,37 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// ResourceQuotas returns a ResourceQuotaInformer.
-func (v *version) ResourceQuotas() ResourceQuotaInformer {
-	return &resourceQuotaInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+// Disks returns a DiskInformer.
+func (v *version) Disks() DiskInformer {
+	return &diskInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// DiskTypes returns a DiskTypeInformer.
+func (v *version) DiskTypes() DiskTypeInformer {
+	return &diskTypeInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
+// Fleets returns a FleetInformer.
+func (v *version) Fleets() FleetInformer {
+	return &fleetInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
+// Instances returns a InstanceInformer.
+func (v *version) Instances() InstanceInformer {
+	return &instanceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// InstanceTypes returns a InstanceTypeInformer.
+func (v *version) InstanceTypes() InstanceTypeInformer {
+	return &instanceTypeInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
+// Networks returns a NetworkInformer.
+func (v *version) Networks() NetworkInformer {
+	return &networkInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// Subnets returns a SubnetInformer.
+func (v *version) Subnets() SubnetInformer {
+	return &subnetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

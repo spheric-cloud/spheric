@@ -6,16 +6,12 @@
 package spheric
 
 import (
-	"spheric.cloud/spheric/internal/controllers/core/certificate/compute"
+	"spheric.cloud/spheric/internal/controllers/core/certificate/core"
 	"spheric.cloud/spheric/internal/controllers/core/certificate/generic"
-	"spheric.cloud/spheric/internal/controllers/core/certificate/networking"
-	"spheric.cloud/spheric/internal/controllers/core/certificate/storage"
 )
 
 var Recognizers []generic.CertificateSigningRequestRecognizer
 
 func init() {
-	Recognizers = append(Recognizers, compute.Recognizers...)
-	Recognizers = append(Recognizers, storage.Recognizers...)
-	Recognizers = append(Recognizers, networking.Recognizers...)
+	Recognizers = append(Recognizers, core.Recognizers...)
 }

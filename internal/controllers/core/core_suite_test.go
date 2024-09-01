@@ -11,10 +11,16 @@ import (
 	"testing"
 	"time"
 
+	"k8s.io/apimachinery/pkg/api/resource"
+	"k8s.io/client-go/tools/record"
+	"k8s.io/utils/lru"
+	coreclient "spheric.cloud/spheric/internal/client/core"
+	"spheric.cloud/spheric/internal/controllers/core/scheduler"
+	. "spheric.cloud/spheric/utils/testing"
+
 	"github.com/ironcore-dev/controller-utils/buildutils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -24,17 +30,11 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	metricserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
-	computev1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
 	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
-	storagev1alpha1 "spheric.cloud/spheric/api/storage/v1alpha1"
 	"spheric.cloud/spheric/internal/controllers/core"
 	certificatespheric "spheric.cloud/spheric/internal/controllers/core/certificate/spheric"
-	quotacontrollergeneric "spheric.cloud/spheric/internal/controllers/core/quota/generic"
-	quotacontrollerspheric "spheric.cloud/spheric/internal/controllers/core/quota/spheric"
-	quotaevaluatorspheric "spheric.cloud/spheric/internal/quota/evaluator/spheric"
 	utilsenvtest "spheric.cloud/spheric/utils/envtest"
 	"spheric.cloud/spheric/utils/envtest/apiserver"
-	"spheric.cloud/spheric/utils/quota"
 )
 
 const (
@@ -45,7 +45,7 @@ const (
 )
 
 var (
-	k8sClient  client.Client
+	k8sClient  = NewClientPromise()
 	testEnv    *envtest.Environment
 	testEnvExt *utilsenvtest.EnvironmentExtensions
 )
@@ -77,13 +77,9 @@ var _ = BeforeSuite(func() {
 	DeferCleanup(utilsenvtest.StopWithExtensions, testEnv, testEnvExt)
 
 	Expect(corev1alpha1.AddToScheme(scheme.Scheme)).Should(Succeed())
-	Expect(computev1alpha1.AddToScheme(scheme.Scheme)).Should(Succeed())
-	Expect(storagev1alpha1.AddToScheme(scheme.Scheme)).Should(Succeed())
 
 	// Init package-level k8sClient
-	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
-	Expect(err).NotTo(HaveOccurred())
-	Expect(k8sClient).NotTo(BeNil())
+	Expect(k8sClient.FulfillWith(client.New(cfg, client.Options{Scheme: scheme.Scheme}))).To(Succeed())
 	komega.SetClient(k8sClient)
 
 	apiSrv, err := apiserver.New(cfg, apiserver.Options{
@@ -101,6 +97,9 @@ var _ = BeforeSuite(func() {
 
 	Expect(utilsenvtest.WaitUntilAPIServicesReadyWithTimeout(apiServiceTimeout, testEnvExt, k8sClient, scheme.Scheme)).To(Succeed())
 
+	ctx, cancel := context.WithCancel(context.Background())
+	DeferCleanup(cancel)
+
 	k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
 		Scheme: scheme.Scheme,
 		Metrics: metricserver.Options{
@@ -109,46 +108,61 @@ var _ = BeforeSuite(func() {
 	})
 	Expect(err).ToNot(HaveOccurred())
 
-	registry := quota.NewRegistry(scheme.Scheme)
-	Expect(quota.AddAllToRegistry(registry, quotaevaluatorspheric.NewEvaluatorsForControllers(k8sManager.GetClient()))).To(Succeed())
+	Expect(coreclient.SetupInstanceSpecDiskNamesFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+	Expect(coreclient.SetupInstanceSpecFleetRefNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+	Expect(coreclient.SetupInstanceSpecInstanceTypeRefNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+	Expect(coreclient.SetupSubnetSpecNetworkRefNameField(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
 
-	replenishReconcilers, err := quotacontrollerspheric.NewReplenishReconcilers(k8sManager.GetClient(), registry)
-	Expect(err).NotTo(HaveOccurred())
-	Expect(quotacontrollergeneric.SetupReplenishReconcilersWithManager(k8sManager, replenishReconcilers)).To(Succeed())
-
-	Expect((&core.ResourceQuotaReconciler{
-		Client:    k8sManager.GetClient(),
-		APIReader: k8sManager.GetAPIReader(),
-		Scheme:    scheme.Scheme,
-		Registry:  registry,
-	}).SetupWithManager(k8sManager)).To(Succeed())
+	schedulerCache := scheduler.NewCache(k8sManager.GetLogger(), scheduler.DefaultCacheStrategy)
+	Expect(k8sManager.Add(schedulerCache)).To(Succeed())
 
 	Expect((&core.CertificateApprovalReconciler{
 		Client:      k8sManager.GetClient(),
 		Recognizers: certificatespheric.Recognizers,
 	}).SetupWithManager(k8sManager)).To(Succeed())
 
-	mgrCtx, cancel := context.WithCancel(context.Background())
-	DeferCleanup(cancel)
+	Expect((&core.DiskReleaseReconciler{
+		Client:       k8sManager.GetClient(),
+		APIReader:    k8sManager.GetAPIReader(),
+		AbsenceCache: lru.New(128),
+	}).SetupWithManager(k8sManager)).To(Succeed())
+
+	Expect((&core.InstanceEphemeralDiskReconciler{
+		Client: k8sManager.GetClient(),
+	}).SetupWithManager(k8sManager)).To(Succeed())
+
+	Expect((&core.InstanceTypeReconciler{
+		Client:    k8sManager.GetClient(),
+		APIReader: k8sManager.GetAPIReader(),
+	}).SetupWithManager(k8sManager)).To(Succeed())
+
+	Expect((&core.NetworkProtectionReconciler{
+		Client: k8sManager.GetClient(),
+		Scheme: scheme.Scheme,
+	}).SetupWithManager(k8sManager)).To(Succeed())
+
+	Expect((&core.InstanceScheduler{
+		EventRecorder: &record.FakeRecorder{},
+		Client:        k8sManager.GetClient(),
+		Cache:         schedulerCache,
+	}).SetupWithManager(k8sManager)).To(Succeed())
 
 	go func() {
 		defer GinkgoRecover()
-		err = k8sManager.Start(mgrCtx)
-		Expect(err).ToNot(HaveOccurred())
+		Expect(k8sManager.Start(ctx)).To(Succeed(), "failed to start manager")
 	}()
 })
 
-func SetupTest(ctx context.Context) *corev1.Namespace {
-	ns := &corev1.Namespace{}
-
-	BeforeEach(func() {
-		*ns = corev1.Namespace{
-			ObjectMeta: metav1.ObjectMeta{GenerateName: "testns-"},
+func SetupInstanceType() *corev1alpha1.InstanceType {
+	return SetupNewObject(k8sClient, func(instanceType *corev1alpha1.InstanceType) {
+		*instanceType = corev1alpha1.InstanceType{
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: "instance-type-",
+			},
+			Capabilities: corev1alpha1.ResourceList{
+				corev1alpha1.ResourceCPU:    resource.MustParse("1"),
+				corev1alpha1.ResourceMemory: resource.MustParse("1Gi"),
+			},
 		}
-		Expect(k8sClient.Create(ctx, ns)).NotTo(HaveOccurred(), "failed to create test namespace")
-
-		DeferCleanup(k8sClient.Delete, ctx, ns)
 	})
-
-	return ns
 }

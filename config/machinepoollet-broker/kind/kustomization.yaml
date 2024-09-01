@@ -13,6 +13,6 @@ patchesJson6902:
       group: apps
       version: v1
       kind: Deployment
-      namespace: machinepoollet-system
-      name: machinepoollet-controller-manager
+      namespace: spherelet-system
+      name: spherelet-controller-manager
     path: add-args.yaml

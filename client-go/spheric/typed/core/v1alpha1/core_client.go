@@ -15,7 +15,13 @@ import (
 
 type CoreV1alpha1Interface interface {
 	RESTClient() rest.Interface
-	ResourceQuotasGetter
+	DisksGetter
+	DiskTypesGetter
+	FleetsGetter
+	InstancesGetter
+	InstanceTypesGetter
+	NetworksGetter
+	SubnetsGetter
 }
 
 // CoreV1alpha1Client is used to interact with features provided by the core.spheric.cloud group.
@@ -23,8 +29,32 @@ type CoreV1alpha1Client struct {
 	restClient rest.Interface
 }
 
-func (c *CoreV1alpha1Client) ResourceQuotas(namespace string) ResourceQuotaInterface {
-	return newResourceQuotas(c, namespace)
+func (c *CoreV1alpha1Client) Disks(namespace string) DiskInterface {
+	return newDisks(c, namespace)
+}
+
+func (c *CoreV1alpha1Client) DiskTypes() DiskTypeInterface {
+	return newDiskTypes(c)
+}
+
+func (c *CoreV1alpha1Client) Fleets() FleetInterface {
+	return newFleets(c)
+}
+
+func (c *CoreV1alpha1Client) Instances(namespace string) InstanceInterface {
+	return newInstances(c, namespace)
+}
+
+func (c *CoreV1alpha1Client) InstanceTypes() InstanceTypeInterface {
+	return newInstanceTypes(c)
+}
+
+func (c *CoreV1alpha1Client) Networks(namespace string) NetworkInterface {
+	return newNetworks(c, namespace)
+}
+
+func (c *CoreV1alpha1Client) Subnets(namespace string) SubnetInterface {
+	return newSubnets(c, namespace)
 }
 
 // NewForConfig creates a new CoreV1alpha1Client for the given config.

@@ -13,9 +13,14 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
+const (
+	// GroupName is the name of the core group.
+	GroupName = "core.spheric.cloud"
+)
+
 var (
 	// SchemeGroupVersion is group version used to register these objects
-	SchemeGroupVersion = schema.GroupVersion{Group: "core.spheric.cloud", Version: "v1alpha1"}
+	SchemeGroupVersion = schema.GroupVersion{Group: GroupName, Version: "v1alpha1"}
 
 	// SchemeBuilder is used to add go types to the GroupVersionKind scheme
 	SchemeBuilder = runtime.NewSchemeBuilder(addKnownTypes)
@@ -28,10 +33,27 @@ func Resource(resource string) schema.GroupResource {
 	return SchemeGroupVersion.WithResource(resource).GroupResource()
 }
 
+func Kind(kind string) schema.GroupVersionKind {
+	return SchemeGroupVersion.WithKind(kind)
+}
+
 func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
-		&ResourceQuota{},
-		&ResourceQuotaList{},
+		&Disk{},
+		&DiskList{},
+		&DiskType{},
+		&DiskTypeList{},
+		&Fleet{},
+		&FleetList{},
+		&Instance{},
+		&InstanceList{},
+		&InstanceExecOptions{},
+		&InstanceType{},
+		&InstanceTypeList{},
+		&Network{},
+		&NetworkList{},
+		&Subnet{},
+		&SubnetList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil

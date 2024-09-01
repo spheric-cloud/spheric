@@ -29,6 +29,8 @@ import (
 	"spheric.cloud/spheric/utils/certificate"
 )
 
+type workKey struct{}
+
 func loadConfigs(cfg, bootstrapCfg *rest.Config) (certCfg, clientCfg *rest.Config, initCert *tls.Certificate, err error) {
 	if cfg == nil && bootstrapCfg == nil {
 		return nil, nil, nil, fmt.Errorf("must specify either cfg or bootstrapCfg")
@@ -67,7 +69,7 @@ type configRotator struct {
 
 	certRotator certificate.Rotator
 
-	queue workqueue.RateLimitingInterface
+	queue workqueue.TypedRateLimitingInterface[workKey]
 
 	closeConns      func()
 	baseConfig      *rest.Config
@@ -263,8 +265,6 @@ func (r *configRotator) TransportConfig() *rest.Config {
 	return r.transportConfig
 }
 
-const workItemKey = "key"
-
 func (r *configRotator) Start(ctx context.Context) error {
 	r.startedMu.Lock()
 	if r.started {
@@ -272,14 +272,14 @@ func (r *configRotator) Start(ctx context.Context) error {
 		return fmt.Errorf("configRotator already started")
 	}
 
-	r.queue = workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
+	r.queue = workqueue.NewTypedRateLimitingQueue[workKey](workqueue.DefaultTypedItemBasedRateLimiter[workKey]())
 	go func() {
 		<-ctx.Done()
 		r.queue.ShutDown()
 	}()
 
 	reg := r.certRotator.AddListener(certificate.RotatorListenerFunc(func() {
-		r.queue.Add(workItemKey)
+		r.queue.Add(workKey{})
 	}))
 	defer r.certRotator.RemoveListener(reg)
 
@@ -392,9 +392,6 @@ func UseOrRequestConfig(
 	}
 	if IsConfigValid(cfg) {
 		return cfg, false, nil
-	}
-	if certCfg == nil {
-		return nil, false, fmt.Errorf("cfg is invalid and certCfg is nil")
 	}
 
 	newCfg, err := RequestConfig(ctx, certCfg, signerName, template, getUsages, requestedDuration)

@@ -23,11 +23,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
-	computev1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
 	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
-	ipamv1alpha1 "spheric.cloud/spheric/api/ipam/v1alpha1"
-	networkingv1alpha1 "spheric.cloud/spheric/api/networking/v1alpha1"
-	storagev1alpha1 "spheric.cloud/spheric/api/storage/v1alpha1"
 	utilsenvtest "spheric.cloud/spheric/utils/envtest"
 	"spheric.cloud/spheric/utils/envtest/apiserver"
 )
@@ -65,8 +61,7 @@ var _ = BeforeSuite(func() {
 	By("bootstrapping test environment")
 	testEnv = &envtest.Environment{}
 	testEnvExt = &utilsenvtest.EnvironmentExtensions{
-		APIServiceDirectoryPaths:       []string{filepath.Join("..", "..", "config", "apiserver", "apiservice", "bases")},
-		ErrorIfAPIServicePathIsMissing: true,
+		APIServiceDirectoryPaths: []string{filepath.Join("..", "..", "config", "apiserver", "apiservice", "bases")},
 	}
 
 	cfg, err = utilsenvtest.StartWithExtensions(testEnv, testEnvExt)
@@ -75,10 +70,6 @@ var _ = BeforeSuite(func() {
 	DeferCleanup(utilsenvtest.StopWithExtensions, testEnv, testEnvExt)
 
 	Expect(corev1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
-	Expect(computev1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
-	Expect(storagev1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
-	Expect(ipamv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
-	Expect(networkingv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
 
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
 	Expect(err).NotTo(HaveOccurred())

@@ -46,10 +46,6 @@ autolabeler:
     files:
       - '/apis/storage/*'
       - '/controllers/storage/*'
-  - label: 'ipam'
-    files:
-      - '/apis/ipam/*'
-      - '/controllers/ipam/*'
   - label: 'compute'
     files:
       - '/apis/compute/*'

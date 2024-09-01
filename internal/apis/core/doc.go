@@ -10,4 +10,4 @@
 // +groupName=core.spheric.cloud
 
 // Package core is the internal version of the API.
-package core // import "spheric.cloud/spheric/internal/core"
+package core // import "spheric.cloud/spheric/internal/apis/core"

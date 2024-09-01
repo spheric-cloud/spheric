@@ -14,12 +14,8 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
-	compute "spheric.cloud/spheric/client-go/informers/compute"
 	core "spheric.cloud/spheric/client-go/informers/core"
 	internalinterfaces "spheric.cloud/spheric/client-go/informers/internalinterfaces"
-	ipam "spheric.cloud/spheric/client-go/informers/ipam"
-	networking "spheric.cloud/spheric/client-go/informers/networking"
-	storage "spheric.cloud/spheric/client-go/informers/storage"
 	spheric "spheric.cloud/spheric/client-go/spheric"
 )
 
@@ -33,6 +29,7 @@ type sharedInformerFactory struct {
 	lock             sync.Mutex
 	defaultResync    time.Duration
 	customResync     map[reflect.Type]time.Duration
+	transform        cache.TransformFunc
 
 	informers map[reflect.Type]cache.SharedIndexInformer
 	// startedInformers is used for tracking which informers have been started.
@@ -67,6 +64,14 @@ func WithTweakListOptions(tweakListOptions internalinterfaces.TweakListOptionsFu
 func WithNamespace(namespace string) SharedInformerOption {
 	return func(factory *sharedInformerFactory) *sharedInformerFactory {
 		factory.namespace = namespace
+		return factory
+	}
+}
+
+// WithTransform sets a transform on all informers.
+func WithTransform(transform cache.TransformFunc) SharedInformerOption {
+	return func(factory *sharedInformerFactory) *sharedInformerFactory {
+		factory.transform = transform
 		return factory
 	}
 }
@@ -175,6 +180,7 @@ func (f *sharedInformerFactory) InformerFor(obj runtime.Object, newFunc internal
 	}
 
 	informer = newFunc(f.client, resyncPeriod)
+	informer.SetTransform(f.transform)
 	f.informers[informerType] = informer
 
 	return informer
@@ -234,29 +240,9 @@ type SharedInformerFactory interface {
 	// client.
 	InformerFor(obj runtime.Object, newFunc internalinterfaces.NewInformerFunc) cache.SharedIndexInformer
 
-	Compute() compute.Interface
 	Core() core.Interface
-	Ipam() ipam.Interface
-	Networking() networking.Interface
-	Storage() storage.Interface
-}
-
-func (f *sharedInformerFactory) Compute() compute.Interface {
-	return compute.New(f, f.namespace, f.tweakListOptions)
 }
 
 func (f *sharedInformerFactory) Core() core.Interface {
 	return core.New(f, f.namespace, f.tweakListOptions)
-}
-
-func (f *sharedInformerFactory) Ipam() ipam.Interface {
-	return ipam.New(f, f.namespace, f.tweakListOptions)
-}
-
-func (f *sharedInformerFactory) Networking() networking.Interface {
-	return networking.New(f, f.namespace, f.tweakListOptions)
-}
-
-func (f *sharedInformerFactory) Storage() storage.Interface {
-	return storage.New(f, f.namespace, f.tweakListOptions)
 }

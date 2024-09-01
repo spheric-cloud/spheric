@@ -10,5 +10,5 @@
 - op: add
   path: /spec/template/spec/containers/1/args
   value:
-    - --namespace=machinepoollet-system
+    - --namespace=spherelet-system
     - --machine-pool-name=virtual

@@ -26,69 +26,137 @@ func Parser() *typed.Parser {
 var parserOnce sync.Once
 var parser *typed.Parser
 var schemaYAML = typed.YAMLObject(`types:
-- name: cloud.spheric.spheric.api.common.v1alpha1.IP
-  scalar: untyped
-- name: cloud.spheric.spheric.api.common.v1alpha1.IPPrefix
-  scalar: untyped
-- name: cloud.spheric.spheric.api.common.v1alpha1.LocalUIDReference
+- name: cloud.spheric.spheric.api.core.v1alpha1.AttachedDisk
   map:
     fields:
+    - name: device
+      type:
+        scalar: string
+    - name: diskRef
+      type:
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.LocalObjectReference
+    - name: emptyDisk
+      type:
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.EmptyDiskSource
+    - name: ephemeral
+      type:
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.EphemeralDiskSource
     - name: name
       type:
         scalar: string
       default: ""
-    - name: uid
-      type:
-        scalar: string
-      default: ""
-    elementRelationship: atomic
-- name: cloud.spheric.spheric.api.common.v1alpha1.SecretKeySelector
+- name: cloud.spheric.spheric.api.core.v1alpha1.AttachedDiskStatus
   map:
     fields:
-    - name: key
+    - name: lastStateTransitionTime
       type:
-        scalar: string
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
     - name: name
       type:
         scalar: string
-    elementRelationship: atomic
-- name: cloud.spheric.spheric.api.common.v1alpha1.Taint
-  map:
-    fields:
-    - name: effect
-      type:
-        scalar: string
       default: ""
-    - name: key
+    - name: state
       type:
         scalar: string
-      default: ""
-    - name: value
-      type:
-        scalar: string
-- name: cloud.spheric.spheric.api.common.v1alpha1.Toleration
-  map:
-    fields:
-    - name: effect
-      type:
-        scalar: string
-    - name: key
-      type:
-        scalar: string
-    - name: operator
-      type:
-        scalar: string
-    - name: value
-      type:
-        scalar: string
-- name: cloud.spheric.spheric.api.compute.v1alpha1.DaemonEndpoint
+- name: cloud.spheric.spheric.api.core.v1alpha1.DaemonEndpoint
   map:
     fields:
     - name: port
       type:
         scalar: numeric
       default: 0
-- name: cloud.spheric.spheric.api.compute.v1alpha1.EFIVar
+- name: cloud.spheric.spheric.api.core.v1alpha1.Disk
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.DiskSpec
+      default: {}
+    - name: status
+      type:
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.DiskStatus
+      default: {}
+- name: cloud.spheric.spheric.api.core.v1alpha1.DiskAccess
+  map:
+    fields:
+    - name: attributes
+      type:
+        map:
+          elementType:
+            scalar: string
+    - name: driver
+      type:
+        scalar: string
+      default: ""
+    - name: handle
+      type:
+        scalar: string
+      default: ""
+    - name: secretRef
+      type:
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.LocalObjectReference
+- name: cloud.spheric.spheric.api.core.v1alpha1.DiskSpec
+  map:
+    fields:
+    - name: instanceRef
+      type:
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.LocalUIDReference
+    - name: resources
+      type:
+        map:
+          elementType:
+            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
+    - name: typeRef
+      type:
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.LocalObjectReference
+      default: {}
+- name: cloud.spheric.spheric.api.core.v1alpha1.DiskStatus
+  map:
+    fields:
+    - name: access
+      type:
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.DiskAccess
+    - name: lastStateTransitionTime
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+    - name: state
+      type:
+        scalar: string
+- name: cloud.spheric.spheric.api.core.v1alpha1.DiskTemplateSpec
+  map:
+    fields:
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.DiskSpec
+      default: {}
+- name: cloud.spheric.spheric.api.core.v1alpha1.DiskType
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+- name: cloud.spheric.spheric.api.core.v1alpha1.EFIVar
   map:
     fields:
     - name: name
@@ -103,25 +171,19 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
-- name: cloud.spheric.spheric.api.compute.v1alpha1.EmptyDiskVolumeSource
+- name: cloud.spheric.spheric.api.core.v1alpha1.EmptyDiskSource
   map:
     fields:
     - name: sizeLimit
       type:
         namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
-- name: cloud.spheric.spheric.api.compute.v1alpha1.EphemeralNetworkInterfaceSource
+- name: cloud.spheric.spheric.api.core.v1alpha1.EphemeralDiskSource
   map:
     fields:
-    - name: networkInterfaceTemplate
+    - name: diskTemplate
       type:
-        namedType: cloud.spheric.spheric.api.networking.v1alpha1.NetworkInterfaceTemplateSpec
-- name: cloud.spheric.spheric.api.compute.v1alpha1.EphemeralVolumeSource
-  map:
-    fields:
-    - name: volumeTemplate
-      type:
-        namedType: cloud.spheric.spheric.api.storage.v1alpha1.VolumeTemplateSpec
-- name: cloud.spheric.spheric.api.compute.v1alpha1.Machine
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.DiskTemplateSpec
+- name: cloud.spheric.spheric.api.core.v1alpha1.Fleet
   map:
     fields:
     - name: apiVersion
@@ -136,52 +198,13 @@ var schemaYAML = typed.YAMLObject(`types:
       default: {}
     - name: spec
       type:
-        namedType: cloud.spheric.spheric.api.compute.v1alpha1.MachineSpec
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.FleetSpec
       default: {}
     - name: status
       type:
-        namedType: cloud.spheric.spheric.api.compute.v1alpha1.MachineStatus
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.FleetStatus
       default: {}
-- name: cloud.spheric.spheric.api.compute.v1alpha1.MachineClass
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: capabilities
-      type:
-        map:
-          elementType:
-            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-- name: cloud.spheric.spheric.api.compute.v1alpha1.MachinePool
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: cloud.spheric.spheric.api.compute.v1alpha1.MachinePoolSpec
-      default: {}
-    - name: status
-      type:
-        namedType: cloud.spheric.spheric.api.compute.v1alpha1.MachinePoolStatus
-      default: {}
-- name: cloud.spheric.spheric.api.compute.v1alpha1.MachinePoolAddress
+- name: cloud.spheric.spheric.api.core.v1alpha1.FleetAddress
   map:
     fields:
     - name: address
@@ -192,13 +215,12 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
-- name: cloud.spheric.spheric.api.compute.v1alpha1.MachinePoolCondition
+- name: cloud.spheric.spheric.api.core.v1alpha1.FleetCondition
   map:
     fields:
     - name: lastTransitionTime
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
-      default: {}
     - name: message
       type:
         scalar: string
@@ -218,14 +240,14 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
-- name: cloud.spheric.spheric.api.compute.v1alpha1.MachinePoolDaemonEndpoints
+- name: cloud.spheric.spheric.api.core.v1alpha1.FleetDaemonEndpoints
   map:
     fields:
-    - name: machinepoolletEndpoint
+    - name: sphereletEndpoint
       type:
-        namedType: cloud.spheric.spheric.api.compute.v1alpha1.DaemonEndpoint
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.DaemonEndpoint
       default: {}
-- name: cloud.spheric.spheric.api.compute.v1alpha1.MachinePoolSpec
+- name: cloud.spheric.spheric.api.core.v1alpha1.FleetSpec
   map:
     fields:
     - name: providerID
@@ -236,28 +258,22 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         list:
           elementType:
-            namedType: cloud.spheric.spheric.api.common.v1alpha1.Taint
+            namedType: cloud.spheric.spheric.api.core.v1alpha1.Taint
           elementRelationship: atomic
-- name: cloud.spheric.spheric.api.compute.v1alpha1.MachinePoolStatus
+- name: cloud.spheric.spheric.api.core.v1alpha1.FleetStatus
   map:
     fields:
     - name: addresses
       type:
         list:
           elementType:
-            namedType: cloud.spheric.spheric.api.compute.v1alpha1.MachinePoolAddress
+            namedType: cloud.spheric.spheric.api.core.v1alpha1.FleetAddress
           elementRelationship: atomic
     - name: allocatable
       type:
         map:
           elementType:
             namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
-    - name: availableMachineClasses
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.api.core.v1.LocalObjectReference
-          elementRelationship: atomic
     - name: capacity
       type:
         map:
@@ -267,52 +283,81 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         list:
           elementType:
-            namedType: cloud.spheric.spheric.api.compute.v1alpha1.MachinePoolCondition
+            namedType: cloud.spheric.spheric.api.core.v1alpha1.FleetCondition
           elementRelationship: atomic
     - name: daemonEndpoints
       type:
-        namedType: cloud.spheric.spheric.api.compute.v1alpha1.MachinePoolDaemonEndpoints
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.FleetDaemonEndpoints
       default: {}
     - name: state
       type:
         scalar: string
-- name: cloud.spheric.spheric.api.compute.v1alpha1.MachineSpec
+- name: cloud.spheric.spheric.api.core.v1alpha1.Instance
   map:
     fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.InstanceSpec
+      default: {}
+    - name: status
+      type:
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.InstanceStatus
+      default: {}
+- name: cloud.spheric.spheric.api.core.v1alpha1.InstanceSpec
+  map:
+    fields:
+    - name: disks
+      type:
+        list:
+          elementType:
+            namedType: cloud.spheric.spheric.api.core.v1alpha1.AttachedDisk
+          elementRelationship: associative
+          keys:
+          - name
     - name: efiVars
       type:
         list:
           elementType:
-            namedType: cloud.spheric.spheric.api.compute.v1alpha1.EFIVar
+            namedType: cloud.spheric.spheric.api.core.v1alpha1.EFIVar
           elementRelationship: associative
           keys:
           - name
+    - name: fleetRef
+      type:
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.LocalObjectReference
+    - name: fleetSelector
+      type:
+        map:
+          elementType:
+            scalar: string
     - name: ignitionRef
       type:
-        namedType: cloud.spheric.spheric.api.common.v1alpha1.SecretKeySelector
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.SecretKeySelector
     - name: image
       type:
         scalar: string
     - name: imagePullSecret
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
-    - name: machineClassRef
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.LocalObjectReference
+    - name: instanceTypeRef
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.LocalObjectReference
       default: {}
-    - name: machinePoolRef
-      type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
-    - name: machinePoolSelector
-      type:
-        map:
-          elementType:
-            scalar: string
     - name: networkInterfaces
       type:
         list:
           elementType:
-            namedType: cloud.spheric.spheric.api.compute.v1alpha1.NetworkInterface
+            namedType: cloud.spheric.spheric.api.core.v1alpha1.NetworkInterface
           elementRelationship: associative
           keys:
           - name
@@ -323,27 +368,25 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         list:
           elementType:
-            namedType: cloud.spheric.spheric.api.common.v1alpha1.Toleration
+            namedType: cloud.spheric.spheric.api.core.v1alpha1.Toleration
           elementRelationship: atomic
-    - name: volumes
+- name: cloud.spheric.spheric.api.core.v1alpha1.InstanceStatus
+  map:
+    fields:
+    - name: disks
       type:
         list:
           elementType:
-            namedType: cloud.spheric.spheric.api.compute.v1alpha1.Volume
-          elementRelationship: associative
-          keys:
-          - name
-- name: cloud.spheric.spheric.api.compute.v1alpha1.MachineStatus
-  map:
-    fields:
-    - name: machineID
+            namedType: cloud.spheric.spheric.api.core.v1alpha1.AttachedDiskStatus
+          elementRelationship: atomic
+    - name: instanceID
       type:
         scalar: string
     - name: networkInterfaces
       type:
         list:
           elementType:
-            namedType: cloud.spheric.spheric.api.compute.v1alpha1.NetworkInterfaceStatus
+            namedType: cloud.spheric.spheric.api.core.v1alpha1.NetworkInterfaceStatus
           elementRelationship: atomic
     - name: observedGeneration
       type:
@@ -351,926 +394,7 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: state
       type:
         scalar: string
-    - name: volumes
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.compute.v1alpha1.VolumeStatus
-          elementRelationship: atomic
-- name: cloud.spheric.spheric.api.compute.v1alpha1.NetworkInterface
-  map:
-    fields:
-    - name: ephemeral
-      type:
-        namedType: cloud.spheric.spheric.api.compute.v1alpha1.EphemeralNetworkInterfaceSource
-    - name: name
-      type:
-        scalar: string
-      default: ""
-    - name: networkInterfaceRef
-      type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
-- name: cloud.spheric.spheric.api.compute.v1alpha1.NetworkInterfaceStatus
-  map:
-    fields:
-    - name: handle
-      type:
-        scalar: string
-    - name: ips
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.common.v1alpha1.IP
-          elementRelationship: atomic
-    - name: lastStateTransitionTime
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
-    - name: name
-      type:
-        scalar: string
-      default: ""
-    - name: state
-      type:
-        scalar: string
-    - name: virtualIP
-      type:
-        namedType: cloud.spheric.spheric.api.common.v1alpha1.IP
-- name: cloud.spheric.spheric.api.compute.v1alpha1.Volume
-  map:
-    fields:
-    - name: device
-      type:
-        scalar: string
-    - name: emptyDisk
-      type:
-        namedType: cloud.spheric.spheric.api.compute.v1alpha1.EmptyDiskVolumeSource
-    - name: ephemeral
-      type:
-        namedType: cloud.spheric.spheric.api.compute.v1alpha1.EphemeralVolumeSource
-    - name: name
-      type:
-        scalar: string
-      default: ""
-    - name: volumeRef
-      type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
-- name: cloud.spheric.spheric.api.compute.v1alpha1.VolumeStatus
-  map:
-    fields:
-    - name: handle
-      type:
-        scalar: string
-    - name: lastStateTransitionTime
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
-    - name: name
-      type:
-        scalar: string
-      default: ""
-    - name: state
-      type:
-        scalar: string
-- name: cloud.spheric.spheric.api.core.v1alpha1.ObjectSelector
-  map:
-    fields:
-    - name: kind
-      type:
-        scalar: string
-      default: ""
-    - name: matchExpressions
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelectorRequirement
-          elementRelationship: atomic
-    - name: matchLabels
-      type:
-        map:
-          elementType:
-            scalar: string
-- name: cloud.spheric.spheric.api.core.v1alpha1.ResourceQuota
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: cloud.spheric.spheric.api.core.v1alpha1.ResourceQuotaSpec
-      default: {}
-    - name: status
-      type:
-        namedType: cloud.spheric.spheric.api.core.v1alpha1.ResourceQuotaStatus
-      default: {}
-- name: cloud.spheric.spheric.api.core.v1alpha1.ResourceQuotaSpec
-  map:
-    fields:
-    - name: hard
-      type:
-        map:
-          elementType:
-            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
-    - name: scopeSelector
-      type:
-        namedType: cloud.spheric.spheric.api.core.v1alpha1.ResourceScopeSelector
-- name: cloud.spheric.spheric.api.core.v1alpha1.ResourceQuotaStatus
-  map:
-    fields:
-    - name: hard
-      type:
-        map:
-          elementType:
-            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
-    - name: used
-      type:
-        map:
-          elementType:
-            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
-- name: cloud.spheric.spheric.api.core.v1alpha1.ResourceScopeSelector
-  map:
-    fields:
-    - name: matchExpressions
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.core.v1alpha1.ResourceScopeSelectorRequirement
-          elementRelationship: atomic
-- name: cloud.spheric.spheric.api.core.v1alpha1.ResourceScopeSelectorRequirement
-  map:
-    fields:
-    - name: operator
-      type:
-        scalar: string
-      default: ""
-    - name: scopeName
-      type:
-        scalar: string
-      default: ""
-    - name: values
-      type:
-        list:
-          elementType:
-            scalar: string
-          elementRelationship: atomic
-- name: cloud.spheric.spheric.api.ipam.v1alpha1.Prefix
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: cloud.spheric.spheric.api.ipam.v1alpha1.PrefixSpec
-      default: {}
-    - name: status
-      type:
-        namedType: cloud.spheric.spheric.api.ipam.v1alpha1.PrefixStatus
-      default: {}
-- name: cloud.spheric.spheric.api.ipam.v1alpha1.PrefixAllocation
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: cloud.spheric.spheric.api.ipam.v1alpha1.PrefixAllocationSpec
-      default: {}
-    - name: status
-      type:
-        namedType: cloud.spheric.spheric.api.ipam.v1alpha1.PrefixAllocationStatus
-      default: {}
-- name: cloud.spheric.spheric.api.ipam.v1alpha1.PrefixAllocationSpec
-  map:
-    fields:
-    - name: ipFamily
-      type:
-        scalar: string
-    - name: prefix
-      type:
-        namedType: cloud.spheric.spheric.api.common.v1alpha1.IPPrefix
-    - name: prefixLength
-      type:
-        scalar: numeric
-    - name: prefixRef
-      type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
-    - name: prefixSelector
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector
-- name: cloud.spheric.spheric.api.ipam.v1alpha1.PrefixAllocationStatus
-  map:
-    fields:
-    - name: lastPhaseTransitionTime
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
-    - name: phase
-      type:
-        scalar: string
-    - name: prefix
-      type:
-        namedType: cloud.spheric.spheric.api.common.v1alpha1.IPPrefix
-- name: cloud.spheric.spheric.api.ipam.v1alpha1.PrefixSpec
-  map:
-    fields:
-    - name: ipFamily
-      type:
-        scalar: string
-    - name: parentRef
-      type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
-    - name: parentSelector
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector
-    - name: prefix
-      type:
-        namedType: cloud.spheric.spheric.api.common.v1alpha1.IPPrefix
-    - name: prefixLength
-      type:
-        scalar: numeric
-- name: cloud.spheric.spheric.api.ipam.v1alpha1.PrefixStatus
-  map:
-    fields:
-    - name: lastPhaseTransitionTime
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
-    - name: phase
-      type:
-        scalar: string
-    - name: used
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.common.v1alpha1.IPPrefix
-          elementRelationship: atomic
-- name: cloud.spheric.spheric.api.ipam.v1alpha1.PrefixTemplateSpec
-  map:
-    fields:
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: cloud.spheric.spheric.api.ipam.v1alpha1.PrefixSpec
-      default: {}
-- name: cloud.spheric.spheric.api.networking.v1alpha1.EphemeralPrefixSource
-  map:
-    fields:
-    - name: prefixTemplate
-      type:
-        namedType: cloud.spheric.spheric.api.ipam.v1alpha1.PrefixTemplateSpec
-- name: cloud.spheric.spheric.api.networking.v1alpha1.EphemeralVirtualIPSource
-  map:
-    fields:
-    - name: virtualIPTemplate
-      type:
-        namedType: cloud.spheric.spheric.api.networking.v1alpha1.VirtualIPTemplateSpec
-- name: cloud.spheric.spheric.api.networking.v1alpha1.IPBlock
-  map:
-    fields:
-    - name: cidr
-      type:
-        namedType: cloud.spheric.spheric.api.common.v1alpha1.IPPrefix
-      default: {}
-    - name: except
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.common.v1alpha1.IPPrefix
-          elementRelationship: atomic
-- name: cloud.spheric.spheric.api.networking.v1alpha1.IPSource
-  map:
-    fields:
-    - name: ephemeral
-      type:
-        namedType: cloud.spheric.spheric.api.networking.v1alpha1.EphemeralPrefixSource
-    - name: value
-      type:
-        namedType: cloud.spheric.spheric.api.common.v1alpha1.IP
-- name: cloud.spheric.spheric.api.networking.v1alpha1.LoadBalancer
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: cloud.spheric.spheric.api.networking.v1alpha1.LoadBalancerSpec
-      default: {}
-    - name: status
-      type:
-        namedType: cloud.spheric.spheric.api.networking.v1alpha1.LoadBalancerStatus
-      default: {}
-- name: cloud.spheric.spheric.api.networking.v1alpha1.LoadBalancerDestination
-  map:
-    fields:
-    - name: ip
-      type:
-        namedType: cloud.spheric.spheric.api.common.v1alpha1.IP
-      default: {}
-    - name: targetRef
-      type:
-        namedType: cloud.spheric.spheric.api.networking.v1alpha1.LoadBalancerTargetRef
-- name: cloud.spheric.spheric.api.networking.v1alpha1.LoadBalancerPort
-  map:
-    fields:
-    - name: endPort
-      type:
-        scalar: numeric
-    - name: port
-      type:
-        scalar: numeric
-      default: 0
-    - name: protocol
-      type:
-        scalar: string
-- name: cloud.spheric.spheric.api.networking.v1alpha1.LoadBalancerRouting
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: destinations
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.networking.v1alpha1.LoadBalancerDestination
-          elementRelationship: atomic
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: networkRef
-      type:
-        namedType: cloud.spheric.spheric.api.common.v1alpha1.LocalUIDReference
-      default: {}
-- name: cloud.spheric.spheric.api.networking.v1alpha1.LoadBalancerSpec
-  map:
-    fields:
-    - name: ipFamilies
-      type:
-        list:
-          elementType:
-            scalar: string
-          elementRelationship: atomic
-    - name: ips
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.networking.v1alpha1.IPSource
-          elementRelationship: atomic
-    - name: networkInterfaceSelector
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector
-    - name: networkRef
-      type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
-      default: {}
-    - name: ports
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.networking.v1alpha1.LoadBalancerPort
-          elementRelationship: atomic
-    - name: type
-      type:
-        scalar: string
-      default: ""
-- name: cloud.spheric.spheric.api.networking.v1alpha1.LoadBalancerStatus
-  map:
-    fields:
-    - name: ips
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.common.v1alpha1.IP
-          elementRelationship: atomic
-- name: cloud.spheric.spheric.api.networking.v1alpha1.LoadBalancerTargetRef
-  map:
-    fields:
-    - name: name
-      type:
-        scalar: string
-      default: ""
-    - name: providerID
-      type:
-        scalar: string
-      default: ""
-    - name: uid
-      type:
-        scalar: string
-      default: ""
-- name: cloud.spheric.spheric.api.networking.v1alpha1.NATGateway
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: cloud.spheric.spheric.api.networking.v1alpha1.NATGatewaySpec
-      default: {}
-    - name: status
-      type:
-        namedType: cloud.spheric.spheric.api.networking.v1alpha1.NATGatewayStatus
-      default: {}
-- name: cloud.spheric.spheric.api.networking.v1alpha1.NATGatewaySpec
-  map:
-    fields:
-    - name: ipFamily
-      type:
-        scalar: string
-      default: ""
-    - name: networkRef
-      type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
-      default: {}
-    - name: portsPerNetworkInterface
-      type:
-        scalar: numeric
-    - name: type
-      type:
-        scalar: string
-      default: ""
-- name: cloud.spheric.spheric.api.networking.v1alpha1.NATGatewayStatus
-  map:
-    fields:
-    - name: ips
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.common.v1alpha1.IP
-          elementRelationship: atomic
-- name: cloud.spheric.spheric.api.networking.v1alpha1.Network
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: cloud.spheric.spheric.api.networking.v1alpha1.NetworkSpec
-      default: {}
-    - name: status
-      type:
-        namedType: cloud.spheric.spheric.api.networking.v1alpha1.NetworkStatus
-      default: {}
-- name: cloud.spheric.spheric.api.networking.v1alpha1.NetworkInterface
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: cloud.spheric.spheric.api.networking.v1alpha1.NetworkInterfaceSpec
-      default: {}
-    - name: status
-      type:
-        namedType: cloud.spheric.spheric.api.networking.v1alpha1.NetworkInterfaceStatus
-      default: {}
-- name: cloud.spheric.spheric.api.networking.v1alpha1.NetworkInterfaceSpec
-  map:
-    fields:
-    - name: attributes
-      type:
-        map:
-          elementType:
-            scalar: string
-    - name: ipFamilies
-      type:
-        list:
-          elementType:
-            scalar: string
-          elementRelationship: atomic
-    - name: ips
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.networking.v1alpha1.IPSource
-          elementRelationship: atomic
-    - name: machineRef
-      type:
-        namedType: cloud.spheric.spheric.api.common.v1alpha1.LocalUIDReference
-    - name: networkRef
-      type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
-      default: {}
-    - name: prefixes
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.networking.v1alpha1.PrefixSource
-          elementRelationship: atomic
-    - name: providerID
-      type:
-        scalar: string
-    - name: virtualIP
-      type:
-        namedType: cloud.spheric.spheric.api.networking.v1alpha1.VirtualIPSource
-- name: cloud.spheric.spheric.api.networking.v1alpha1.NetworkInterfaceStatus
-  map:
-    fields:
-    - name: ips
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.common.v1alpha1.IP
-          elementRelationship: atomic
-    - name: lastStateTransitionTime
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
-    - name: prefixes
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.common.v1alpha1.IPPrefix
-          elementRelationship: atomic
-    - name: state
-      type:
-        scalar: string
-    - name: virtualIP
-      type:
-        namedType: cloud.spheric.spheric.api.common.v1alpha1.IP
-- name: cloud.spheric.spheric.api.networking.v1alpha1.NetworkInterfaceTemplateSpec
-  map:
-    fields:
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: cloud.spheric.spheric.api.networking.v1alpha1.NetworkInterfaceSpec
-      default: {}
-- name: cloud.spheric.spheric.api.networking.v1alpha1.NetworkPeering
-  map:
-    fields:
-    - name: name
-      type:
-        scalar: string
-      default: ""
-    - name: networkRef
-      type:
-        namedType: cloud.spheric.spheric.api.networking.v1alpha1.NetworkPeeringNetworkRef
-      default: {}
-- name: cloud.spheric.spheric.api.networking.v1alpha1.NetworkPeeringClaimRef
-  map:
-    fields:
-    - name: name
-      type:
-        scalar: string
-      default: ""
-    - name: namespace
-      type:
-        scalar: string
-    - name: uid
-      type:
-        scalar: string
-- name: cloud.spheric.spheric.api.networking.v1alpha1.NetworkPeeringNetworkRef
-  map:
-    fields:
-    - name: name
-      type:
-        scalar: string
-      default: ""
-    - name: namespace
-      type:
-        scalar: string
-- name: cloud.spheric.spheric.api.networking.v1alpha1.NetworkPeeringStatus
-  map:
-    fields:
-    - name: name
-      type:
-        scalar: string
-      default: ""
-- name: cloud.spheric.spheric.api.networking.v1alpha1.NetworkPolicy
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: cloud.spheric.spheric.api.networking.v1alpha1.NetworkPolicySpec
-      default: {}
-    - name: status
-      type:
-        namedType: cloud.spheric.spheric.api.networking.v1alpha1.NetworkPolicyStatus
-      default: {}
-- name: cloud.spheric.spheric.api.networking.v1alpha1.NetworkPolicyCondition
-  map:
-    fields:
-    - name: lastTransitionTime
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
-      default: {}
-    - name: message
-      type:
-        scalar: string
-      default: ""
-    - name: observedGeneration
-      type:
-        scalar: numeric
-    - name: reason
-      type:
-        scalar: string
-      default: ""
-    - name: status
-      type:
-        scalar: string
-      default: ""
-    - name: type
-      type:
-        scalar: string
-      default: ""
-- name: cloud.spheric.spheric.api.networking.v1alpha1.NetworkPolicyEgressRule
-  map:
-    fields:
-    - name: ports
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.networking.v1alpha1.NetworkPolicyPort
-          elementRelationship: atomic
-    - name: to
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.networking.v1alpha1.NetworkPolicyPeer
-          elementRelationship: atomic
-- name: cloud.spheric.spheric.api.networking.v1alpha1.NetworkPolicyIngressRule
-  map:
-    fields:
-    - name: from
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.networking.v1alpha1.NetworkPolicyPeer
-          elementRelationship: atomic
-    - name: ports
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.networking.v1alpha1.NetworkPolicyPort
-          elementRelationship: atomic
-- name: cloud.spheric.spheric.api.networking.v1alpha1.NetworkPolicyPeer
-  map:
-    fields:
-    - name: ipBlock
-      type:
-        namedType: cloud.spheric.spheric.api.networking.v1alpha1.IPBlock
-    - name: objectSelector
-      type:
-        namedType: cloud.spheric.spheric.api.core.v1alpha1.ObjectSelector
-- name: cloud.spheric.spheric.api.networking.v1alpha1.NetworkPolicyPort
-  map:
-    fields:
-    - name: endPort
-      type:
-        scalar: numeric
-    - name: port
-      type:
-        scalar: numeric
-    - name: protocol
-      type:
-        scalar: string
-- name: cloud.spheric.spheric.api.networking.v1alpha1.NetworkPolicySpec
-  map:
-    fields:
-    - name: egress
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.networking.v1alpha1.NetworkPolicyEgressRule
-          elementRelationship: atomic
-    - name: ingress
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.networking.v1alpha1.NetworkPolicyIngressRule
-          elementRelationship: atomic
-    - name: networkInterfaceSelector
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector
-      default: {}
-    - name: networkRef
-      type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
-      default: {}
-    - name: policyTypes
-      type:
-        list:
-          elementType:
-            scalar: string
-          elementRelationship: atomic
-- name: cloud.spheric.spheric.api.networking.v1alpha1.NetworkPolicyStatus
-  map:
-    fields:
-    - name: conditions
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.networking.v1alpha1.NetworkPolicyCondition
-          elementRelationship: atomic
-- name: cloud.spheric.spheric.api.networking.v1alpha1.NetworkSpec
-  map:
-    fields:
-    - name: incomingPeerings
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.networking.v1alpha1.NetworkPeeringClaimRef
-          elementRelationship: associative
-          keys:
-          - name
-    - name: peerings
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.networking.v1alpha1.NetworkPeering
-          elementRelationship: associative
-          keys:
-          - name
-    - name: providerID
-      type:
-        scalar: string
-- name: cloud.spheric.spheric.api.networking.v1alpha1.NetworkStatus
-  map:
-    fields:
-    - name: peerings
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.networking.v1alpha1.NetworkPeeringStatus
-          elementRelationship: associative
-          keys:
-          - name
-    - name: state
-      type:
-        scalar: string
-- name: cloud.spheric.spheric.api.networking.v1alpha1.PrefixSource
-  map:
-    fields:
-    - name: ephemeral
-      type:
-        namedType: cloud.spheric.spheric.api.networking.v1alpha1.EphemeralPrefixSource
-    - name: value
-      type:
-        namedType: cloud.spheric.spheric.api.common.v1alpha1.IPPrefix
-- name: cloud.spheric.spheric.api.networking.v1alpha1.VirtualIP
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: cloud.spheric.spheric.api.networking.v1alpha1.VirtualIPSpec
-      default: {}
-    - name: status
-      type:
-        namedType: cloud.spheric.spheric.api.networking.v1alpha1.VirtualIPStatus
-      default: {}
-- name: cloud.spheric.spheric.api.networking.v1alpha1.VirtualIPSource
-  map:
-    fields:
-    - name: ephemeral
-      type:
-        namedType: cloud.spheric.spheric.api.networking.v1alpha1.EphemeralVirtualIPSource
-    - name: virtualIPRef
-      type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
-- name: cloud.spheric.spheric.api.networking.v1alpha1.VirtualIPSpec
-  map:
-    fields:
-    - name: ipFamily
-      type:
-        scalar: string
-      default: ""
-    - name: targetRef
-      type:
-        namedType: cloud.spheric.spheric.api.common.v1alpha1.LocalUIDReference
-    - name: type
-      type:
-        scalar: string
-      default: ""
-- name: cloud.spheric.spheric.api.networking.v1alpha1.VirtualIPStatus
-  map:
-    fields:
-    - name: ip
-      type:
-        namedType: cloud.spheric.spheric.api.common.v1alpha1.IP
-- name: cloud.spheric.spheric.api.networking.v1alpha1.VirtualIPTemplateSpec
-  map:
-    fields:
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: cloud.spheric.spheric.api.networking.v1alpha1.VirtualIPSpec
-      default: {}
-- name: cloud.spheric.spheric.api.storage.v1alpha1.Bucket
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: cloud.spheric.spheric.api.storage.v1alpha1.BucketSpec
-      default: {}
-    - name: status
-      type:
-        namedType: cloud.spheric.spheric.api.storage.v1alpha1.BucketStatus
-      default: {}
-- name: cloud.spheric.spheric.api.storage.v1alpha1.BucketAccess
-  map:
-    fields:
-    - name: endpoint
-      type:
-        scalar: string
-      default: ""
-    - name: secretRef
-      type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
-- name: cloud.spheric.spheric.api.storage.v1alpha1.BucketClass
+- name: cloud.spheric.spheric.api.core.v1alpha1.InstanceType
   map:
     fields:
     - name: apiVersion
@@ -1281,6 +405,9 @@ var schemaYAML = typed.YAMLObject(`types:
         map:
           elementType:
             namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
+    - name: class
+      type:
+        scalar: string
     - name: kind
       type:
         scalar: string
@@ -1288,31 +415,25 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       default: {}
-- name: cloud.spheric.spheric.api.storage.v1alpha1.BucketCondition
+- name: cloud.spheric.spheric.api.core.v1alpha1.LocalObjectReference
   map:
     fields:
-    - name: lastTransitionTime
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
-      default: {}
-    - name: message
+    - name: name
       type:
         scalar: string
-    - name: observedGeneration
-      type:
-        scalar: numeric
-    - name: reason
-      type:
-        scalar: string
-    - name: status
+- name: cloud.spheric.spheric.api.core.v1alpha1.LocalUIDReference
+  map:
+    fields:
+    - name: name
       type:
         scalar: string
       default: ""
-    - name: type
+    - name: uid
       type:
         scalar: string
       default: ""
-- name: cloud.spheric.spheric.api.storage.v1alpha1.BucketPool
+    elementRelationship: atomic
+- name: cloud.spheric.spheric.api.core.v1alpha1.Network
   map:
     fields:
     - name: apiVersion
@@ -1327,331 +448,178 @@ var schemaYAML = typed.YAMLObject(`types:
       default: {}
     - name: spec
       type:
-        namedType: cloud.spheric.spheric.api.storage.v1alpha1.BucketPoolSpec
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.NetworkSpec
       default: {}
     - name: status
       type:
-        namedType: cloud.spheric.spheric.api.storage.v1alpha1.BucketPoolStatus
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.NetworkStatus
       default: {}
-- name: cloud.spheric.spheric.api.storage.v1alpha1.BucketPoolSpec
+- name: cloud.spheric.spheric.api.core.v1alpha1.NetworkInterface
   map:
     fields:
-    - name: providerID
+    - name: accessIPFamilies
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: atomic
+    - name: accessIPs
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: atomic
+    - name: ipFamilies
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: atomic
+    - name: ips
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: atomic
+    - name: name
       type:
         scalar: string
       default: ""
-    - name: taints
+    - name: subnetRef
       type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.common.v1alpha1.Taint
-          elementRelationship: atomic
-- name: cloud.spheric.spheric.api.storage.v1alpha1.BucketPoolStatus
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.SubnetReference
+      default: {}
+- name: cloud.spheric.spheric.api.core.v1alpha1.NetworkInterfaceStatus
   map:
     fields:
-    - name: availableBucketClasses
+    - name: accessIPs
       type:
         list:
-          elementType:
-            namedType: io.k8s.api.core.v1.LocalObjectReference
-          elementRelationship: atomic
-    - name: state
-      type:
-        scalar: string
-- name: cloud.spheric.spheric.api.storage.v1alpha1.BucketSpec
-  map:
-    fields:
-    - name: bucketClassRef
-      type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
-    - name: bucketPoolRef
-      type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
-    - name: bucketPoolSelector
-      type:
-        map:
           elementType:
             scalar: string
-    - name: tolerations
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.common.v1alpha1.Toleration
           elementRelationship: atomic
-- name: cloud.spheric.spheric.api.storage.v1alpha1.BucketStatus
-  map:
-    fields:
-    - name: access
-      type:
-        namedType: cloud.spheric.spheric.api.storage.v1alpha1.BucketAccess
-    - name: conditions
+    - name: ips
       type:
         list:
           elementType:
-            namedType: cloud.spheric.spheric.api.storage.v1alpha1.BucketCondition
+            scalar: string
           elementRelationship: atomic
     - name: lastStateTransitionTime
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+    - name: name
+      type:
+        scalar: string
+      default: ""
     - name: state
       type:
         scalar: string
-- name: cloud.spheric.spheric.api.storage.v1alpha1.Volume
+- name: cloud.spheric.spheric.api.core.v1alpha1.NetworkSpec
+  map:
+    elementType:
+      scalar: untyped
+      list:
+        elementType:
+          namedType: __untyped_atomic_
+        elementRelationship: atomic
+      map:
+        elementType:
+          namedType: __untyped_deduced_
+        elementRelationship: separable
+- name: cloud.spheric.spheric.api.core.v1alpha1.NetworkStatus
   map:
     fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: cloud.spheric.spheric.api.storage.v1alpha1.VolumeSpec
-      default: {}
-    - name: status
-      type:
-        namedType: cloud.spheric.spheric.api.storage.v1alpha1.VolumeStatus
-      default: {}
-- name: cloud.spheric.spheric.api.storage.v1alpha1.VolumeAccess
-  map:
-    fields:
-    - name: driver
-      type:
-        scalar: string
-      default: ""
-    - name: handle
-      type:
-        scalar: string
-      default: ""
-    - name: secretRef
-      type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
-    - name: volumeAttributes
-      type:
-        map:
-          elementType:
-            scalar: string
-- name: cloud.spheric.spheric.api.storage.v1alpha1.VolumeClass
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: capabilities
-      type:
-        map:
-          elementType:
-            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: resizePolicy
-      type:
-        scalar: string
-- name: cloud.spheric.spheric.api.storage.v1alpha1.VolumeCondition
-  map:
-    fields:
-    - name: lastTransitionTime
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
-      default: {}
-    - name: message
-      type:
-        scalar: string
-    - name: observedGeneration
-      type:
-        scalar: numeric
-    - name: reason
-      type:
-        scalar: string
-    - name: status
-      type:
-        scalar: string
-      default: ""
-    - name: type
-      type:
-        scalar: string
-      default: ""
-- name: cloud.spheric.spheric.api.storage.v1alpha1.VolumeEncryption
-  map:
-    fields:
-    - name: secretRef
-      type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
-      default: {}
-- name: cloud.spheric.spheric.api.storage.v1alpha1.VolumePool
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: cloud.spheric.spheric.api.storage.v1alpha1.VolumePoolSpec
-      default: {}
-    - name: status
-      type:
-        namedType: cloud.spheric.spheric.api.storage.v1alpha1.VolumePoolStatus
-      default: {}
-- name: cloud.spheric.spheric.api.storage.v1alpha1.VolumePoolCondition
-  map:
-    fields:
-    - name: lastTransitionTime
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
-      default: {}
-    - name: message
-      type:
-        scalar: string
-      default: ""
-    - name: observedGeneration
-      type:
-        scalar: numeric
-    - name: reason
-      type:
-        scalar: string
-      default: ""
-    - name: status
-      type:
-        scalar: string
-      default: ""
-    - name: type
-      type:
-        scalar: string
-      default: ""
-- name: cloud.spheric.spheric.api.storage.v1alpha1.VolumePoolSpec
-  map:
-    fields:
-    - name: providerID
-      type:
-        scalar: string
-      default: ""
-    - name: taints
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.common.v1alpha1.Taint
-          elementRelationship: atomic
-- name: cloud.spheric.spheric.api.storage.v1alpha1.VolumePoolStatus
-  map:
-    fields:
-    - name: allocatable
-      type:
-        map:
-          elementType:
-            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
-    - name: availableVolumeClasses
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.api.core.v1.LocalObjectReference
-          elementRelationship: atomic
-    - name: capacity
-      type:
-        map:
-          elementType:
-            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
-    - name: conditions
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.storage.v1alpha1.VolumePoolCondition
-          elementRelationship: atomic
     - name: state
       type:
         scalar: string
-- name: cloud.spheric.spheric.api.storage.v1alpha1.VolumeSpec
+- name: cloud.spheric.spheric.api.core.v1alpha1.SecretKeySelector
   map:
     fields:
-    - name: claimRef
-      type:
-        namedType: cloud.spheric.spheric.api.common.v1alpha1.LocalUIDReference
-    - name: encryption
-      type:
-        namedType: cloud.spheric.spheric.api.storage.v1alpha1.VolumeEncryption
-    - name: image
+    - name: key
       type:
         scalar: string
-    - name: imagePullSecretRef
-      type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
-    - name: resources
-      type:
-        map:
-          elementType:
-            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
-    - name: tolerations
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.common.v1alpha1.Toleration
-          elementRelationship: atomic
-    - name: unclaimable
-      type:
-        scalar: boolean
-    - name: volumeClassRef
-      type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
-    - name: volumePoolRef
-      type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
-    - name: volumePoolSelector
-      type:
-        map:
-          elementType:
-            scalar: string
-- name: cloud.spheric.spheric.api.storage.v1alpha1.VolumeStatus
-  map:
-    fields:
-    - name: access
-      type:
-        namedType: cloud.spheric.spheric.api.storage.v1alpha1.VolumeAccess
-    - name: conditions
-      type:
-        list:
-          elementType:
-            namedType: cloud.spheric.spheric.api.storage.v1alpha1.VolumeCondition
-          elementRelationship: atomic
-    - name: lastStateTransitionTime
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
-    - name: state
-      type:
-        scalar: string
-- name: cloud.spheric.spheric.api.storage.v1alpha1.VolumeTemplateSpec
-  map:
-    fields:
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: cloud.spheric.spheric.api.storage.v1alpha1.VolumeSpec
-      default: {}
-- name: io.k8s.api.core.v1.LocalObjectReference
-  map:
-    fields:
     - name: name
       type:
         scalar: string
     elementRelationship: atomic
+- name: cloud.spheric.spheric.api.core.v1alpha1.Subnet
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.SubnetSpec
+      default: {}
+    - name: status
+      type:
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.SubnetStatus
+      default: {}
+- name: cloud.spheric.spheric.api.core.v1alpha1.SubnetReference
+  map:
+    fields:
+    - name: name
+      type:
+        scalar: string
+    - name: networkName
+      type:
+        scalar: string
+- name: cloud.spheric.spheric.api.core.v1alpha1.SubnetSpec
+  map:
+    fields:
+    - name: cidrs
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: atomic
+    - name: networkRef
+      type:
+        namedType: cloud.spheric.spheric.api.core.v1alpha1.LocalObjectReference
+      default: {}
+- name: cloud.spheric.spheric.api.core.v1alpha1.SubnetStatus
+  map:
+    fields:
+    - name: state
+      type:
+        scalar: string
+- name: cloud.spheric.spheric.api.core.v1alpha1.Taint
+  map:
+    fields:
+    - name: effect
+      type:
+        scalar: string
+      default: ""
+    - name: key
+      type:
+        scalar: string
+      default: ""
+    - name: value
+      type:
+        scalar: string
+- name: cloud.spheric.spheric.api.core.v1alpha1.Toleration
+  map:
+    fields:
+    - name: effect
+      type:
+        scalar: string
+    - name: key
+      type:
+        scalar: string
+    - name: operator
+      type:
+        scalar: string
+    - name: value
+      type:
+        scalar: string
 - name: io.k8s.apimachinery.pkg.api.resource.Quantity
   scalar: untyped
 - name: io.k8s.apimachinery.pkg.apis.meta.v1.FieldsV1
@@ -1666,38 +634,6 @@ var schemaYAML = typed.YAMLObject(`types:
         elementType:
           namedType: __untyped_deduced_
         elementRelationship: separable
-- name: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector
-  map:
-    fields:
-    - name: matchExpressions
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelectorRequirement
-          elementRelationship: atomic
-    - name: matchLabels
-      type:
-        map:
-          elementType:
-            scalar: string
-    elementRelationship: atomic
-- name: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelectorRequirement
-  map:
-    fields:
-    - name: key
-      type:
-        scalar: string
-      default: ""
-    - name: operator
-      type:
-        scalar: string
-      default: ""
-    - name: values
-      type:
-        list:
-          elementType:
-            scalar: string
-          elementRelationship: atomic
 - name: io.k8s.apimachinery.pkg.apis.meta.v1.ManagedFieldsEntry
   map:
     fields:
@@ -1733,7 +669,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: creationTimestamp
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
-      default: {}
     - name: deletionGracePeriodSeconds
       type:
         scalar: numeric

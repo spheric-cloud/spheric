@@ -28,18 +28,8 @@ jobs:
           target: controller-manager
         - name: apiserver
           target: apiserver
-        - name: machinepoollet
-          target: machinepoollet
-        - name: srictl-machine
-          target: srictl-machine
-        - name: volumepoollet
-          target: volumepoollet
-        - name: srictl-volume
-          target: srictl-volume
-        - name: bucketpoollet
-          target: bucketpoollet
-        - name: srictl-bucket
-          target: srictl-bucket
+        - name: spherelet
+          target: spherelet
     permissions:
       contents: read
       packages: write

@@ -12,16 +12,6 @@ rules:
   - create
   - patch
 - apiGroups:
-  - ""
-  resources:
-  - namespaces
-  verbs:
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
   - authorization.k8s.io
   resources:
   - subjectaccessreviews
@@ -54,41 +44,23 @@ rules:
 - apiGroups:
   - compute.spheric.cloud
   resources:
-  - machineclasses
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - compute.spheric.cloud
-  resources:
-  - machineclasses/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - compute.spheric.cloud
-  resources:
-  - machineclasses/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - compute.spheric.cloud
-  resources:
-  - machinepools
+  - instances
   verbs:
   - get
   - list
   - watch
 - apiGroups:
-  - compute.spheric.cloud
+  - core.spheric.cloud
   resources:
-  - machines
+  - fleets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - core.spheric.cloud
+  resources:
+  - instances
   verbs:
   - get
   - list
@@ -96,9 +68,10 @@ rules:
   - update
   - watch
 - apiGroups:
-  - compute.spheric.cloud
+  - core.spheric.cloud
   resources:
-  - machines/status
+  - instances/status
+  - instancetypes/status
   verbs:
   - get
   - patch
@@ -106,7 +79,7 @@ rules:
 - apiGroups:
   - core.spheric.cloud
   resources:
-  - resourcequotas
+  - instancetypes
   verbs:
   - create
   - delete
@@ -118,120 +91,18 @@ rules:
 - apiGroups:
   - core.spheric.cloud
   resources:
-  - resourcequotas/finalizers
+  - instancetypes/finalizers
   verbs:
   - update
-- apiGroups:
-  - core.spheric.cloud
-  resources:
-  - resourcequotas/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - ipam.spheric.cloud
-  resources:
-  - prefixallocations
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - ipam.spheric.cloud
-  resources:
-  - prefixallocations/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - ipam.spheric.cloud
-  resources:
-  - prefixes
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - ipam.spheric.cloud
-  resources:
-  - prefixes/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - ipam.spheric.cloud
-  resources:
-  - prefixes/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - networking.spheric.cloud
-  resources:
-  - loadbalancerroutings
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
 - apiGroups:
   - networking.spheric.cloud
   resources:
   - loadbalancers
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - networking.spheric.cloud
-  resources:
-  - loadbalancers/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - networking.spheric.cloud
-  resources:
-  - loadbalancers/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - networking.spheric.cloud
-  resources:
   - natgateways
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - networking.spheric.cloud
-  resources:
   - networkinterfaces
   verbs:
-  - create
-  - delete
   - get
   - list
-  - patch
-  - update
   - watch
 - apiGroups:
   - networking.spheric.cloud
@@ -260,9 +131,9 @@ rules:
   - patch
   - update
 - apiGroups:
-  - networking.spheric.cloud
+  - storage.spheric.cloud
   resources:
-  - virtualips
+  - disks
   verbs:
   - create
   - delete
@@ -271,109 +142,3 @@ rules:
   - patch
   - update
   - watch
-- apiGroups:
-  - storage.spheric.cloud
-  resources:
-  - bucketclasses
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - storage.spheric.cloud
-  resources:
-  - bucketclasses/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - storage.spheric.cloud
-  resources:
-  - bucketclasses/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - storage.spheric.cloud
-  resources:
-  - bucketpools
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - storage.spheric.cloud
-  resources:
-  - buckets
-  verbs:
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - storage.spheric.cloud
-  resources:
-  - buckets/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - storage.spheric.cloud
-  resources:
-  - volumeclasses
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - storage.spheric.cloud
-  resources:
-  - volumeclasses/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - storage.spheric.cloud
-  resources:
-  - volumeclasses/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - storage.spheric.cloud
-  resources:
-  - volumepools
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - storage.spheric.cloud
-  resources:
-  - volumes
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - storage.spheric.cloud
-  resources:
-  - volumes/status
-  verbs:
-  - get
-  - patch
-  - update

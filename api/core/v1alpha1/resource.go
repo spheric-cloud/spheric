@@ -4,11 +4,9 @@
 package v1alpha1
 
 import (
-	"fmt"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/api/resource"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 // ResourceName is the name of a resource, most often used alongside a resource.Quantity.
@@ -26,44 +24,18 @@ const (
 	// ResourceIOPS defines max IOPS in input/output operations per second.
 	ResourceIOPS ResourceName = "iops"
 
-	// ResourcesRequestsPrefix is the prefix used for limiting resource requests in ResourceQuota.
-	ResourcesRequestsPrefix = "requests."
-
-	// ResourceRequestsCPU is the amount of requested cpu in cores.
-	ResourceRequestsCPU = ResourcesRequestsPrefix + ResourceCPU
-	// ResourceRequestsMemory is the amount of requested memory in bytes.
-	ResourceRequestsMemory = ResourcesRequestsPrefix + ResourceMemory
-	// ResourceRequestsStorage is the amount of requested storage in bytes.
-	ResourceRequestsStorage = ResourcesRequestsPrefix + ResourceStorage
-
-	// ResourceCountNamespacePrefix is resource namespace prefix for counting resources.
-	ResourceCountNamespacePrefix = "count/"
-
-	// ClassPrefix is the prefix for a resource to define the max amount how many times an instance of a class can be provisioned.
-	ClassPrefix = "class/"
+	// ResourceInstanceTypePrefix is the prefix for instance type resources.
+	ResourceInstanceTypePrefix = "instance-type/"
 )
 
-// ObjectCountQuotaResourceNameFor returns the ResourceName for counting the given groupResource.
-func ObjectCountQuotaResourceNameFor(groupResource schema.GroupResource) ResourceName {
-	if len(groupResource.Group) == 0 {
-		return ResourceName("count/" + groupResource.Resource)
-	}
-	return ResourceName(ResourceCountNamespacePrefix + groupResource.Resource + "." + groupResource.Group)
+// ResourceInstanceType is the resource for a specific instance type.
+func ResourceInstanceType(name string) ResourceName {
+	return ResourceName(ResourceInstanceTypePrefix + name)
 }
 
-func IsClassCountResource(resource ResourceName) bool {
-	return strings.HasPrefix(string(resource), ClassPrefix)
-}
-
-type ClassType string
-
-const (
-	ClassTypeMachineClass ClassType = "machine"
-	ClassTypeVolumeClass  ClassType = "volume"
-)
-
-func ClassCountFor(classType ClassType, className string) ResourceName {
-	return ResourceName(fmt.Sprintf("%s%s.%s", ClassPrefix, classType, className))
+// IsInstanceTypeResource determines whether the given resource name is for an instance type.
+func IsInstanceTypeResource(name ResourceName) bool {
+	return strings.HasPrefix(string(name), ResourceInstanceTypePrefix)
 }
 
 // ResourceList is a list of ResourceName alongside their resource.Quantity.

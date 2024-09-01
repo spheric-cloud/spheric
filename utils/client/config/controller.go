@@ -25,6 +25,8 @@ import (
 	utilrest "spheric.cloud/spheric/utils/rest"
 )
 
+type workKey struct{}
+
 type Controller interface {
 	manager.Runnable
 	healthz.HealthChecker
@@ -67,7 +69,7 @@ type controller struct {
 	logConstructor func() logr.Logger
 	store          Store
 
-	queue workqueue.RateLimitingInterface
+	queue workqueue.TypedRateLimitingInterface[workKey]
 
 	configRotator utilrest.ConfigRotator
 }
@@ -118,8 +120,6 @@ func NewController(ctx context.Context, store Store, bootstrapCfg *rest.Config, 
 		configRotator:  configRotator,
 	}, nil
 }
-
-const workItemKey = "key"
 
 func (c *controller) persist(ctx context.Context) error {
 	clientConfig := c.configRotator.ClientConfig()
@@ -183,14 +183,14 @@ func (c *controller) Start(ctx context.Context) error {
 		return fmt.Errorf("controller was already started")
 	}
 
-	c.queue = workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
+	c.queue = workqueue.NewTypedRateLimitingQueue[workKey](workqueue.DefaultTypedControllerRateLimiter[workKey]())
 	go func() {
 		<-ctx.Done()
 		c.queue.ShutDown()
 	}()
 
 	reg := c.configRotator.AddListener(certificate.RotatorListenerFunc(func() {
-		c.queue.Add(workItemKey)
+		c.queue.Add(workKey{})
 	}))
 	defer c.configRotator.RemoveListener(reg)
 

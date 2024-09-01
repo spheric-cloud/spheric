@@ -10,57 +10,56 @@ import (
 
 	"github.com/go-logr/logr"
 	"k8s.io/client-go/util/workqueue"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 )
 
-type loggingQueue struct {
+type loggingQueue[T comparable] struct {
 	mu sync.RWMutex
 
 	done bool
 	log  logr.Logger
-	workqueue.RateLimitingInterface
+	workqueue.TypedRateLimitingInterface[T]
 }
 
-func newLoggingQueue(log logr.Logger, queue workqueue.RateLimitingInterface) *loggingQueue {
-	return &loggingQueue{log: log, RateLimitingInterface: queue}
+func newLoggingQueue[T comparable](log logr.Logger, queue workqueue.TypedRateLimitingInterface[T]) *loggingQueue[T] {
+	return &loggingQueue[T]{log: log, TypedRateLimitingInterface: queue}
 }
 
-func (q *loggingQueue) Add(item interface{}) {
+func (q *loggingQueue[T]) Add(item T) {
 	q.mu.RLock()
 	defer q.mu.RUnlock()
 	q.log.Info("Add", "Item", item, "Done", q.done)
-	q.RateLimitingInterface.Add(item)
+	q.TypedRateLimitingInterface.Add(item)
 }
 
-func (q *loggingQueue) AddRateLimited(item interface{}) {
+func (q *loggingQueue[T]) AddRateLimited(item T) {
 	q.mu.RLock()
 	defer q.mu.RUnlock()
 	q.log.Info("AddRateLimited", "Item", item, "Done", q.done)
-	q.RateLimitingInterface.AddRateLimited(item)
+	q.TypedRateLimitingInterface.AddRateLimited(item)
 }
 
-func (q *loggingQueue) AddAfter(item interface{}, duration time.Duration) {
+func (q *loggingQueue[T]) AddAfter(item T, duration time.Duration) {
 	q.mu.RLock()
 	defer q.mu.RUnlock()
 	q.log.Info("AddAfter", "Item", item, "Duration", duration, "Done", q.done)
-	q.RateLimitingInterface.AddAfter(item, duration)
+	q.TypedRateLimitingInterface.AddAfter(item, duration)
 }
 
-func (q *loggingQueue) Finish() {
+func (q *loggingQueue[T]) Finish() {
 	q.mu.Lock()
 	defer q.mu.Unlock()
 	q.done = true
 }
 
-type debugHandler struct {
+type debugHandler[object any, request comparable] struct {
 	log         logr.Logger
-	handler     handler.EventHandler
-	objectValue func(client.Object) any
+	handler     handler.TypedEventHandler[object, request]
+	objectValue func(object) any
 }
 
-func (d *debugHandler) Create(ctx context.Context, evt event.CreateEvent, queue workqueue.RateLimitingInterface) {
+func (d *debugHandler[object, request]) Create(ctx context.Context, evt event.TypedCreateEvent[object], queue workqueue.TypedRateLimitingInterface[request]) {
 	log := d.log.WithValues("Event", "Create", "Object", d.objectValue(evt.Object))
 	log.Info("Handling Event")
 
@@ -70,7 +69,7 @@ func (d *debugHandler) Create(ctx context.Context, evt event.CreateEvent, queue 
 	d.handler.Create(ctx, evt, lQueue)
 }
 
-func (d *debugHandler) Update(ctx context.Context, evt event.UpdateEvent, queue workqueue.RateLimitingInterface) {
+func (d *debugHandler[object, request]) Update(ctx context.Context, evt event.TypedUpdateEvent[object], queue workqueue.TypedRateLimitingInterface[request]) {
 	log := d.log.WithValues("Event", "Update", "ObjectOld", d.objectValue(evt.ObjectOld), "ObjectNew", d.objectValue(evt.ObjectNew))
 	log.Info("Handling Event")
 
@@ -80,7 +79,7 @@ func (d *debugHandler) Update(ctx context.Context, evt event.UpdateEvent, queue 
 	d.handler.Update(ctx, evt, lQueue)
 }
 
-func (d *debugHandler) Delete(ctx context.Context, evt event.DeleteEvent, queue workqueue.RateLimitingInterface) {
+func (d *debugHandler[object, request]) Delete(ctx context.Context, evt event.TypedDeleteEvent[object], queue workqueue.TypedRateLimitingInterface[request]) {
 	log := d.log.WithValues("Event", "Delete", "Object", d.objectValue(evt.Object))
 	log.Info("Handling Event")
 
@@ -90,7 +89,7 @@ func (d *debugHandler) Delete(ctx context.Context, evt event.DeleteEvent, queue 
 	d.handler.Delete(ctx, evt, lQueue)
 }
 
-func (d *debugHandler) Generic(ctx context.Context, evt event.GenericEvent, queue workqueue.RateLimitingInterface) {
+func (d *debugHandler[object, request]) Generic(ctx context.Context, evt event.TypedGenericEvent[object], queue workqueue.TypedRateLimitingInterface[request]) {
 	log := d.log.WithValues("Event", "Generic", "Object", d.objectValue(evt.Object))
 	log.Info("Handling Event")
 
@@ -100,15 +99,15 @@ func (d *debugHandler) Generic(ctx context.Context, evt event.GenericEvent, queu
 	d.handler.Generic(ctx, evt, lQueue)
 }
 
-// Handler allows debugging a handler.EventHandler by wrapping it and logging each action it does.
+// TypedHandler allows debugging a handler.EventHandler by wrapping it and logging each action it does.
 //
 // Caution: This has a heavy toll on runtime performance and should *not* be used in production code.
 // Use only for debugging handlers and remove once done.
-func Handler(name string, handler handler.EventHandler, opts ...HandlerOption) handler.EventHandler {
-	o := (&HandlerOptions{}).ApplyOptions(opts)
-	setHandlerOptionsDefaults(o)
+func TypedHandler[object any, request comparable](name string, handler handler.TypedEventHandler[object, request], opts ...TypedHandlerOption[object, request]) handler.TypedEventHandler[object, request] {
+	o := (&TypedHandlerOptions[object, request]{}).ApplyOptions(opts)
+	setTypedHandlerOptionsDefaults(o)
 
-	return &debugHandler{
+	return &debugHandler[object, request]{
 		log:         o.Log.WithName(name),
 		handler:     handler,
 		objectValue: o.ObjectValue,

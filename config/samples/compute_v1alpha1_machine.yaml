@@ -4,7 +4,7 @@ metadata:
   name: machine-sample
 spec:
   machineClassRef:
-    name: machineclass-sample
+    name: instancetype-sample
   #  machinePoolRef:
   #    name: default
   image: my-image
@@ -12,6 +12,6 @@ spec:
     - name: rootdisk # first disk is root disk
       # priority: 0 # optional
       volumeRef:
-        name: my-volume
+        name: my-disk
   ignitionRef:
     name: my-ignition-secret

@@ -7,8 +7,3 @@ the [Updating API Reference Documentation](/development/documentation/#api-refer
 in the documentation development guide.
 
 * [Core](../core)
-* [IPAM](../ipam)
-* [Compute](../compute)
-* [Networking](../networking)
-* [Storage](../storage)
-* [Common](../common)

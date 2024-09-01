@@ -11,22 +11,14 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	serializer "k8s.io/apimachinery/pkg/runtime/serializer"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
-	computev1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
 	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
-	ipamv1alpha1 "spheric.cloud/spheric/api/ipam/v1alpha1"
-	networkingv1alpha1 "spheric.cloud/spheric/api/networking/v1alpha1"
-	storagev1alpha1 "spheric.cloud/spheric/api/storage/v1alpha1"
 )
 
 var Scheme = runtime.NewScheme()
 var Codecs = serializer.NewCodecFactory(Scheme)
 var ParameterCodec = runtime.NewParameterCodec(Scheme)
 var localSchemeBuilder = runtime.SchemeBuilder{
-	computev1alpha1.AddToScheme,
 	corev1alpha1.AddToScheme,
-	ipamv1alpha1.AddToScheme,
-	networkingv1alpha1.AddToScheme,
-	storagev1alpha1.AddToScheme,
 }
 
 // AddToScheme adds all types of this clientset into the given scheme. This allows composition

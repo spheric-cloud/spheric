@@ -1,5 +1,5 @@
 # Build the manager binary
-FROM --platform=$BUILDPLATFORM golang:1.21.5 as builder
+FROM --platform=$BUILDPLATFORM golang:1.23 as builder
 
 WORKDIR /workspace
 # Copy the Go Modules manifests
@@ -14,12 +14,8 @@ COPY api/ api/
 COPY client-go/ client-go/
 COPY cmd/ cmd/
 COPY internal/ internal/
-COPY sri/ sri/
-COPY srictl/ srictl/
-COPY srictl-bucket/ srictl-bucket/
-COPY srictl-machine/ srictl-machine/
-COPY srictl-volume/ srictl-volume/
-COPY poollet/ poollet/
+COPY iri-api/ iri-api/
+COPY spherelet/ spherelet/
 COPY utils/ utils/
 
 ARG TARGETOS
@@ -39,41 +35,11 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
     CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/controller-manager ./cmd/controller-manager
 
-FROM builder as machinepoollet-builder
+FROM builder as spherelet-builder
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/machinepoollet ./poollet/machinepoollet/cmd/machinepoollet/main.go
-
-FROM builder as srictl-machine-builder
-
-RUN --mount=type=cache,target=/root/.cache/go-build \
-    --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/srictl-machine ./srictl-machine/cmd/srictl-machine/main.go
-
-FROM builder as volumepoollet-builder
-
-RUN --mount=type=cache,target=/root/.cache/go-build \
-    --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/volumepoollet ./poollet/volumepoollet/cmd/volumepoollet/main.go
-
-FROM builder as srictl-volume-builder
-
-RUN --mount=type=cache,target=/root/.cache/go-build \
-    --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/srictl-volume ./srictl-volume/cmd/srictl-volume/main.go
-
-FROM builder as bucketpoollet-builder
-
-RUN --mount=type=cache,target=/root/.cache/go-build \
-    --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/bucketpoollet ./poollet/bucketpoollet/cmd/bucketpoollet/main.go
-
-FROM builder as srictl-bucket-builder
-
-RUN --mount=type=cache,target=/root/.cache/go-build \
-    --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/srictl-bucket ./srictl-bucket/cmd/srictl-bucket/main.go
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/spherelet ./spherelet/cmd/spherelet/main.go
 
 # Use distroless as minimal base image to package the manager binary
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
@@ -91,38 +57,9 @@ USER 65532:65532
 
 ENTRYPOINT ["/apiserver"]
 
-FROM gcr.io/distroless/static:nonroot as machinepoollet
+FROM gcr.io/distroless/static:nonroot as spherelet
 WORKDIR /
-COPY --from=machinepoollet-builder /workspace/bin/machinepoollet .
+COPY --from=spherelet-builder /workspace/bin/spherelet .
 USER 65532:65532
 
-ENTRYPOINT ["/machinepoollet"]
-
-FROM debian:bullseye-slim as srictl-machine
-WORKDIR /
-COPY --from=srictl-machine-builder /workspace/bin/srictl-machine .
-USER 65532:65532
-
-FROM gcr.io/distroless/static:nonroot as volumepoollet
-WORKDIR /
-COPY --from=volumepoollet-builder /workspace/bin/volumepoollet .
-USER 65532:65532
-
-ENTRYPOINT ["/volumepoollet"]
-
-FROM debian:bullseye-slim as srictl-volume
-WORKDIR /
-COPY --from=srictl-volume-builder /workspace/bin/srictl-volume .
-USER 65532:65532
-
-FROM gcr.io/distroless/static:nonroot as bucketpoollet
-WORKDIR /
-COPY --from=bucketpoollet-builder /workspace/bin/bucketpoollet .
-USER 65532:65532
-
-ENTRYPOINT ["/bucketpoollet"]
-
-FROM debian:bullseye-slim as srictl-bucket
-WORKDIR /
-COPY --from=srictl-bucket-builder /workspace/bin/srictl-bucket .
-USER 65532:65532
+ENTRYPOINT ["/spherelet"]

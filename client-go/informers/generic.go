@@ -10,11 +10,7 @@ import (
 
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
-	v1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
-	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
-	ipamv1alpha1 "spheric.cloud/spheric/api/ipam/v1alpha1"
-	networkingv1alpha1 "spheric.cloud/spheric/api/networking/v1alpha1"
-	storagev1alpha1 "spheric.cloud/spheric/api/storage/v1alpha1"
+	v1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
 )
 
 // GenericInformer is type of SharedIndexInformer which will locate and delegate to other
@@ -43,53 +39,21 @@ func (f *genericInformer) Lister() cache.GenericLister {
 // TODO extend this to unknown resources with a client pool
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
 	switch resource {
-	// Group=compute.spheric.cloud, Version=v1alpha1
-	case v1alpha1.SchemeGroupVersion.WithResource("machines"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Compute().V1alpha1().Machines().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("machineclasses"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Compute().V1alpha1().MachineClasses().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("machinepools"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Compute().V1alpha1().MachinePools().Informer()}, nil
-
-		// Group=core.spheric.cloud, Version=v1alpha1
-	case corev1alpha1.SchemeGroupVersion.WithResource("resourcequotas"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Core().V1alpha1().ResourceQuotas().Informer()}, nil
-
-		// Group=ipam.spheric.cloud, Version=v1alpha1
-	case ipamv1alpha1.SchemeGroupVersion.WithResource("prefixes"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Ipam().V1alpha1().Prefixes().Informer()}, nil
-	case ipamv1alpha1.SchemeGroupVersion.WithResource("prefixallocations"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Ipam().V1alpha1().PrefixAllocations().Informer()}, nil
-
-		// Group=networking.spheric.cloud, Version=v1alpha1
-	case networkingv1alpha1.SchemeGroupVersion.WithResource("loadbalancers"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().LoadBalancers().Informer()}, nil
-	case networkingv1alpha1.SchemeGroupVersion.WithResource("loadbalancerroutings"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().LoadBalancerRoutings().Informer()}, nil
-	case networkingv1alpha1.SchemeGroupVersion.WithResource("natgateways"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().NATGateways().Informer()}, nil
-	case networkingv1alpha1.SchemeGroupVersion.WithResource("networks"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().Networks().Informer()}, nil
-	case networkingv1alpha1.SchemeGroupVersion.WithResource("networkinterfaces"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().NetworkInterfaces().Informer()}, nil
-	case networkingv1alpha1.SchemeGroupVersion.WithResource("networkpolicies"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().NetworkPolicies().Informer()}, nil
-	case networkingv1alpha1.SchemeGroupVersion.WithResource("virtualips"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().VirtualIPs().Informer()}, nil
-
-		// Group=storage.spheric.cloud, Version=v1alpha1
-	case storagev1alpha1.SchemeGroupVersion.WithResource("buckets"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Storage().V1alpha1().Buckets().Informer()}, nil
-	case storagev1alpha1.SchemeGroupVersion.WithResource("bucketclasses"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Storage().V1alpha1().BucketClasses().Informer()}, nil
-	case storagev1alpha1.SchemeGroupVersion.WithResource("bucketpools"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Storage().V1alpha1().BucketPools().Informer()}, nil
-	case storagev1alpha1.SchemeGroupVersion.WithResource("volumes"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Storage().V1alpha1().Volumes().Informer()}, nil
-	case storagev1alpha1.SchemeGroupVersion.WithResource("volumeclasses"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Storage().V1alpha1().VolumeClasses().Informer()}, nil
-	case storagev1alpha1.SchemeGroupVersion.WithResource("volumepools"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Storage().V1alpha1().VolumePools().Informer()}, nil
+	// Group=core.spheric.cloud, Version=v1alpha1
+	case v1alpha1.SchemeGroupVersion.WithResource("disks"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Core().V1alpha1().Disks().Informer()}, nil
+	case v1alpha1.SchemeGroupVersion.WithResource("disktypes"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Core().V1alpha1().DiskTypes().Informer()}, nil
+	case v1alpha1.SchemeGroupVersion.WithResource("fleets"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Core().V1alpha1().Fleets().Informer()}, nil
+	case v1alpha1.SchemeGroupVersion.WithResource("instances"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Core().V1alpha1().Instances().Informer()}, nil
+	case v1alpha1.SchemeGroupVersion.WithResource("instancetypes"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Core().V1alpha1().InstanceTypes().Informer()}, nil
+	case v1alpha1.SchemeGroupVersion.WithResource("networks"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Core().V1alpha1().Networks().Informer()}, nil
+	case v1alpha1.SchemeGroupVersion.WithResource("subnets"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Core().V1alpha1().Subnets().Informer()}, nil
 
 	}
 

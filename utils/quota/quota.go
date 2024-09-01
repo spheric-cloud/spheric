@@ -8,10 +8,8 @@ package quota
 import (
 	"strings"
 
-	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/sets"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
 )
 
@@ -197,57 +195,4 @@ func IsNegative(a corev1alpha1.ResourceList) sets.Set[corev1alpha1.ResourceName]
 // ToSet takes a list of resource names and converts to a string set
 func ToSet(resourceNames []corev1alpha1.ResourceName) sets.Set[corev1alpha1.ResourceName] {
 	return sets.New(resourceNames...)
-}
-
-func EvaluatorMatchingResourceNames(evaluator Evaluator, names sets.Set[corev1alpha1.ResourceName]) sets.Set[corev1alpha1.ResourceName] {
-	res := sets.New[corev1alpha1.ResourceName]()
-	for name := range names {
-		if evaluator.MatchesResourceName(name) {
-			res.Insert(name)
-		}
-	}
-	return res
-}
-
-func EvaluatorMatchesResourceNames(evaluator Evaluator, names sets.Set[corev1alpha1.ResourceName]) bool {
-	for name := range names {
-		if evaluator.MatchesResourceName(name) {
-			return true
-		}
-	}
-	return false
-}
-
-func EvaluatorMatchesResourceList(evaluator Evaluator, list corev1alpha1.ResourceList) bool {
-	for resourceName := range list {
-		if evaluator.MatchesResourceName(resourceName) {
-			return true
-		}
-	}
-	return false
-}
-
-func EvaluatorMatchesResourceScopeSelector(
-	evaluator Evaluator,
-	item client.Object,
-	resourceScopeSelector *corev1alpha1.ResourceScopeSelector,
-) (bool, error) {
-	if resourceScopeSelector == nil {
-		return true, nil
-	}
-	for _, req := range resourceScopeSelector.MatchExpressions {
-		ok, err := evaluator.MatchesResourceScopeSelectorRequirement(item, req)
-		if err != nil || !ok {
-			return ok, err
-		}
-	}
-	return true, nil
-}
-
-func KubernetesResourceListToResourceList(k8sResourceList corev1.ResourceList) corev1alpha1.ResourceList {
-	res := make(corev1alpha1.ResourceList, len(k8sResourceList))
-	for name, quantity := range k8sResourceList {
-		res[corev1alpha1.ResourceName(name)] = quantity
-	}
-	return res
 }

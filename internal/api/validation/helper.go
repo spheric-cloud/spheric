@@ -12,13 +12,13 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"k8s.io/apimachinery/pkg/api/equality"
+
 	"github.com/google/go-cmp/cmp"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
-	"spheric.cloud/spheric/api/common/v1alpha1"
-	"spheric.cloud/spheric/utils/equality"
 )
 
 const (
@@ -69,7 +69,7 @@ func ValidateImmutableField(newVal, oldVal interface{}, fldPath *field.Path) fie
 func ValidateImmutableFieldWithDiff(newVal, oldVal interface{}, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 	if !equality.Semantic.DeepEqual(oldVal, newVal) {
-		diff := cmp.Diff(oldVal, newVal, cmp.Comparer(v1alpha1.EqualIPs), cmp.Comparer(v1alpha1.EqualIPPrefixes))
+		diff := cmp.Diff(oldVal, newVal)
 		allErrs = append(allErrs, field.Forbidden(fldPath, fmt.Sprintf("%s\n%s", validation.FieldImmutableErrorMsg, diff)))
 	}
 	return allErrs

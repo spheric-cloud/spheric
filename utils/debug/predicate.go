@@ -5,18 +5,17 @@ package debug
 
 import (
 	"github.com/go-logr/logr"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
 
-type debugPredicate struct {
+type typedDebugPredicate[object any] struct {
 	log         logr.Logger
-	predicate   predicate.Predicate
-	objectValue func(client.Object) any
+	predicate   predicate.TypedPredicate[object]
+	objectValue func(object) any
 }
 
-func (d *debugPredicate) Create(evt event.CreateEvent) bool {
+func (d *typedDebugPredicate[object]) Create(evt event.TypedCreateEvent[object]) bool {
 	log := d.log.WithValues("Event", "Create", "Object", d.objectValue(evt.Object))
 	log.Info("Handling event")
 	res := d.predicate.Create(evt)
@@ -24,7 +23,7 @@ func (d *debugPredicate) Create(evt event.CreateEvent) bool {
 	return res
 }
 
-func (d *debugPredicate) Delete(evt event.DeleteEvent) bool {
+func (d *typedDebugPredicate[object]) Delete(evt event.TypedDeleteEvent[object]) bool {
 	log := d.log.WithValues("Event", "Delete", "Object", d.objectValue(evt.Object))
 	log.Info("Handling event")
 	res := d.predicate.Delete(evt)
@@ -32,7 +31,7 @@ func (d *debugPredicate) Delete(evt event.DeleteEvent) bool {
 	return res
 }
 
-func (d *debugPredicate) Update(evt event.UpdateEvent) bool {
+func (d *typedDebugPredicate[object]) Update(evt event.TypedUpdateEvent[object]) bool {
 	log := d.log.WithValues("Event", "Update", "ObjectOld", d.objectValue(evt.ObjectOld), "ObjectNew", d.objectValue(evt.ObjectNew))
 	log.Info("Handling event")
 	res := d.predicate.Update(evt)
@@ -40,7 +39,7 @@ func (d *debugPredicate) Update(evt event.UpdateEvent) bool {
 	return res
 }
 
-func (d *debugPredicate) Generic(evt event.GenericEvent) bool {
+func (d *typedDebugPredicate[object]) Generic(evt event.TypedGenericEvent[object]) bool {
 	log := d.log.WithValues("Event", "Generic", "Object", d.objectValue(evt.Object))
 	log.Info("Handling event")
 	res := d.predicate.Generic(evt)
@@ -48,15 +47,15 @@ func (d *debugPredicate) Generic(evt event.GenericEvent) bool {
 	return res
 }
 
-// Predicate allows debugging a predicate.Predicate by wrapping it and logging each action it does.
+// TypedPredicate allows debugging a predicate.Predicate by wrapping it and logging each action it does.
 //
 // Caution: This has a heavy toll on runtime performance and should *not* be used in production code.
 // Use only for debugging predicates and remove once done.
-func Predicate(name string, prct predicate.Predicate, opts ...PredicateOption) predicate.Predicate {
-	o := (&PredicateOptions{}).ApplyOptions(opts)
+func TypedPredicate[object any](name string, prct predicate.TypedPredicate[object], opts ...TypedPredicateOption[object]) predicate.TypedPredicate[object] {
+	o := (&TypedPredicateOptions[object]{}).ApplyOptions(opts)
 	setPredicateOptionsDefaults(o)
 
-	return &debugPredicate{
+	return &typedDebugPredicate[object]{
 		log:         o.Log.WithName(name),
 		predicate:   prct,
 		objectValue: o.ObjectValue,

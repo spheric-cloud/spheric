@@ -36,11 +36,13 @@ func main() {
 		log            logr.Logger
 		openapiPackage string
 		openapiTitle   string
+		keepTmpFile    bool
 	)
 
 	zapOpts.BindFlags(flag.CommandLine)
 	flag.StringVar(&openapiPackage, "openapi-package", "", "Package containing the openapi definitions.")
 	flag.StringVar(&openapiTitle, "openapi-title", "", "Title for the generated openapi json definition.")
+	flag.BoolVar(&keepTmpFile, "keep-tmp-file", keepTmpFile, "Keep the temporary file and print its path for diagnosis.")
 	flag.Parse()
 	log = zap.New(zap.UseFlagOptions(&zapOpts))
 
@@ -53,21 +55,26 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := run(log, openapiPackage, openapiTitle); err != nil {
+	if err := run(log, openapiPackage, openapiTitle, keepTmpFile); err != nil {
 		log.Error(err, "Error running models-schema")
 	}
 }
 
-func run(log logr.Logger, openapiPackage, openapiTitle string) error {
+func run(log logr.Logger, openapiPackage, openapiTitle string, keepTmpFile bool) error {
 	tmpFile, err := os.CreateTemp("", "models-schema-*.go")
 	if err != nil {
 		return fmt.Errorf("error creating temporary file: %w", err)
 	}
-	defer func() {
-		if err := os.Remove(tmpFile.Name()); err != nil && !errors.Is(err, fs.ErrNotExist) {
-			log.Error(err, "Error cleaning up temporary file")
-		}
-	}()
+
+	if keepTmpFile {
+		_, _ = fmt.Fprintln(os.Stderr, "Temporary file at", tmpFile.Name())
+	} else {
+		defer func() {
+			if err := os.Remove(tmpFile.Name()); err != nil && !errors.Is(err, fs.ErrNotExist) {
+				log.Error(err, "Error cleaning up temporary file")
+			}
+		}()
+	}
 
 	if err := mainGoTemplate.Execute(tmpFile, mainGoTemplateArgs{
 		OpenAPIPackage: openapiPackage,

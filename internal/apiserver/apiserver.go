@@ -8,17 +8,16 @@ package apiserver
 import (
 	"fmt"
 
-	"k8s.io/apimachinery/pkg/version"
 	"k8s.io/apiserver/pkg/registry/generic"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	serverstorage "k8s.io/apiserver/pkg/server/storage"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"spheric.cloud/spheric/internal/machinepoollet/client"
-	computerest "spheric.cloud/spheric/internal/registry/compute/rest"
 	corerest "spheric.cloud/spheric/internal/registry/core/rest"
-	ipamrest "spheric.cloud/spheric/internal/registry/ipam/rest"
-	networkingrest "spheric.cloud/spheric/internal/registry/networking/rest"
-	storagerest "spheric.cloud/spheric/internal/registry/storage/rest"
+	"spheric.cloud/spheric/internal/spherelet/client"
+)
+
+const (
+	SphericComponentName = "spheric"
 )
 
 var (
@@ -28,7 +27,7 @@ var (
 // ExtraConfig holds custom apiserver config
 type ExtraConfig struct {
 	APIResourceConfigSource serverstorage.APIResourceConfigSource
-	MachinePoolletConfig    client.MachinePoolletClientConfig
+	SphereletConfig         client.SphereletClientConfig
 }
 
 // Config defines the config for the apiserver
@@ -59,11 +58,6 @@ func (cfg *Config) Complete() CompletedConfig {
 		&cfg.ExtraConfig,
 	}
 
-	c.GenericConfig.Version = &version.Info{
-		Major: "1",
-		Minor: "0",
-	}
-
 	return CompletedConfig{&c}
 }
 
@@ -85,13 +79,9 @@ func (c completedConfig) New() (*SphericAPIServer, error) {
 
 	apiResourceConfigSource := c.ExtraConfig.APIResourceConfigSource
 	restStorageProviders := []RESTStorageProvider{
-		ipamrest.StorageProvider{},
-		corerest.StorageProvider{},
-		computerest.StorageProvider{
-			MachinePoolletClientConfig: c.ExtraConfig.MachinePoolletConfig,
+		corerest.StorageProvider{
+			SphereletClientConfig: c.ExtraConfig.SphereletConfig,
 		},
-		networkingrest.StorageProvider{},
-		storagerest.StorageProvider{},
 	}
 
 	var apiGroupsInfos []*genericapiserver.APIGroupInfo

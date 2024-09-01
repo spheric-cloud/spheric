@@ -5,4 +5,16 @@
 
 package v1alpha1
 
-type ResourceQuotaExpansion interface{}
+type DiskExpansion interface{}
+
+type DiskTypeExpansion interface{}
+
+type FleetExpansion interface{}
+
+type InstanceExpansion interface{}
+
+type InstanceTypeExpansion interface{}
+
+type NetworkExpansion interface{}
+
+type SubnetExpansion interface{}

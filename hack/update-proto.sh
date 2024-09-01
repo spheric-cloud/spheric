@@ -11,36 +11,23 @@ export TERM="xterm-256color"
 blue="$(tput setaf 4)"
 normal="$(tput sgr0)"
 
-VGOPATH="$VGOPATH"
-PROTOC_GEN_GOGO="$PROTOC_GEN_GOGO"
-
-VIRTUAL_GOPATH="$(mktemp -d)"
-trap 'rm -rf "$VIRTUAL_GOPATH"' EXIT
-
-# Setup virtual GOPATH so the codegen tools work as expected.
-(
-cd "$REPO_ROOT"
-"$VGOPATH" -o "$VIRTUAL_GOPATH"
-)
-
-export GOPATH="$VIRTUAL_GOPATH"
-export GO111MODULE=off
+PROTOC_GEN_GO="$PROTOC_GEN_GO"
+PROTOC_GEN_GO_GRPC="$PROTOC_GEN_GO_GRPC"
 
 function generate() {
   package="$1"
   (
-  cd "$VIRTUAL_GOPATH/src"
-  export PATH="$PATH:$(dirname "$PROTOC_GEN_GOGO")"
+  export PATH="$PATH:$(dirname "$PROTOC_GEN_GO")"
+  export PATH="$PATH:$(dirname "$PROTOC_GEN_GO_GRPC")"
   echo "Generating ${blue}$package${normal}"
   protoc \
-    --proto_path "./spheric.cloud/spheric/$package" \
-    --proto_path "$VIRTUAL_GOPATH/src" \
-    --gogo_out=plugins=grpc:"$VIRTUAL_GOPATH/src" \
-    "./spheric.cloud/spheric/$package/api.proto"
+    --proto_path "." \
+    --go_out="." \
+    --go-grpc_out="." \
+    --go_opt=module=spheric.cloud/spheric \
+    --go-grpc_opt=module=spheric.cloud/spheric \
+    "$package/api.proto"
   )
 }
 
-generate "sri/apis/meta/v1alpha1"
-generate "sri/apis/machine/v1alpha1"
-generate "sri/apis/volume/v1alpha1"
-generate "sri/apis/bucket/v1alpha1"
+generate "iri-api/apis/runtime/v1alpha1"

@@ -9,14 +9,13 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 
+	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	certificatesv1 "k8s.io/api/certificates/v1"
 	corev1 "k8s.io/api/core/v1"
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
-	computev1alpha1 "spheric.cloud/spheric/api/compute/v1alpha1"
-	networkingv1alpha1 "spheric.cloud/spheric/api/networking/v1alpha1"
-	storagev1alpha1 "spheric.cloud/spheric/api/storage/v1alpha1"
 	utilcertificate "spheric.cloud/spheric/utils/certificate"
 )
 
@@ -47,21 +46,9 @@ var _ = Describe("CertificateApprovalController", func() {
 				))),
 			)
 		},
-		Entry("machine pool",
-			computev1alpha1.MachinePoolCommonName("my-pool"),
-			computev1alpha1.MachinePoolsGroup,
-		),
-		Entry("volume pool",
-			storagev1alpha1.VolumePoolCommonName("my-pool"),
-			storagev1alpha1.VolumePoolsGroup,
-		),
-		Entry("bucket pool",
-			storagev1alpha1.BucketPoolCommonName("my-pool"),
-			storagev1alpha1.BucketPoolsGroup,
-		),
-		Entry("network plugin",
-			networkingv1alpha1.NetworkPluginCommonName("my-plugin"),
-			networkingv1alpha1.NetworkPluginsGroup,
+		Entry("fleet",
+			corev1alpha1.FleetCommonName("my-pool"),
+			corev1alpha1.FleetsGroup,
 		),
 	)
 })

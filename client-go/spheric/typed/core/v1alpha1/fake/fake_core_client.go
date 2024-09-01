@@ -15,8 +15,32 @@ type FakeCoreV1alpha1 struct {
 	*testing.Fake
 }
 
-func (c *FakeCoreV1alpha1) ResourceQuotas(namespace string) v1alpha1.ResourceQuotaInterface {
-	return &FakeResourceQuotas{c, namespace}
+func (c *FakeCoreV1alpha1) Disks(namespace string) v1alpha1.DiskInterface {
+	return &FakeDisks{c, namespace}
+}
+
+func (c *FakeCoreV1alpha1) DiskTypes() v1alpha1.DiskTypeInterface {
+	return &FakeDiskTypes{c}
+}
+
+func (c *FakeCoreV1alpha1) Fleets() v1alpha1.FleetInterface {
+	return &FakeFleets{c}
+}
+
+func (c *FakeCoreV1alpha1) Instances(namespace string) v1alpha1.InstanceInterface {
+	return &FakeInstances{c, namespace}
+}
+
+func (c *FakeCoreV1alpha1) InstanceTypes() v1alpha1.InstanceTypeInterface {
+	return &FakeInstanceTypes{c}
+}
+
+func (c *FakeCoreV1alpha1) Networks(namespace string) v1alpha1.NetworkInterface {
+	return &FakeNetworks{c, namespace}
+}
+
+func (c *FakeCoreV1alpha1) Subnets(namespace string) v1alpha1.SubnetInterface {
+	return &FakeSubnets{c, namespace}
 }
 
 // RESTClient returns a RESTClient that is used to communicate

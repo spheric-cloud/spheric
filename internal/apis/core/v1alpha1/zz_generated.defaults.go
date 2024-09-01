@@ -10,11 +10,56 @@ package v1alpha1
 
 import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
+	v1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
 )
 
 // RegisterDefaults adds defaulters functions to the given scheme.
 // Public to allow building arbitrary schemes.
 // All generated defaulters are covering - they call all nested defaulters.
 func RegisterDefaults(scheme *runtime.Scheme) error {
+	scheme.AddTypeDefaultingFunc(&v1alpha1.Disk{}, func(obj interface{}) { SetObjectDefaults_Disk(obj.(*v1alpha1.Disk)) })
+	scheme.AddTypeDefaultingFunc(&v1alpha1.DiskList{}, func(obj interface{}) { SetObjectDefaults_DiskList(obj.(*v1alpha1.DiskList)) })
+	scheme.AddTypeDefaultingFunc(&v1alpha1.Instance{}, func(obj interface{}) { SetObjectDefaults_Instance(obj.(*v1alpha1.Instance)) })
+	scheme.AddTypeDefaultingFunc(&v1alpha1.InstanceList{}, func(obj interface{}) { SetObjectDefaults_InstanceList(obj.(*v1alpha1.InstanceList)) })
+	scheme.AddTypeDefaultingFunc(&v1alpha1.Network{}, func(obj interface{}) { SetObjectDefaults_Network(obj.(*v1alpha1.Network)) })
+	scheme.AddTypeDefaultingFunc(&v1alpha1.NetworkList{}, func(obj interface{}) { SetObjectDefaults_NetworkList(obj.(*v1alpha1.NetworkList)) })
 	return nil
+}
+
+func SetObjectDefaults_Disk(in *v1alpha1.Disk) {
+	SetDefaults_DiskStatus(&in.Status)
+}
+
+func SetObjectDefaults_DiskList(in *v1alpha1.DiskList) {
+	for i := range in.Items {
+		a := &in.Items[i]
+		SetObjectDefaults_Disk(a)
+	}
+}
+
+func SetObjectDefaults_Instance(in *v1alpha1.Instance) {
+	SetDefaults_InstanceSpec(&in.Spec)
+	SetDefaults_InstanceStatus(&in.Status)
+	for i := range in.Status.NetworkInterfaces {
+		a := &in.Status.NetworkInterfaces[i]
+		SetDefaults_NetworkInterfaceStatus(a)
+	}
+}
+
+func SetObjectDefaults_InstanceList(in *v1alpha1.InstanceList) {
+	for i := range in.Items {
+		a := &in.Items[i]
+		SetObjectDefaults_Instance(a)
+	}
+}
+
+func SetObjectDefaults_Network(in *v1alpha1.Network) {
+	SetDefaults_NetworkStatus(&in.Status)
+}
+
+func SetObjectDefaults_NetworkList(in *v1alpha1.NetworkList) {
+	for i := range in.Items {
+		a := &in.Items[i]
+		SetObjectDefaults_Network(a)
+	}
 }

@@ -1,5 +1,5 @@
 ---
-title: OEP Title
+title: SEP Title
 
 oep-number: NNNN
 
@@ -19,7 +19,7 @@ reviewers:
 
 ---
 
-# OEP-NNNN: Your short, descriptive title
+# SEP-NNNN: Your short, descriptive title
 
 ## Table of Contents
 

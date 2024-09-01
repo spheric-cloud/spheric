@@ -12,55 +12,23 @@ import (
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
 	flowcontrol "k8s.io/client-go/util/flowcontrol"
-	computev1alpha1 "spheric.cloud/spheric/client-go/spheric/typed/compute/v1alpha1"
 	corev1alpha1 "spheric.cloud/spheric/client-go/spheric/typed/core/v1alpha1"
-	ipamv1alpha1 "spheric.cloud/spheric/client-go/spheric/typed/ipam/v1alpha1"
-	networkingv1alpha1 "spheric.cloud/spheric/client-go/spheric/typed/networking/v1alpha1"
-	storagev1alpha1 "spheric.cloud/spheric/client-go/spheric/typed/storage/v1alpha1"
 )
 
 type Interface interface {
 	Discovery() discovery.DiscoveryInterface
-	ComputeV1alpha1() computev1alpha1.ComputeV1alpha1Interface
 	CoreV1alpha1() corev1alpha1.CoreV1alpha1Interface
-	IpamV1alpha1() ipamv1alpha1.IpamV1alpha1Interface
-	NetworkingV1alpha1() networkingv1alpha1.NetworkingV1alpha1Interface
-	StorageV1alpha1() storagev1alpha1.StorageV1alpha1Interface
 }
 
 // Clientset contains the clients for groups.
 type Clientset struct {
 	*discovery.DiscoveryClient
-	computeV1alpha1    *computev1alpha1.ComputeV1alpha1Client
-	coreV1alpha1       *corev1alpha1.CoreV1alpha1Client
-	ipamV1alpha1       *ipamv1alpha1.IpamV1alpha1Client
-	networkingV1alpha1 *networkingv1alpha1.NetworkingV1alpha1Client
-	storageV1alpha1    *storagev1alpha1.StorageV1alpha1Client
-}
-
-// ComputeV1alpha1 retrieves the ComputeV1alpha1Client
-func (c *Clientset) ComputeV1alpha1() computev1alpha1.ComputeV1alpha1Interface {
-	return c.computeV1alpha1
+	coreV1alpha1 *corev1alpha1.CoreV1alpha1Client
 }
 
 // CoreV1alpha1 retrieves the CoreV1alpha1Client
 func (c *Clientset) CoreV1alpha1() corev1alpha1.CoreV1alpha1Interface {
 	return c.coreV1alpha1
-}
-
-// IpamV1alpha1 retrieves the IpamV1alpha1Client
-func (c *Clientset) IpamV1alpha1() ipamv1alpha1.IpamV1alpha1Interface {
-	return c.ipamV1alpha1
-}
-
-// NetworkingV1alpha1 retrieves the NetworkingV1alpha1Client
-func (c *Clientset) NetworkingV1alpha1() networkingv1alpha1.NetworkingV1alpha1Interface {
-	return c.networkingV1alpha1
-}
-
-// StorageV1alpha1 retrieves the StorageV1alpha1Client
-func (c *Clientset) StorageV1alpha1() storagev1alpha1.StorageV1alpha1Interface {
-	return c.storageV1alpha1
 }
 
 // Discovery retrieves the DiscoveryClient
@@ -107,23 +75,7 @@ func NewForConfigAndClient(c *rest.Config, httpClient *http.Client) (*Clientset,
 
 	var cs Clientset
 	var err error
-	cs.computeV1alpha1, err = computev1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
-	if err != nil {
-		return nil, err
-	}
 	cs.coreV1alpha1, err = corev1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
-	if err != nil {
-		return nil, err
-	}
-	cs.ipamV1alpha1, err = ipamv1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
-	if err != nil {
-		return nil, err
-	}
-	cs.networkingV1alpha1, err = networkingv1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
-	if err != nil {
-		return nil, err
-	}
-	cs.storageV1alpha1, err = storagev1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
 	if err != nil {
 		return nil, err
 	}
@@ -148,11 +100,7 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 // New creates a new Clientset for the given RESTClient.
 func New(c rest.Interface) *Clientset {
 	var cs Clientset
-	cs.computeV1alpha1 = computev1alpha1.New(c)
 	cs.coreV1alpha1 = corev1alpha1.New(c)
-	cs.ipamV1alpha1 = ipamv1alpha1.New(c)
-	cs.networkingV1alpha1 = networkingv1alpha1.New(c)
-	cs.storageV1alpha1 = storagev1alpha1.New(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)
 	return &cs

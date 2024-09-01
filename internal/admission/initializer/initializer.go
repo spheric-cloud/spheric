@@ -9,24 +9,20 @@ import (
 	"k8s.io/apiserver/pkg/admission"
 	sphericinformers "spheric.cloud/spheric/client-go/informers"
 	"spheric.cloud/spheric/client-go/spheric"
-	"spheric.cloud/spheric/utils/quota"
 )
 
 type initializer struct {
 	externalClient    spheric.Interface
 	externalInformers sphericinformers.SharedInformerFactory
-	quotaRegistry     quota.Registry
 }
 
 func New(
 	externalClient spheric.Interface,
 	externalInformers sphericinformers.SharedInformerFactory,
-	quotaRegistry quota.Registry,
 ) admission.PluginInitializer {
 	return &initializer{
 		externalClient:    externalClient,
 		externalInformers: externalInformers,
-		quotaRegistry:     quotaRegistry,
 	}
 }
 
@@ -38,10 +34,6 @@ func (i *initializer) Initialize(plugin admission.Interface) {
 	if wants, ok := plugin.(WantsExternalInformers); ok {
 		wants.SetExternalSphericInformerFactory(i.externalInformers)
 	}
-
-	if wants, ok := plugin.(WantsQuotaRegistry); ok {
-		wants.SetQuotaRegistry(i.quotaRegistry)
-	}
 }
 
 type WantsExternalSphericClientSet interface {
@@ -51,10 +43,5 @@ type WantsExternalSphericClientSet interface {
 
 type WantsExternalInformers interface {
 	SetExternalSphericInformerFactory(f sphericinformers.SharedInformerFactory)
-	admission.InitializationValidator
-}
-
-type WantsQuotaRegistry interface {
-	SetQuotaRegistry(registry quota.Registry)
 	admission.InitializationValidator
 }

@@ -44,110 +44,93 @@ function qualify-gs() {
   echo "$res"
 }
 
-VGOPATH="$VGOPATH"
-MODELS_SCHEMA="$MODELS_SCHEMA"
-CLIENT_GEN="$CLIENT_GEN"
-DEEPCOPY_GEN="$DEEPCOPY_GEN"
-LISTER_GEN="$LISTER_GEN"
-INFORMER_GEN="$INFORMER_GEN"
-DEFAULTER_GEN="$DEFAULTER_GEN"
-CONVERSION_GEN="$CONVERSION_GEN"
-OPENAPI_GEN="$OPENAPI_GEN"
-APPLYCONFIGURATION_GEN="$APPLYCONFIGURATION_GEN"
+MODELS_SCHEMA="${MODELS_SCHEMA:-models-schema}"
+CLIENT_GEN="${CLIENT_GEN:-client-gen}"
+DEEPCOPY_GEN="${DEEPCOPY_GEN:-deepcopy-gen}"
+LISTER_GEN="${LISTER_GEN:-lister-gen}"
+INFORMER_GEN="${INFORMER_GEN:-informer-gen}"
+DEFAULTER_GEN="${DEFAULTER_GEN:-defaulter-gen}"
+CONVERSION_GEN="${CONVERSION_GEN:-conversion-gen}"
+OPENAPI_GEN="${OPENAPI_GEN:-openapi-gen}"
+APPLYCONFIGURATION_GEN="${APPLYCONFIGURATION_GEN:-applyconfiguration-gen}"
 
-VIRTUAL_GOPATH="$(mktemp -d)"
-trap 'rm -rf "$VIRTUAL_GOPATH"' EXIT
-
-# Setup virtual GOPATH so the codegen tools work as expected.
-(cd "$SCRIPT_DIR/.."; go mod download && "$VGOPATH" -o "$VIRTUAL_GOPATH")
-
-export GOROOT="${GOROOT:-"$(go env GOROOT)"}"
-export GOPATH="$VIRTUAL_GOPATH"
-export GO111MODULE=off
-
-CLIENT_GROUPS="core compute ipam networking storage"
-CLIENT_VERSION_GROUPS="core:v1alpha1 compute:v1alpha1 ipam:v1alpha1 networking:v1alpha1 storage:v1alpha1"
-ALL_VERSION_GROUPS="common:v1alpha1 $CLIENT_VERSION_GROUPS"
+CLIENT_GROUPS="core"
+CLIENT_VERSION_GROUPS="core:v1alpha1"
+ALL_VERSION_GROUPS="$CLIENT_VERSION_GROUPS"
 
 echo "${bold}Public types${normal}"
 
 echo "Generating ${blue}deepcopy${normal}"
 "$DEEPCOPY_GEN" \
-  --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gvs "spheric.cloud/spheric/api" "$ALL_VERSION_GROUPS")" \
-  -O zz_generated.deepcopy
+  --output-file zz_generated.deepcopy.go \
+  "$(qualify-gvs "./api" "$ALL_VERSION_GROUPS")"
 
 echo "Generating ${blue}openapi${normal}"
 "$OPENAPI_GEN" \
-  --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gvs "spheric.cloud/spheric/api" "$ALL_VERSION_GROUPS")" \
-  --input-dirs "k8s.io/apimachinery/pkg/apis/meta/v1,k8s.io/apimachinery/pkg/runtime,k8s.io/apimachinery/pkg/version" \
-  --input-dirs "k8s.io/api/core/v1" \
-  --input-dirs "k8s.io/apimachinery/pkg/api/resource" \
-  --output-package "spheric.cloud/spheric/client-go/openapi" \
-  -O zz_generated.openapi \
-  --report-filename "$SCRIPT_DIR/../client-go/openapi/api_violations.report"
+  --output-pkg "spheric.cloud/spheric/client-go/openapi" \
+  --output-dir "./client-go/openapi" \
+  --output-file zz_generated.openapi.go \
+  --report-filename "./client-go/openapi/api_violations.report" \
+  "k8s.io/apimachinery/pkg/apis/meta/v1" \
+  "k8s.io/apimachinery/pkg/api/resource" \
+  "k8s.io/apimachinery/pkg/runtime" \
+  "k8s.io/apimachinery/pkg/version" \
+  "$(qualify-gvs "./api" "$ALL_VERSION_GROUPS")"
 
 echo "Generating ${blue}applyconfiguration${normal}"
-applyconfigurationgen_external_apis+=("k8s.io/apimachinery/pkg/apis/meta/v1")
-applyconfigurationgen_external_apis+=("$(qualify-gvs "spheric.cloud/spheric/api" "$ALL_VERSION_GROUPS")")
-applyconfigurationgen_external_apis_csv=$(IFS=,; echo "${applyconfigurationgen_external_apis[*]}")
 "$APPLYCONFIGURATION_GEN" \
-  --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "${applyconfigurationgen_external_apis_csv}" \
+  --output-pkg "spheric.cloud/spheric/client-go/applyconfigurations" \
+  --output-dir "./client-go/applyconfigurations" \
   --openapi-schema <("$MODELS_SCHEMA" --openapi-package "spheric.cloud/spheric/client-go/openapi" --openapi-title "spheric") \
-  --output-package "spheric.cloud/spheric/client-go/applyconfigurations"
+  "$(qualify-gvs "./api" "$ALL_VERSION_GROUPS")"
 
 echo "Generating ${blue}client${normal}"
 "$CLIENT_GEN" \
-  --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input "$(qualify-gvs "spheric.cloud/spheric/api" "$CLIENT_VERSION_GROUPS")" \
-  --output-package "spheric.cloud/spheric/client-go" \
+  --output-pkg "spheric.cloud/spheric/client-go" \
+  --output-dir "client-go" \
   --apply-configuration-package "spheric.cloud/spheric/client-go/applyconfigurations" \
   --clientset-name "spheric" \
-  --input-base ""
+  --input-base "spheric.cloud/spheric/api" \
+  --input "core/v1alpha1"
 
 echo "Generating ${blue}lister${normal}"
 "$LISTER_GEN" \
-  --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gvs "spheric.cloud/spheric/api" "$CLIENT_VERSION_GROUPS")" \
-  --output-package "spheric.cloud/spheric/client-go/listers"
+  --output-pkg "spheric.cloud/spheric/client-go/listers" \
+  --output-dir "client-go/listers" \
+  "$(qualify-gvs "./api" "$CLIENT_VERSION_GROUPS")" \
 
 echo "Generating ${blue}informer${normal}"
 "$INFORMER_GEN" \
-  --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gvs "spheric.cloud/spheric/api" "$CLIENT_VERSION_GROUPS")" \
-  --versioned-clientset-package "spheric.cloud/spheric/client-go/spheric" \
+  --output-pkg "spheric.cloud/spheric/client-go/informers" \
+  --output-dir "client-go/informers" \
   --listers-package "spheric.cloud/spheric/client-go/listers" \
-  --output-package "spheric.cloud/spheric/client-go/informers" \
-  --single-directory
+  --versioned-clientset-package "spheric.cloud/spheric/client-go/spheric" \
+  --single-directory \
+  "$(qualify-gvs "./api" "$CLIENT_VERSION_GROUPS")"
 
 echo "${bold}Internal types${normal}"
 
 echo "Generating ${blue}deepcopy${normal}"
 "$DEEPCOPY_GEN" \
-  --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gs "spheric.cloud/spheric/internal/apis" "$CLIENT_GROUPS")" \
-  -O zz_generated.deepcopy
+  --output-file zz_generated.deepcopy.go \
+  "$(qualify-gs "./internal/apis" "$CLIENT_GROUPS")"
 
 echo "Generating ${blue}defaulter${normal}"
 "$DEFAULTER_GEN" \
-  --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gvs "spheric.cloud/spheric/internal/apis" "$CLIENT_VERSION_GROUPS")" \
-  -O zz_generated.defaults
+  --output-file "zz_generated.defaults.go" \
+  "$(qualify-gvs "./internal/apis" "$CLIENT_VERSION_GROUPS")"
 
 echo "Generating ${blue}conversion${normal}"
 "$CONVERSION_GEN" \
-  --output-base "$GOPATH/src" \
   --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  --input-dirs "$(qualify-gs "spheric.cloud/spheric/internal/apis" "$CLIENT_GROUPS")" \
-  --input-dirs "$(qualify-gvs "spheric.cloud/spheric/internal/apis" "$CLIENT_VERSION_GROUPS")" \
-  -O zz_generated.conversion
+  --output-file "zz_generated.conversion.go" \
+  "$(qualify-gs "spheric.cloud/spheric/internal/apis" "$CLIENT_GROUPS")" \
+  "$(qualify-gvs "spheric.cloud/spheric/internal/apis" "$CLIENT_VERSION_GROUPS")"

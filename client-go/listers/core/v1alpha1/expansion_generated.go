@@ -5,10 +5,46 @@
 
 package v1alpha1
 
-// ResourceQuotaListerExpansion allows custom methods to be added to
-// ResourceQuotaLister.
-type ResourceQuotaListerExpansion interface{}
+// DiskListerExpansion allows custom methods to be added to
+// DiskLister.
+type DiskListerExpansion interface{}
 
-// ResourceQuotaNamespaceListerExpansion allows custom methods to be added to
-// ResourceQuotaNamespaceLister.
-type ResourceQuotaNamespaceListerExpansion interface{}
+// DiskNamespaceListerExpansion allows custom methods to be added to
+// DiskNamespaceLister.
+type DiskNamespaceListerExpansion interface{}
+
+// DiskTypeListerExpansion allows custom methods to be added to
+// DiskTypeLister.
+type DiskTypeListerExpansion interface{}
+
+// FleetListerExpansion allows custom methods to be added to
+// FleetLister.
+type FleetListerExpansion interface{}
+
+// InstanceListerExpansion allows custom methods to be added to
+// InstanceLister.
+type InstanceListerExpansion interface{}
+
+// InstanceNamespaceListerExpansion allows custom methods to be added to
+// InstanceNamespaceLister.
+type InstanceNamespaceListerExpansion interface{}
+
+// InstanceTypeListerExpansion allows custom methods to be added to
+// InstanceTypeLister.
+type InstanceTypeListerExpansion interface{}
+
+// NetworkListerExpansion allows custom methods to be added to
+// NetworkLister.
+type NetworkListerExpansion interface{}
+
+// NetworkNamespaceListerExpansion allows custom methods to be added to
+// NetworkNamespaceLister.
+type NetworkNamespaceListerExpansion interface{}
+
+// SubnetListerExpansion allows custom methods to be added to
+// SubnetLister.
+type SubnetListerExpansion interface{}
+
+// SubnetNamespaceListerExpansion allows custom methods to be added to
+// SubnetNamespaceLister.
+type SubnetNamespaceListerExpansion interface{}
