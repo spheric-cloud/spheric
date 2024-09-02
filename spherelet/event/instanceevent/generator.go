@@ -13,7 +13,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	sri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
+	iri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
 
 	"github.com/go-logr/logr"
 	"google.golang.org/protobuf/proto"
@@ -37,17 +37,17 @@ type event struct {
 }
 
 type oldNewMapEntry struct {
-	Old     *sri.Instance
-	Current *sri.Instance
+	Old     *iri.Instance
+	Current *iri.Instance
 }
 
 type oldNewMap map[string]*oldNewMapEntry
 
-func (m oldNewMap) id(obj *sri.Instance) string {
+func (m oldNewMap) id(obj *iri.Instance) string {
 	return obj.GetMetadata().GetId()
 }
 
-func (m oldNewMap) setCurrent(current []*sri.Instance) {
+func (m oldNewMap) setCurrent(current []*iri.Instance) {
 	for _, v := range m {
 		v.Current = nil
 	}
@@ -65,7 +65,7 @@ func (m oldNewMap) setCurrent(current []*sri.Instance) {
 	}
 }
 
-func (m oldNewMap) getCurrent(id string) (*sri.Instance, bool) {
+func (m oldNewMap) getCurrent(id string) (*iri.Instance, bool) {
 	r, ok := m[id]
 	if ok && r.Current != nil {
 		return r.Current, true
@@ -73,7 +73,7 @@ func (m oldNewMap) getCurrent(id string) (*sri.Instance, bool) {
 	return nil, false
 }
 
-func (m oldNewMap) getOld(id string) (*sri.Instance, bool) {
+func (m oldNewMap) getOld(id string) (*iri.Instance, bool) {
 	r, ok := m[id]
 	if ok && r.Old != nil {
 		return r.Old, true
@@ -118,7 +118,7 @@ type generator struct {
 
 	items oldNewMap
 
-	list func(ctx context.Context) ([]*sri.Instance, error)
+	list func(ctx context.Context) ([]*iri.Instance, error)
 }
 
 type GeneratorOptions struct {
@@ -139,7 +139,7 @@ func setGeneratorOptionsDefaults(o *GeneratorOptions) {
 	}
 }
 
-func NewGenerator(list func(ctx context.Context) ([]*sri.Instance, error), opts GeneratorOptions) Generator {
+func NewGenerator(list func(ctx context.Context) ([]*iri.Instance, error), opts GeneratorOptions) Generator {
 	setGeneratorOptionsDefaults(&opts)
 
 	return &generator{

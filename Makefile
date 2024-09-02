@@ -156,9 +156,9 @@ docker-build-spheric-controller-manager: ## Build controller-manager.
 docker-build-spherelet: ## Build spherelet image.
 	docker build --target spherelet -t ${SPHERELET_IMG} .
 
-.PHONY: docker-build-srictl-machine
-docker-build-srictl-machine: ## Build srictl-machine image.
-	docker build --target srictl-machine -t ${SRICTL_MACHINE_IMG} .
+.PHONY: docker-build-irictl-machine
+docker-build-irictl-machine: ## Build irictl-machine image.
+	docker build --target irictl-machine -t ${IRICTL_MACHINE_IMG} .
 
 .PHONY: docker-push
 docker-push: ## Push docker image with the manager.

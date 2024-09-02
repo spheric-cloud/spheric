@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	ctrl "sigs.k8s.io/controller-runtime"
-	sri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
+	iri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
 	clicommon "spheric.cloud/spheric/irictl/cmd"
 	"spheric.cloud/spheric/irictl/cmd/irictl/common"
 	"spheric.cloud/spheric/irictl/renderer"
@@ -73,20 +73,20 @@ func Command(streams clicommon.Streams, clientFactory common.Factory) *cobra.Com
 func Run(
 	ctx context.Context,
 	streams clicommon.Streams,
-	client sri.RuntimeServiceClient,
+	client iri.RuntimeServiceClient,
 	render renderer.Renderer,
 	name string,
 	opts Options,
 ) error {
-	var filter *sri.InstanceFilter
+	var filter *iri.InstanceFilter
 	if name != "" || opts.Labels != nil {
-		filter = &sri.InstanceFilter{
+		filter = &iri.InstanceFilter{
 			Id:            name,
 			LabelSelector: opts.Labels,
 		}
 	}
 
-	res, err := client.ListInstances(ctx, &sri.ListInstancesRequest{Filter: filter})
+	res, err := client.ListInstances(ctx, &iri.ListInstancesRequest{Filter: filter})
 	if err != nil {
 		return fmt.Errorf("error listing instances: %w", err)
 	}

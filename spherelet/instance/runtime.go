@@ -8,20 +8,20 @@ package instance
 import (
 	"context"
 
-	api "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
+	iri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
 )
 
 type RuntimeService interface {
-	Version(context.Context, *api.VersionRequest) (*api.VersionResponse, error)
-	ListInstances(context.Context, *api.ListInstancesRequest) (*api.ListInstancesResponse, error)
-	CreateInstance(context.Context, *api.CreateInstanceRequest) (*api.CreateInstanceResponse, error)
-	DeleteInstance(context.Context, *api.DeleteInstanceRequest) (*api.DeleteInstanceResponse, error)
-	UpdateInstanceAnnotations(context.Context, *api.UpdateInstanceAnnotationsRequest) (*api.UpdateInstanceAnnotationsResponse, error)
-	UpdateInstancePower(context.Context, *api.UpdateInstancePowerRequest) (*api.UpdateInstancePowerResponse, error)
-	AttachDisk(context.Context, *api.AttachDiskRequest) (*api.AttachDiskResponse, error)
-	DetachDisk(context.Context, *api.DetachDiskRequest) (*api.DetachDiskResponse, error)
-	AttachNetworkInterface(context.Context, *api.AttachNetworkInterfaceRequest) (*api.AttachNetworkInterfaceResponse, error)
-	DetachNetworkInterface(context.Context, *api.DetachNetworkInterfaceRequest) (*api.DetachNetworkInterfaceResponse, error)
-	Status(context.Context, *api.StatusRequest) (*api.StatusResponse, error)
-	Exec(context.Context, *api.ExecRequest) (*api.ExecResponse, error)
+	Version(context.Context, *iri.VersionRequest) (*iri.VersionResponse, error)
+	ListInstances(context.Context, *iri.ListInstancesRequest) (*iri.ListInstancesResponse, error)
+	CreateInstance(context.Context, *iri.CreateInstanceRequest) (*iri.CreateInstanceResponse, error)
+	DeleteInstance(context.Context, *iri.DeleteInstanceRequest) (*iri.DeleteInstanceResponse, error)
+	UpdateInstanceAnnotations(context.Context, *iri.UpdateInstanceAnnotationsRequest) (*iri.UpdateInstanceAnnotationsResponse, error)
+	UpdateInstancePower(context.Context, *iri.UpdateInstancePowerRequest) (*iri.UpdateInstancePowerResponse, error)
+	AttachDisk(context.Context, *iri.AttachDiskRequest) (*iri.AttachDiskResponse, error)
+	DetachDisk(context.Context, *iri.DetachDiskRequest) (*iri.DetachDiskResponse, error)
+	AttachNetworkInterface(context.Context, *iri.AttachNetworkInterfaceRequest) (*iri.AttachNetworkInterfaceResponse, error)
+	DetachNetworkInterface(context.Context, *iri.DetachNetworkInterfaceRequest) (*iri.DetachNetworkInterfaceResponse, error)
+	Status(context.Context, *iri.StatusRequest) (*iri.StatusResponse, error)
+	Exec(context.Context, *iri.ExecRequest) (*iri.ExecResponse, error)
 }

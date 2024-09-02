@@ -14,7 +14,7 @@ import (
 	grpcstatus "google.golang.org/grpc/status"
 	"k8s.io/apimachinery/pkg/util/proxy"
 	ctrl "sigs.k8s.io/controller-runtime"
-	sri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
+	iri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
 	"spheric.cloud/spheric/spherelet/api/v1alpha1"
 )
 
@@ -22,8 +22,8 @@ func (s *Server) serveExec(w http.ResponseWriter, req *http.Request, namespace, 
 	ctx := req.Context()
 	log := ctrl.LoggerFrom(ctx)
 
-	listInstancesRes, err := s.runtimeService.ListInstances(ctx, &sri.ListInstancesRequest{
-		Filter: &sri.InstanceFilter{
+	listInstancesRes, err := s.runtimeService.ListInstances(ctx, &iri.ListInstancesRequest{
+		Filter: &iri.InstanceFilter{
 			LabelSelector: map[string]string{
 				v1alpha1.InstanceNamespaceLabel: namespace,
 				v1alpha1.InstanceNameLabel:      name,
@@ -41,7 +41,7 @@ func (s *Server) serveExec(w http.ResponseWriter, req *http.Request, namespace, 
 	}
 
 	instance := listInstancesRes.Instances[0]
-	execRes, err := s.runtimeService.Exec(ctx, &sri.ExecRequest{
+	execRes, err := s.runtimeService.Exec(ctx, &iri.ExecRequest{
 		InstanceId: instance.Metadata.Id,
 	})
 	if err != nil {

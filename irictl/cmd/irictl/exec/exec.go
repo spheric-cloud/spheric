@@ -18,7 +18,7 @@ import (
 	"k8s.io/client-go/tools/remotecommand"
 	"k8s.io/kubectl/pkg/util/term"
 	ctrl "sigs.k8s.io/controller-runtime"
-	sri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
+	iri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
 	clicommon "spheric.cloud/spheric/irictl/cmd"
 	"spheric.cloud/spheric/irictl/cmd/irictl/common"
 )
@@ -50,9 +50,9 @@ func Command(streams clicommon.Streams, clientFactory common.Factory) *cobra.Com
 	return cmd
 }
 
-func Run(ctx context.Context, streams clicommon.Streams, client sri.RuntimeServiceClient, instanceID string) error {
+func Run(ctx context.Context, streams clicommon.Streams, client iri.RuntimeServiceClient, instanceID string) error {
 	log := ctrl.LoggerFrom(ctx)
-	res, err := client.Exec(ctx, &sri.ExecRequest{
+	res, err := client.Exec(ctx, &iri.ExecRequest{
 		InstanceId: instanceID,
 	})
 	if err != nil {

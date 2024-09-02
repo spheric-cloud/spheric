@@ -3,11 +3,11 @@
 
 package runtimeevent
 
-import sri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
+import iri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
 
 type UpdateResourcesEvent struct {
-	ResourcesOld *sri.RuntimeResources
-	ResourcesNew *sri.RuntimeResources
+	ResourcesOld *iri.RuntimeResources
+	ResourcesNew *iri.RuntimeResources
 }
 
 type Handler interface {

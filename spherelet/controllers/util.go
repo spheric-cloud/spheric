@@ -9,15 +9,15 @@ import (
 	"fmt"
 	"strconv"
 
-	sri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
+	iri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
 	"spheric.cloud/spheric/utils/generic"
 	utilslices "spheric.cloud/spheric/utils/slices"
 )
 
-func FindNewIRINetworkInterfaces(desiredIRINics, existingIRINics []*sri.NetworkInterface) []*sri.NetworkInterface {
+func FindNewIRINetworkInterfaces(desiredIRINics, existingIRINics []*iri.NetworkInterface) []*iri.NetworkInterface {
 	var (
-		existingIRINicNames = utilslices.ToSetFunc(existingIRINics, (*sri.NetworkInterface).GetName)
-		newIRINics          []*sri.NetworkInterface
+		existingIRINicNames = utilslices.ToSetFunc(existingIRINics, (*iri.NetworkInterface).GetName)
+		newIRINics          []*iri.NetworkInterface
 	)
 	for _, desiredIRINic := range desiredIRINics {
 		if existingIRINicNames.Has(desiredIRINic.Name) {
@@ -29,10 +29,10 @@ func FindNewIRINetworkInterfaces(desiredIRINics, existingIRINics []*sri.NetworkI
 	return newIRINics
 }
 
-func FindNewIRIDisks(desiredIRIDisks, existingIRIDisks []*sri.Disk) []*sri.Disk {
+func FindNewIRIDisks(desiredIRIDisks, existingIRIDisks []*iri.Disk) []*iri.Disk {
 	var (
-		existingIRIDiskNames = utilslices.ToSetFunc(existingIRIDisks, (*sri.Disk).GetName)
-		newIRIDisks          []*sri.Disk
+		existingIRIDiskNames = utilslices.ToSetFunc(existingIRIDisks, (*iri.Disk).GetName)
+		newIRIDisks          []*iri.Disk
 	)
 	for _, desiredIRIDisk := range desiredIRIDisks {
 		if existingIRIDiskNames.Has(desiredIRIDisk.Name) {

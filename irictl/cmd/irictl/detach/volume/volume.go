@@ -14,7 +14,7 @@ import (
 	"google.golang.org/grpc/status"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
-	sri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
+	iri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
 	clicommon "spheric.cloud/spheric/irictl/cmd"
 	"spheric.cloud/spheric/irictl/cmd/irictl/common"
 )
@@ -61,9 +61,9 @@ func Command(streams clicommon.Streams, clientFactory common.Factory) *cobra.Com
 	return cmd
 }
 
-func Run(ctx context.Context, streams clicommon.Streams, client sri.RuntimeServiceClient, names []string, opts Options) error {
+func Run(ctx context.Context, streams clicommon.Streams, client iri.RuntimeServiceClient, names []string, opts Options) error {
 	for _, name := range names {
-		if _, err := client.DetachDisk(ctx, &sri.DetachDiskRequest{
+		if _, err := client.DetachDisk(ctx, &iri.DetachDiskRequest{
 			InstanceId: opts.InstanceID,
 			Name:       name,
 		}); err != nil {

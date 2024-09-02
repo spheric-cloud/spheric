@@ -17,7 +17,7 @@ import (
 	"k8s.io/apiserver/pkg/server/healthz"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
-	sri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
+	iri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
 )
 
 type Generator interface {
@@ -50,9 +50,9 @@ type generator struct {
 	// firstListTime is the first time a relist happened.
 	firstListTime time.Time
 
-	resources *sri.RuntimeResources
+	resources *iri.RuntimeResources
 
-	getResources func(ctx context.Context) (*sri.RuntimeResources, error)
+	getResources func(ctx context.Context) (*iri.RuntimeResources, error)
 }
 
 type GeneratorOptions struct {
@@ -73,7 +73,7 @@ func setGeneratorOptionsDefaults(o *GeneratorOptions) {
 	}
 }
 
-func NewGenerator(getResources func(ctx context.Context) (*sri.RuntimeResources, error), opts GeneratorOptions) Generator {
+func NewGenerator(getResources func(ctx context.Context) (*iri.RuntimeResources, error), opts GeneratorOptions) Generator {
 	setGeneratorOptionsDefaults(&opts)
 
 	return &generator{

@@ -5,23 +5,23 @@
 
 package instanceevent
 
-import sri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
+import iri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
 
 type CreateEvent struct {
-	Object *sri.Instance
+	Object *iri.Instance
 }
 
 type UpdateEvent struct {
-	ObjectOld *sri.Instance
-	ObjectNew *sri.Instance
+	ObjectOld *iri.Instance
+	ObjectNew *iri.Instance
 }
 
 type DeleteEvent struct {
-	Object *sri.Instance
+	Object *iri.Instance
 }
 
 type GenericEvent struct {
-	Object *sri.Instance
+	Object *iri.Instance
 }
 
 type Handler interface {

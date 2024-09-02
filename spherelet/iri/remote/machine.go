@@ -15,12 +15,12 @@ import (
 )
 
 const (
-	AddressEnv = "SRI_MACHINE_RUNTIME_ENDPOINT"
+	AddressEnv = "IRI_MACHINE_RUNTIME_ENDPOINT"
 )
 
 var WellKnownEndpoints = []string{
-	"/var/run/sri-machinebroker.sock",
-	"/var/run/sri-virtd.sock",
+	"/var/run/iri-machinebroker.sock",
+	"/var/run/iri-virtd.sock",
 }
 
 func GetAddressWithTimeout(timeout time.Duration, explicitAddress string) (string, error) {

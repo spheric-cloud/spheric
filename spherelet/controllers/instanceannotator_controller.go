@@ -21,7 +21,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
-	sri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
+	iri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
 	sphereletv1alpha1 "spheric.cloud/spheric/spherelet/api/v1alpha1"
 	sphericclient "spheric.cloud/spheric/utils/client"
 )
@@ -47,7 +47,7 @@ func (r *InstanceAnnotatorReconciler) Reconcile(ctx context.Context, req ctrl.Re
 }
 
 func instanceAnnotatorEventHandler(log logr.Logger, c chan<- event.GenericEvent) sphereletevent.HandlerFuncs {
-	handleEvent := func(obj *sri.Instance) {
+	handleEvent := func(obj *iri.Instance) {
 		namespace, ok := obj.GetMetadata().Labels[sphereletv1alpha1.InstanceNamespaceLabel]
 		if !ok {
 			return
@@ -104,7 +104,7 @@ func (r *InstanceAnnotatorReconciler) iriInstanceEventChannel(mgr ctrl.Manager) 
 	ch := make(chan event.GenericEvent, 1024)
 
 	if err := mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
-		log := ctrl.LoggerFrom(ctx).WithName("instanceannotator").WithName("srieventhandlers")
+		log := ctrl.LoggerFrom(ctx).WithName("instanceannotator").WithName("irieventhandlers")
 
 		registrationFuncs := []func() (sphereletevent.HandlerRegistration, error){
 			func() (sphereletevent.HandlerRegistration, error) {

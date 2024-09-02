@@ -19,7 +19,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"k8s.io/apimachinery/pkg/labels"
-	sri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
+	iri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
 )
 
 var (
@@ -52,21 +52,21 @@ func generateID(length int) string {
 }
 
 type FakeInstance struct {
-	sri.Instance
+	iri.Instance
 }
 
 type FakeStatus struct {
-	Capacity    sri.RuntimeResources
-	Allocatable sri.RuntimeResources
+	Capacity    iri.RuntimeResources
+	Allocatable iri.RuntimeResources
 }
 
 type FakeRuntimeService struct {
 	sync.RWMutex
 
 	Instances   map[string]*FakeInstance
-	Capacity    *sri.RuntimeResources
-	Allocatable *sri.RuntimeResources
-	GetExecURL  func(req *sri.ExecRequest) string
+	Capacity    *iri.RuntimeResources
+	Allocatable *iri.RuntimeResources
+	GetExecURL  func(req *iri.ExecRequest) string
 }
 
 func NewFakeRuntimeService() *FakeRuntimeService {
@@ -124,7 +124,7 @@ func (r *FakeRuntimeService) SetInstances(instances []*FakeInstance) {
 	}
 }
 
-func (r *FakeRuntimeService) SetStatus(capacity, allocatable *sri.RuntimeResources) {
+func (r *FakeRuntimeService) SetStatus(capacity, allocatable *iri.RuntimeResources) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -132,27 +132,27 @@ func (r *FakeRuntimeService) SetStatus(capacity, allocatable *sri.RuntimeResourc
 	r.Allocatable = allocatable
 }
 
-func (r *FakeRuntimeService) SetGetExecURL(f func(req *sri.ExecRequest) string) {
+func (r *FakeRuntimeService) SetGetExecURL(f func(req *iri.ExecRequest) string) {
 	r.Lock()
 	defer r.Unlock()
 
 	r.GetExecURL = f
 }
 
-func (r *FakeRuntimeService) Version(ctx context.Context, req *sri.VersionRequest) (*sri.VersionResponse, error) {
-	return &sri.VersionResponse{
+func (r *FakeRuntimeService) Version(ctx context.Context, req *iri.VersionRequest) (*iri.VersionResponse, error) {
+	return &iri.VersionResponse{
 		RuntimeName:    RuntimeName,
 		RuntimeVersion: Version,
 	}, nil
 }
 
-func (r *FakeRuntimeService) ListInstances(ctx context.Context, req *sri.ListInstancesRequest) (*sri.ListInstancesResponse, error) {
+func (r *FakeRuntimeService) ListInstances(ctx context.Context, req *iri.ListInstancesRequest) (*iri.ListInstancesResponse, error) {
 	r.Lock()
 	defer r.Unlock()
 
 	filter := req.Filter
 
-	var res []*sri.Instance
+	var res []*iri.Instance
 	for _, m := range r.Instances {
 		if filter != nil {
 			if filter.Id != "" && filter.Id != m.Metadata.Id {
@@ -163,13 +163,13 @@ func (r *FakeRuntimeService) ListInstances(ctx context.Context, req *sri.ListIns
 			}
 		}
 
-		instance := proto.Clone(&m.Instance).(*sri.Instance) //nolint
+		instance := proto.Clone(&m.Instance).(*iri.Instance) //nolint
 		res = append(res, instance)
 	}
-	return &sri.ListInstancesResponse{Instances: res}, nil
+	return &iri.ListInstancesResponse{Instances: res}, nil
 }
 
-func (r *FakeRuntimeService) CreateInstance(ctx context.Context, req *sri.CreateInstanceRequest) (*sri.CreateInstanceResponse, error) {
+func (r *FakeRuntimeService) CreateInstance(ctx context.Context, req *iri.CreateInstanceRequest) (*iri.CreateInstanceResponse, error) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -178,18 +178,18 @@ func (r *FakeRuntimeService) CreateInstance(ctx context.Context, req *sri.Create
 
 	fakeInst.Instance.Metadata.Id = generateID(defaultIDLength)
 	fakeInst.Instance.Metadata.CreatedAt = time.Now().UnixNano()
-	fakeInst.Instance.Status = &sri.InstanceStatus{
-		State: sri.InstanceState_INSTANCE_PENDING,
+	fakeInst.Instance.Status = &iri.InstanceStatus{
+		State: iri.InstanceState_INSTANCE_PENDING,
 	}
 
 	r.Instances[fakeInst.Instance.Metadata.Id] = fakeInst
 
-	return &sri.CreateInstanceResponse{
+	return &iri.CreateInstanceResponse{
 		Instance: &fakeInst.Instance,
 	}, nil
 }
 
-func (r *FakeRuntimeService) DeleteInstance(ctx context.Context, req *sri.DeleteInstanceRequest) (*sri.DeleteInstanceResponse, error) {
+func (r *FakeRuntimeService) DeleteInstance(ctx context.Context, req *iri.DeleteInstanceRequest) (*iri.DeleteInstanceResponse, error) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -199,10 +199,10 @@ func (r *FakeRuntimeService) DeleteInstance(ctx context.Context, req *sri.Delete
 	}
 
 	delete(r.Instances, instanceID)
-	return &sri.DeleteInstanceResponse{}, nil
+	return &iri.DeleteInstanceResponse{}, nil
 }
 
-func (r *FakeRuntimeService) UpdateInstanceAnnotations(ctx context.Context, req *sri.UpdateInstanceAnnotationsRequest) (*sri.UpdateInstanceAnnotationsResponse, error) {
+func (r *FakeRuntimeService) UpdateInstanceAnnotations(ctx context.Context, req *iri.UpdateInstanceAnnotationsRequest) (*iri.UpdateInstanceAnnotationsResponse, error) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -213,10 +213,10 @@ func (r *FakeRuntimeService) UpdateInstanceAnnotations(ctx context.Context, req 
 	}
 
 	instance.Metadata.Annotations = req.Annotations
-	return &sri.UpdateInstanceAnnotationsResponse{}, nil
+	return &iri.UpdateInstanceAnnotationsResponse{}, nil
 }
 
-func (r *FakeRuntimeService) UpdateInstancePower(ctx context.Context, req *sri.UpdateInstancePowerRequest) (*sri.UpdateInstancePowerResponse, error) {
+func (r *FakeRuntimeService) UpdateInstancePower(ctx context.Context, req *iri.UpdateInstancePowerRequest) (*iri.UpdateInstancePowerResponse, error) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -227,10 +227,10 @@ func (r *FakeRuntimeService) UpdateInstancePower(ctx context.Context, req *sri.U
 	}
 
 	instance.Spec.Power = req.Power
-	return &sri.UpdateInstancePowerResponse{}, nil
+	return &iri.UpdateInstancePowerResponse{}, nil
 }
 
-func (r *FakeRuntimeService) AttachDisk(ctx context.Context, req *sri.AttachDiskRequest) (*sri.AttachDiskResponse, error) {
+func (r *FakeRuntimeService) AttachDisk(ctx context.Context, req *iri.AttachDiskRequest) (*iri.AttachDiskResponse, error) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -241,10 +241,10 @@ func (r *FakeRuntimeService) AttachDisk(ctx context.Context, req *sri.AttachDisk
 	}
 
 	instance.Spec.Disks = append(instance.Spec.Disks, req.Disk)
-	return &sri.AttachDiskResponse{}, nil
+	return &iri.AttachDiskResponse{}, nil
 }
 
-func (r *FakeRuntimeService) DetachDisk(ctx context.Context, req *sri.DetachDiskRequest) (*sri.DetachDiskResponse, error) {
+func (r *FakeRuntimeService) DetachDisk(ctx context.Context, req *iri.DetachDiskRequest) (*iri.DetachDiskResponse, error) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -255,7 +255,7 @@ func (r *FakeRuntimeService) DetachDisk(ctx context.Context, req *sri.DetachDisk
 	}
 
 	var (
-		filtered []*sri.Disk
+		filtered []*iri.Disk
 		found    bool
 	)
 	for _, attachment := range instance.Spec.Disks {
@@ -271,10 +271,10 @@ func (r *FakeRuntimeService) DetachDisk(ctx context.Context, req *sri.DetachDisk
 	}
 
 	instance.Spec.Disks = filtered
-	return &sri.DetachDiskResponse{}, nil
+	return &iri.DetachDiskResponse{}, nil
 }
 
-func (r *FakeRuntimeService) AttachNetworkInterface(ctx context.Context, req *sri.AttachNetworkInterfaceRequest) (*sri.AttachNetworkInterfaceResponse, error) {
+func (r *FakeRuntimeService) AttachNetworkInterface(ctx context.Context, req *iri.AttachNetworkInterfaceRequest) (*iri.AttachNetworkInterfaceResponse, error) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -285,10 +285,10 @@ func (r *FakeRuntimeService) AttachNetworkInterface(ctx context.Context, req *sr
 	}
 
 	instance.Spec.NetworkInterfaces = append(instance.Spec.NetworkInterfaces, req.NetworkInterface)
-	return &sri.AttachNetworkInterfaceResponse{}, nil
+	return &iri.AttachNetworkInterfaceResponse{}, nil
 }
 
-func (r *FakeRuntimeService) DetachNetworkInterface(ctx context.Context, req *sri.DetachNetworkInterfaceRequest) (*sri.DetachNetworkInterfaceResponse, error) {
+func (r *FakeRuntimeService) DetachNetworkInterface(ctx context.Context, req *iri.DetachNetworkInterfaceRequest) (*iri.DetachNetworkInterfaceResponse, error) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -299,7 +299,7 @@ func (r *FakeRuntimeService) DetachNetworkInterface(ctx context.Context, req *sr
 	}
 
 	var (
-		filtered []*sri.NetworkInterface
+		filtered []*iri.NetworkInterface
 		found    bool
 	)
 	for _, attachment := range instance.Spec.NetworkInterfaces {
@@ -315,20 +315,20 @@ func (r *FakeRuntimeService) DetachNetworkInterface(ctx context.Context, req *sr
 	}
 
 	instance.Spec.NetworkInterfaces = filtered
-	return &sri.DetachNetworkInterfaceResponse{}, nil
+	return &iri.DetachNetworkInterfaceResponse{}, nil
 }
 
-func (r *FakeRuntimeService) Status(ctx context.Context, req *sri.StatusRequest) (*sri.StatusResponse, error) {
+func (r *FakeRuntimeService) Status(ctx context.Context, req *iri.StatusRequest) (*iri.StatusResponse, error) {
 	r.Lock()
 	defer r.Unlock()
 
-	return &sri.StatusResponse{
+	return &iri.StatusResponse{
 		Capacity:    r.Capacity,
 		Allocatable: r.Allocatable,
 	}, nil
 }
 
-func (r *FakeRuntimeService) Exec(ctx context.Context, req *sri.ExecRequest) (*sri.ExecResponse, error) {
+func (r *FakeRuntimeService) Exec(ctx context.Context, req *iri.ExecRequest) (*iri.ExecResponse, error) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -336,5 +336,5 @@ func (r *FakeRuntimeService) Exec(ctx context.Context, req *sri.ExecRequest) (*s
 	if r.GetExecURL != nil {
 		url = r.GetExecURL(req)
 	}
-	return &sri.ExecResponse{Url: url}, nil
+	return &iri.ExecResponse{Url: url}, nil
 }

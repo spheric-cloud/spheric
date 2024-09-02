@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	ctrl "sigs.k8s.io/controller-runtime"
-	sri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
+	iri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
 	clicommon "spheric.cloud/spheric/irictl/cmd"
 	"spheric.cloud/spheric/irictl/cmd/irictl/common"
 	"spheric.cloud/spheric/irictl/decoder"
@@ -65,18 +65,18 @@ func Command(streams clicommon.Streams, clientFactory common.Factory) *cobra.Com
 	return cmd
 }
 
-func Run(ctx context.Context, streams clicommon.Streams, client sri.RuntimeServiceClient, r renderer.Renderer, opts Options) error {
+func Run(ctx context.Context, streams clicommon.Streams, client iri.RuntimeServiceClient, r renderer.Renderer, opts Options) error {
 	data, err := clicommon.ReadFileOrReader(opts.Filename, os.Stdin)
 	if err != nil {
 		return err
 	}
 
-	instance := &sri.Instance{}
+	instance := &iri.Instance{}
 	if err := decoder.Decode(data, instance); err != nil {
 		return err
 	}
 
-	res, err := client.CreateInstance(ctx, &sri.CreateInstanceRequest{Instance: instance})
+	res, err := client.CreateInstance(ctx, &iri.CreateInstanceRequest{Instance: instance})
 	if err != nil {
 		return err
 	}

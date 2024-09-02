@@ -19,7 +19,7 @@ linters-settings:
   misspell:
     ignore-words:
       - strat
-      - sritable
+      - iritable
   revive:
     severity: error
     rules:
@@ -36,6 +36,8 @@ linters-settings:
         alias: $1
       - pkg: spheric.cloud/spheric/internal/client/(\w+)
         alias: ${1}client
+      - pkg: spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1
+        alias: iri
 
 issues:
   exclude: # Exclude stutter issues (for now)

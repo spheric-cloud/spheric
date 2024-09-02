@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"io"
 
-	sritable "spheric.cloud/spheric/irictl/api"
+	iritable "spheric.cloud/spheric/irictl/api"
 	"spheric.cloud/spheric/irictl/tableconverter"
 	"spheric.cloud/spheric/irictl/tabwriter"
 )
@@ -35,6 +35,6 @@ func (t *table) Render(v any, w io.Writer) error {
 		return err
 	}
 
-	sritable.Write(tab, tw)
+	iritable.Write(tab, tw)
 	return tw.Flush()
 }

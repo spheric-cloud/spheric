@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	ctrl "sigs.k8s.io/controller-runtime"
-	sri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
+	iri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
 	clicommon "spheric.cloud/spheric/irictl/cmd"
 	"spheric.cloud/spheric/irictl/cmd/irictl/common"
 )
@@ -46,9 +46,9 @@ func Command(streams clicommon.Streams, clientFactory common.Factory) *cobra.Com
 	return cmd
 }
 
-func Run(ctx context.Context, streams clicommon.Streams, client sri.RuntimeServiceClient, ids []string) error {
+func Run(ctx context.Context, streams clicommon.Streams, client iri.RuntimeServiceClient, ids []string) error {
 	for _, id := range ids {
-		if _, err := client.DeleteInstance(ctx, &sri.DeleteInstanceRequest{
+		if _, err := client.DeleteInstance(ctx, &iri.DeleteInstanceRequest{
 			InstanceId: id,
 		}); err != nil {
 			if status.Code(err) != codes.NotFound {
