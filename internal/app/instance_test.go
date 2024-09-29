@@ -16,7 +16,7 @@ import (
 	. "spheric.cloud/spheric/utils/testing"
 )
 
-var _ = Describe("Compute", func() {
+var _ = Describe("Core", func() {
 	var (
 		ctx           = SetupContext()
 		ns            = SetupTest(ctx)

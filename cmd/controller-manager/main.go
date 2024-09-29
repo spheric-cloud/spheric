@@ -11,7 +11,7 @@ import (
 	"os"
 	"time"
 
-	computescheduler "spheric.cloud/spheric/internal/controllers/core/scheduler"
+	scheduler "spheric.cloud/spheric/internal/controllers/core/scheduler"
 
 	"k8s.io/utils/lru"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
@@ -41,8 +41,8 @@ var (
 )
 
 const (
-	instanceEphemeralVolumeController = "machineephemeralvolume"
-	instanceSchedulerController       = "machinescheduler"
+	instanceEphemeralVolumeController = "instanceephemeralvolume"
+	instanceSchedulerController       = "instancescheduler"
 	instanceTypeController            = "instancetype"
 	diskReleaseController             = "volumerelease"
 	networkProtectionController       = "networkprotection"
@@ -126,7 +126,7 @@ func main() {
 	}
 
 	if controllers.Enabled(instanceSchedulerController) {
-		schedulerCache := computescheduler.NewCache(mgr.GetLogger(), computescheduler.DefaultCacheStrategy)
+		schedulerCache := scheduler.NewCache(mgr.GetLogger(), scheduler.DefaultCacheStrategy)
 		if err := mgr.Add(schedulerCache); err != nil {
 			setupLog.Error(err, "unable to create cache", "controller", "InstanceSchedulerCache")
 			os.Exit(1)

@@ -5,7 +5,9 @@
 
 package instanceevent
 
-import iri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
+import (
+	iri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
+)
 
 type CreateEvent struct {
 	Object *iri.Instance

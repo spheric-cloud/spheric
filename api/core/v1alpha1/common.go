@@ -14,12 +14,12 @@ const (
 	InstanceInstanceTypeRefNameField = "spec.instanceTypeRef.name"
 
 	// FleetsGroup is the system rbac group all fleets are in.
-	FleetsGroup = "compute.spheric.cloud:system:fleets"
+	FleetsGroup = "core.spheric.cloud:system:fleets"
 
 	// FleetUserNamePrefix is the prefix all fleet users should have.
-	FleetUserNamePrefix = "compute.spheric.cloud:system:fleet:"
+	FleetUserNamePrefix = "core.spheric.cloud:system:fleet:"
 
-	SecretTypeIgnition = corev1.SecretType("compute.spheric.cloud/ignition")
+	SecretTypeIgnition = corev1.SecretType("core.spheric.cloud/ignition")
 )
 
 // FleetCommonName constructs the common name for a certificate of a fleet user.

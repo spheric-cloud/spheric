@@ -316,11 +316,11 @@ func (s *Server) router() http.Handler {
 	r.Use(utilshttp.InjectLogger(s.log))
 	r.Use(utilshttp.LogRequest)
 
-	r.Route("/apis/compute.spheric.cloud", func(r chi.Router) {
+	r.Route("/apis/core.spheric.cloud", func(r chi.Router) {
 		if s.auth != nil {
 			r.Use(s.authMiddleware)
 		}
-		s.registerComputeRoutes(r)
+		s.registerCoreRoutes(r)
 	})
 
 	r.Get("/healthz", healthz.CheckHandler{Checker: healthz.Ping}.ServeHTTP)
@@ -393,7 +393,7 @@ func getAPIVerb(method string) string {
 	}
 }
 
-func (s *Server) registerComputeRoutes(r chi.Router) {
+func (s *Server) registerCoreRoutes(r chi.Router) {
 	for _, method := range []string{http.MethodGet, http.MethodPost} {
 		r.MethodFunc(method, "/namespaces/{namespace}/instances/{name}/exec", func(w http.ResponseWriter, req *http.Request) {
 			namespace := chi.URLParam(req, "namespace")

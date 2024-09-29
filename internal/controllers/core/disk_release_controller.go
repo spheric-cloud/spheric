@@ -31,8 +31,8 @@ type DiskReleaseReconciler struct {
 	AbsenceCache *lru.Cache
 }
 
-//+kubebuilder:rbac:groups=storage.spheric.cloud,resources=disks,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=compute.spheric.cloud,resources=instances,verbs=get;list;watch
+//+kubebuilder:rbac:groups=core.spheric.cloud,resources=disks,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=core.spheric.cloud,resources=instances,verbs=get;list;watch
 
 func (r *DiskReleaseReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)

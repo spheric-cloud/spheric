@@ -42,17 +42,25 @@ rules:
   verbs:
   - approve
 - apiGroups:
-  - compute.spheric.cloud
+  - core.spheric.cloud
   resources:
-  - instances
+  - disks
+  - instancetypes
+  - networks
   verbs:
+  - create
+  - delete
   - get
   - list
+  - patch
+  - update
   - watch
 - apiGroups:
   - core.spheric.cloud
   resources:
   - fleets
+  - loadbalancers
+  - natgateways
   verbs:
   - get
   - list
@@ -72,73 +80,15 @@ rules:
   resources:
   - instances/status
   - instancetypes/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - core.spheric.cloud
-  resources:
-  - instancetypes
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - core.spheric.cloud
-  resources:
-  - instancetypes/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - networking.spheric.cloud
-  resources:
-  - loadbalancers
-  - natgateways
-  - networkinterfaces
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - networking.spheric.cloud
-  resources:
-  - networks
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - networking.spheric.cloud
-  resources:
-  - networks/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - networking.spheric.cloud
-  resources:
   - networks/status
   verbs:
   - get
   - patch
   - update
 - apiGroups:
-  - storage.spheric.cloud
+  - core.spheric.cloud
   resources:
-  - disks
+  - instancetypes/finalizers
+  - networks/finalizers
   verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
   - update
-  - watch

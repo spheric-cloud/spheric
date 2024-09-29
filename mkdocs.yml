@@ -62,10 +62,6 @@ nav:
 - API Reference:
   - Overview: api-reference/overview.md
   - Core: api-reference/core.md
-  - Compute: api-reference/compute.md
-  - Networking: api-reference/networking.md
-  - Storage: api-reference/storage.md
-  - Common: api-reference/common.md
 
 extra:
   social:

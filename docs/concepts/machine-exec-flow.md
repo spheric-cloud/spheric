@@ -1,38 +1,38 @@
-# Machine Exec
+# Instance Exec
 
-The `exec` feature allows accessing the serial console of a
-`compute.Machine` via the `spheric-apiserver`.
+The `exec` feature allows accessing the serial console of an
+`Instance` via the `apiserver`.
 The following parties are involved in implementing `exec`:
 
-* `spheric-apiserver`
-* `machinepollet`
-* `iri-machine` implementor
+* `apiserver`
+* `spherelet`
+* `iri` implementor
 
 The connection flow between those components looks like the following:
 
 ```mermaid
 sequenceDiagram
     participant User as user
-    participant OA as spheric-apiserver
-    participant MP as machinepoollet
-    participant OM as iri-machine implementor
+    participant API as apiserver
+    participant SP as spherelet
+    participant IRI as iri implementor
 
-    User->>OA: exec request with machine name
-    Note over OA: Get machine by name
-    Note over OA: Get machine pool
-    Note over OA: Find suitable address & port
-    Note over OA: Create URL for exec request
-    OA->>MP: HTTP request to exec URL
-    Note over MP: Check authentication & authorization
-    MP->>OM: Call Exec method
-    Note over OM: Provide functioning Exec implementation
-    Note over OM: iri-machine implementor generates unique token
-    Note over OM: Token-associated URL is called
-    Note over OM: Calls exec on its target
-    Note over OM: Proxies response from the spheric-apiserver to the requester
-    OM-->>MP: Returns URL for exec session
-    MP-->>OA: Proxy response
-    OA-->>User: Proxy response
+    User->>API: exec request with instance name
+    Note over API: Get instance by name
+    Note over API: Get fleet
+    Note over API: Find suitable address & port
+    Note over API: Create URL for exec request
+    API->>SP: HTTP request to exec URL
+    Note over SP: Check authentication & authorization
+    SP->>IRI: Call Exec method
+    Note over IRI: Provide functioning Exec implementation
+    Note over IRI: iri implementor generates unique token
+    Note over IRI: Token-associated URL is called
+    Note over IRI: Calls exec on its target
+    Note over IRI: Proxies response from the apiserver to the requester
+    IRI-->>SP: Returns URL for exec session
+    SP-->>API: Proxy response
+    API-->>User: Proxy response
 ```
 
 ## `spheric-apiserver`
@@ -61,7 +61,7 @@ create a URL to make the target `exec` request to. The URL is of the
 form
 
 ```
-https://<host>:<port>/apis/compute.spheric.cloud/namespaces/<namespace>/machines/<machine/exec
+https://<host>:<port>/apis/core.spheric.cloud/namespaces/<namespace>/machines/<machine/exec
 ```
 
 It then makes an http request to that location and proxies the

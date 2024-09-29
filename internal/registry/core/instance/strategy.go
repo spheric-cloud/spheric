@@ -189,7 +189,7 @@ func ExecLocation(
 	loc := &url.URL{
 		Scheme: fleetInfo.Scheme,
 		Host:   net.JoinHostPort(fleetInfo.Hostname, fleetInfo.Port),
-		Path:   fmt.Sprintf("/apis/compute.spheric.cloud/namespaces/%s/instances/%s/exec", instance.Namespace, instance.Name),
+		Path:   fmt.Sprintf("/apis/core.spheric.cloud/namespaces/%s/instances/%s/exec", instance.Namespace, instance.Name),
 	}
 	transport := fleetInfo.Transport
 	if opts.InsecureSkipTLSVerifyBackend {

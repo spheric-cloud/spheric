@@ -24,5 +24,5 @@ const (
 	// DefaultEphemeralManager is the default spheric ephemeral manager.
 	DefaultEphemeralManager = "ephemeral-manager"
 
-	FinalizerNetwork = "networking.spheric.cloud/network"
+	FinalizerNetwork = "core.spheric.cloud/network"
 )

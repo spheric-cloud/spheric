@@ -33,8 +33,8 @@ type InstanceEphemeralDiskReconciler struct {
 	client.Client
 }
 
-//+kubebuilder:rbac:groups=compute.spheric.cloud,resources=instances,verbs=get;list;watch
-//+kubebuilder:rbac:groups=storage.spheric.cloud,resources=disks,verbs=get;list;watch;create;update;delete
+//+kubebuilder:rbac:groups=core.spheric.cloud,resources=instances,verbs=get;list;watch
+//+kubebuilder:rbac:groups=core.spheric.cloud,resources=disks,verbs=get;list;watch;create;update;delete
 
 func (r *InstanceEphemeralDiskReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)

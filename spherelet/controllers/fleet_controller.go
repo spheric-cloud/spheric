@@ -27,7 +27,7 @@ import (
 type FleetReconciler struct {
 	client.Client
 
-	// FleetName is the name of the computev1alpha1.Fleet to report / update.
+	// FleetName is the name of the Fleet to report / update.
 	FleetName string
 	// Addresses are the addresses the spherelet server is available on.
 	Addresses []corev1alpha1.FleetAddress
@@ -37,9 +37,9 @@ type FleetReconciler struct {
 	InstanceRuntime instance.RuntimeService
 }
 
-//+kubebuilder:rbac:groups=compute.spheric.cloud,resources=instancepools,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=compute.spheric.cloud,resources=instancepools/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=compute.spheric.cloud,resources=instanceclasses,verbs=get;list;watch
+//+kubebuilder:rbac:groups=core.spheric.cloud,resources=fleets,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=core.spheric.cloud,resources=fleets/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=core.spheric.cloud,resources=instancetypes,verbs=get;list;watch
 
 func (r *FleetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)

@@ -42,18 +42,6 @@ autolabeler:
     files:
       - '/apis/core/*'
       - '/controllers/core/*'
-  - label: 'storage'
-    files:
-      - '/apis/storage/*'
-      - '/controllers/storage/*'
-  - label: 'compute'
-    files:
-      - '/apis/compute/*'
-      - '/controllers/compute/*'
-  - label: 'networking'
-    files:
-      - '/apis/networking/*'
-      - '/controllers/networking/*'
   - label: 'documentation'
     files:
       - '*.md'

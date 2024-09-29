@@ -68,12 +68,12 @@ func (r *InstanceReconciler) instanceUIDLabelSelector(instanceUID types.UID) map
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 //+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch
-//+kubebuilder:rbac:groups=compute.spheric.cloud,resources=instances,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=compute.spheric.cloud,resources=instances/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=compute.spheric.cloud,resources=instances/finalizers,verbs=update
-//+kubebuilder:rbac:groups=storage.spheric.cloud,resources=disks,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=networking.spheric.cloud,resources=networkinterfaces,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=networking.spheric.cloud,resources=networks,verbs=get;list;watch
+//+kubebuilder:rbac:groups=core.spheric.cloud,resources=instances,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=core.spheric.cloud,resources=instances/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=core.spheric.cloud,resources=instances/finalizers,verbs=update
+//+kubebuilder:rbac:groups=core.spheric.cloud,resources=disks,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=core.spheric.cloud,resources=networks,verbs=get;list;watch
+//+kubebuilder:rbac:groups=core.spheric.cloud,resources=subnets,verbs=get;list;watch
 
 func (r *InstanceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)

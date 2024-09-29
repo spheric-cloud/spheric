@@ -26,12 +26,11 @@ type NetworkProtectionReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=networking.spheric.cloud,resources=networks,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=networking.spheric.cloud,resources=networks/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=networking.spheric.cloud,resources=networks/finalizers,verbs=update
-//+kubebuilder:rbac:groups=networking.spheric.cloud,resources=networkinterfaces,verbs=get;list;watch
-//+kubebuilder:rbac:groups=networking.spheric.cloud,resources=loadbalancers,verbs=get;list;watch
-//+kubebuilder:rbac:groups=networking.spheric.cloud,resources=natgateways,verbs=get;list;watch
+//+kubebuilder:rbac:groups=core.spheric.cloud,resources=networks,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=core.spheric.cloud,resources=networks/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=core.spheric.cloud,resources=networks/finalizers,verbs=update
+//+kubebuilder:rbac:groups=core.spheric.cloud,resources=loadbalancers,verbs=get;list;watch
+//+kubebuilder:rbac:groups=core.spheric.cloud,resources=natgateways,verbs=get;list;watch
 
 func (r *NetworkProtectionReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)

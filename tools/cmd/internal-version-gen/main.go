@@ -405,7 +405,7 @@ func main() {
 	)
 
 	pflag.StringVar(&dir, "dir", ".", "Output directory of the internal version packages.")
-	pflag.StringSliceVar(&packages, "packages", packages, "Packages to generate internal versions for (e.g. api/networking/v1alpha1).")
+	pflag.StringSliceVar(&packages, "packages", packages, "Packages to generate internal versions for (e.g. api/core/v1alpha1).")
 
 	pflag.Parse()
 
