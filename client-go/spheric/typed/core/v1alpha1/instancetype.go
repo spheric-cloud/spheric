@@ -7,14 +7,11 @@ package v1alpha1
 
 import (
 	"context"
-	json "encoding/json"
-	"fmt"
-	"time"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
-	rest "k8s.io/client-go/rest"
+	gentype "k8s.io/client-go/gentype"
 	v1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
 	corev1alpha1 "spheric.cloud/spheric/client-go/applyconfigurations/core/v1alpha1"
 	scheme "spheric.cloud/spheric/client-go/spheric/scheme"
@@ -42,143 +39,18 @@ type InstanceTypeInterface interface {
 
 // instanceTypes implements InstanceTypeInterface
 type instanceTypes struct {
-	client rest.Interface
+	*gentype.ClientWithListAndApply[*v1alpha1.InstanceType, *v1alpha1.InstanceTypeList, *corev1alpha1.InstanceTypeApplyConfiguration]
 }
 
 // newInstanceTypes returns a InstanceTypes
 func newInstanceTypes(c *CoreV1alpha1Client) *instanceTypes {
 	return &instanceTypes{
-		client: c.RESTClient(),
+		gentype.NewClientWithListAndApply[*v1alpha1.InstanceType, *v1alpha1.InstanceTypeList, *corev1alpha1.InstanceTypeApplyConfiguration](
+			"instancetypes",
+			c.RESTClient(),
+			scheme.ParameterCodec,
+			"",
+			func() *v1alpha1.InstanceType { return &v1alpha1.InstanceType{} },
+			func() *v1alpha1.InstanceTypeList { return &v1alpha1.InstanceTypeList{} }),
 	}
-}
-
-// Get takes name of the instanceType, and returns the corresponding instanceType object, and an error if there is any.
-func (c *instanceTypes) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.InstanceType, err error) {
-	result = &v1alpha1.InstanceType{}
-	err = c.client.Get().
-		Resource("instancetypes").
-		Name(name).
-		VersionedParams(&options, scheme.ParameterCodec).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// List takes label and field selectors, and returns the list of InstanceTypes that match those selectors.
-func (c *instanceTypes) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.InstanceTypeList, err error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
-	result = &v1alpha1.InstanceTypeList{}
-	err = c.client.Get().
-		Resource("instancetypes").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Timeout(timeout).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Watch returns a watch.Interface that watches the requested instanceTypes.
-func (c *instanceTypes) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
-	opts.Watch = true
-	return c.client.Get().
-		Resource("instancetypes").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Timeout(timeout).
-		Watch(ctx)
-}
-
-// Create takes the representation of a instanceType and creates it.  Returns the server's representation of the instanceType, and an error, if there is any.
-func (c *instanceTypes) Create(ctx context.Context, instanceType *v1alpha1.InstanceType, opts v1.CreateOptions) (result *v1alpha1.InstanceType, err error) {
-	result = &v1alpha1.InstanceType{}
-	err = c.client.Post().
-		Resource("instancetypes").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(instanceType).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Update takes the representation of a instanceType and updates it. Returns the server's representation of the instanceType, and an error, if there is any.
-func (c *instanceTypes) Update(ctx context.Context, instanceType *v1alpha1.InstanceType, opts v1.UpdateOptions) (result *v1alpha1.InstanceType, err error) {
-	result = &v1alpha1.InstanceType{}
-	err = c.client.Put().
-		Resource("instancetypes").
-		Name(instanceType.Name).
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(instanceType).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Delete takes name of the instanceType and deletes it. Returns an error if one occurs.
-func (c *instanceTypes) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
-	return c.client.Delete().
-		Resource("instancetypes").
-		Name(name).
-		Body(&opts).
-		Do(ctx).
-		Error()
-}
-
-// DeleteCollection deletes a collection of objects.
-func (c *instanceTypes) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	var timeout time.Duration
-	if listOpts.TimeoutSeconds != nil {
-		timeout = time.Duration(*listOpts.TimeoutSeconds) * time.Second
-	}
-	return c.client.Delete().
-		Resource("instancetypes").
-		VersionedParams(&listOpts, scheme.ParameterCodec).
-		Timeout(timeout).
-		Body(&opts).
-		Do(ctx).
-		Error()
-}
-
-// Patch applies the patch and returns the patched instanceType.
-func (c *instanceTypes) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.InstanceType, err error) {
-	result = &v1alpha1.InstanceType{}
-	err = c.client.Patch(pt).
-		Resource("instancetypes").
-		Name(name).
-		SubResource(subresources...).
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(data).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Apply takes the given apply declarative configuration, applies it and returns the applied instanceType.
-func (c *instanceTypes) Apply(ctx context.Context, instanceType *corev1alpha1.InstanceTypeApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.InstanceType, err error) {
-	if instanceType == nil {
-		return nil, fmt.Errorf("instanceType provided to Apply must not be nil")
-	}
-	patchOpts := opts.ToPatchOptions()
-	data, err := json.Marshal(instanceType)
-	if err != nil {
-		return nil, err
-	}
-	name := instanceType.Name
-	if name == nil {
-		return nil, fmt.Errorf("instanceType.Name must be provided to Apply")
-	}
-	result = &v1alpha1.InstanceType{}
-	err = c.client.Patch(types.ApplyPatchType).
-		Resource("instancetypes").
-		Name(*name).
-		VersionedParams(&patchOpts, scheme.ParameterCodec).
-		Body(data).
-		Do(ctx).
-		Into(result)
-	return
 }

@@ -5,7 +5,7 @@
 
 package v1alpha1
 
-// DiskAccessApplyConfiguration represents an declarative configuration of the DiskAccess type for use
+// DiskAccessApplyConfiguration represents a declarative configuration of the DiskAccess type for use
 // with apply.
 type DiskAccessApplyConfiguration struct {
 	Driver     *string                                 `json:"driver,omitempty"`
@@ -14,7 +14,7 @@ type DiskAccessApplyConfiguration struct {
 	SecretRef  *LocalObjectReferenceApplyConfiguration `json:"secretRef,omitempty"`
 }
 
-// DiskAccessApplyConfiguration constructs an declarative configuration of the DiskAccess type for use with
+// DiskAccessApplyConfiguration constructs a declarative configuration of the DiskAccess type for use with
 // apply.
 func DiskAccess() *DiskAccessApplyConfiguration {
 	return &DiskAccessApplyConfiguration{}

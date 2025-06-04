@@ -6,8 +6,8 @@
 package v1alpha1
 
 import (
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/listers"
 	"k8s.io/client-go/tools/cache"
 	v1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
 )
@@ -26,30 +26,10 @@ type InstanceTypeLister interface {
 
 // instanceTypeLister implements the InstanceTypeLister interface.
 type instanceTypeLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*v1alpha1.InstanceType]
 }
 
 // NewInstanceTypeLister returns a new InstanceTypeLister.
 func NewInstanceTypeLister(indexer cache.Indexer) InstanceTypeLister {
-	return &instanceTypeLister{indexer: indexer}
-}
-
-// List lists all InstanceTypes in the indexer.
-func (s *instanceTypeLister) List(selector labels.Selector) (ret []*v1alpha1.InstanceType, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.InstanceType))
-	})
-	return ret, err
-}
-
-// Get retrieves the InstanceType from the index for a given name.
-func (s *instanceTypeLister) Get(name string) (*v1alpha1.InstanceType, error) {
-	obj, exists, err := s.indexer.GetByKey(name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("instancetype"), name)
-	}
-	return obj.(*v1alpha1.InstanceType), nil
+	return &instanceTypeLister{listers.New[*v1alpha1.InstanceType](indexer, v1alpha1.Resource("instancetype"))}
 }

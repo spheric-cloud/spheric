@@ -12,7 +12,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
-	"spheric.cloud/spheric/api/core/v1alpha1"
 	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
 	"spheric.cloud/spheric/utils/annotations"
 	. "spheric.cloud/spheric/utils/testing"
@@ -29,31 +28,31 @@ var _ = Describe("InstanceEphemeralDiskController", func() {
 				Namespace:    ns.Name,
 				GenerateName: "ref-disk-",
 			},
-			Spec: v1alpha1.DiskSpec{},
+			Spec: corev1alpha1.DiskSpec{},
 		}
 		Expect(k8sClient.Create(ctx, refDisk)).To(Succeed())
 
 		By("creating a instance")
-		instance := &v1alpha1.Instance{
+		instance := &corev1alpha1.Instance{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "instance-",
 			},
-			Spec: v1alpha1.InstanceSpec{
+			Spec: corev1alpha1.InstanceSpec{
 				InstanceTypeRef: corev1alpha1.LocalObjRef(instanceClass.Name),
-				Disks: []v1alpha1.AttachedDisk{
+				Disks: []corev1alpha1.AttachedDisk{
 					{
 						Name: "ref-disk",
-						AttachedDiskSource: v1alpha1.AttachedDiskSource{
+						AttachedDiskSource: corev1alpha1.AttachedDiskSource{
 							DiskRef: corev1alpha1.NewLocalObjRef(refDisk.Name),
 						},
 					},
 					{
 						Name: "ephem-disk",
-						AttachedDiskSource: v1alpha1.AttachedDiskSource{
-							Ephemeral: &v1alpha1.EphemeralDiskSource{
+						AttachedDiskSource: corev1alpha1.AttachedDiskSource{
+							Ephemeral: &corev1alpha1.EphemeralDiskSource{
 								DiskTemplate: &corev1alpha1.DiskTemplateSpec{
-									Spec: v1alpha1.DiskSpec{},
+									Spec: corev1alpha1.DiskSpec{},
 								},
 							},
 						},
@@ -69,7 +68,7 @@ var _ = Describe("InstanceEphemeralDiskController", func() {
 				Namespace:    ns.Name,
 				GenerateName: "undesired-ctrl-disk-",
 			},
-			Spec: v1alpha1.DiskSpec{},
+			Spec: corev1alpha1.DiskSpec{},
 		}
 		annotations.SetDefaultEphemeralManagedBy(undesiredControlledDiskClaimClaim)
 		_ = ctrl.SetControllerReference(instance, undesiredControlledDiskClaimClaim, k8sClient.Scheme())
@@ -79,7 +78,7 @@ var _ = Describe("InstanceEphemeralDiskController", func() {
 		ephemDiskClaim := &corev1alpha1.Disk{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: ns.Name,
-				Name:      v1alpha1.InstanceEphemeralDiskName(instance.Name, "ephem-disk"),
+				Name:      corev1alpha1.InstanceEphemeralDiskName(instance.Name, "ephem-disk"),
 			},
 		}
 		Eventually(Get(ephemDiskClaim)).Should(Succeed())
@@ -93,12 +92,12 @@ var _ = Describe("InstanceEphemeralDiskController", func() {
 
 	It("should not delete externally managed disks for a instance", func(ctx SpecContext) {
 		By("creating a instance")
-		instance := &v1alpha1.Instance{
+		instance := &corev1alpha1.Instance{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "instance-",
 			},
-			Spec: v1alpha1.InstanceSpec{
+			Spec: corev1alpha1.InstanceSpec{
 				InstanceTypeRef: corev1alpha1.LocalObjRef(instanceClass.Name),
 			},
 		}
@@ -110,7 +109,7 @@ var _ = Describe("InstanceEphemeralDiskController", func() {
 				Namespace:    ns.Name,
 				GenerateName: "external-disk-",
 			},
-			Spec: v1alpha1.DiskSpec{},
+			Spec: corev1alpha1.DiskSpec{},
 		}
 		_ = ctrl.SetControllerReference(instance, externalDiskClaim, k8sClient.Scheme())
 		Expect(k8sClient.Create(ctx, externalDiskClaim)).To(Succeed())

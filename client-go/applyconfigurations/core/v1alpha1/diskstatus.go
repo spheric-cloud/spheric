@@ -10,7 +10,7 @@ import (
 	v1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
 )
 
-// DiskStatusApplyConfiguration represents an declarative configuration of the DiskStatus type for use
+// DiskStatusApplyConfiguration represents a declarative configuration of the DiskStatus type for use
 // with apply.
 type DiskStatusApplyConfiguration struct {
 	State                   *v1alpha1.DiskState           `json:"state,omitempty"`
@@ -18,7 +18,7 @@ type DiskStatusApplyConfiguration struct {
 	LastStateTransitionTime *v1.Time                      `json:"lastStateTransitionTime,omitempty"`
 }
 
-// DiskStatusApplyConfiguration constructs an declarative configuration of the DiskStatus type for use with
+// DiskStatusApplyConfiguration constructs a declarative configuration of the DiskStatus type for use with
 // apply.
 func DiskStatus() *DiskStatusApplyConfiguration {
 	return &DiskStatusApplyConfiguration{}

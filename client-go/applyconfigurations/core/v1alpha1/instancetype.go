@@ -14,7 +14,7 @@ import (
 	internal "spheric.cloud/spheric/client-go/applyconfigurations/internal"
 )
 
-// InstanceTypeApplyConfiguration represents an declarative configuration of the InstanceType type for use
+// InstanceTypeApplyConfiguration represents a declarative configuration of the InstanceType type for use
 // with apply.
 type InstanceTypeApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -23,7 +23,7 @@ type InstanceTypeApplyConfiguration struct {
 	Capabilities                     *v1alpha1.ResourceList      `json:"capabilities,omitempty"`
 }
 
-// InstanceType constructs an declarative configuration of the InstanceType type for use with
+// InstanceType constructs a declarative configuration of the InstanceType type for use with
 // apply.
 func InstanceType(name string) *InstanceTypeApplyConfiguration {
 	b := &InstanceTypeApplyConfiguration{}
@@ -240,4 +240,10 @@ func (b *InstanceTypeApplyConfiguration) WithClass(value v1alpha1.InstanceTypeCl
 func (b *InstanceTypeApplyConfiguration) WithCapabilities(value v1alpha1.ResourceList) *InstanceTypeApplyConfiguration {
 	b.Capabilities = &value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *InstanceTypeApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

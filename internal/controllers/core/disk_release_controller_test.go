@@ -10,7 +10,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/uuid"
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
-	"spheric.cloud/spheric/api/core/v1alpha1"
 	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
 	. "spheric.cloud/spheric/utils/testing"
 )
@@ -25,7 +24,7 @@ var _ = Describe("DiskReleaseReconciler", func() {
 				Namespace:    ns.Name,
 				GenerateName: "disk-",
 			},
-			Spec: v1alpha1.DiskSpec{
+			Spec: corev1alpha1.DiskSpec{
 				InstanceRef: &corev1alpha1.LocalUIDReference{
 					Name: "should-not-exist",
 					UID:  uuid.NewUUID(),

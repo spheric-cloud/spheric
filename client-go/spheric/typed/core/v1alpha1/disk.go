@@ -7,14 +7,11 @@ package v1alpha1
 
 import (
 	"context"
-	json "encoding/json"
-	"fmt"
-	"time"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
-	rest "k8s.io/client-go/rest"
+	gentype "k8s.io/client-go/gentype"
 	v1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
 	corev1alpha1 "spheric.cloud/spheric/client-go/applyconfigurations/core/v1alpha1"
 	scheme "spheric.cloud/spheric/client-go/spheric/scheme"
@@ -30,6 +27,7 @@ type DisksGetter interface {
 type DiskInterface interface {
 	Create(ctx context.Context, disk *v1alpha1.Disk, opts v1.CreateOptions) (*v1alpha1.Disk, error)
 	Update(ctx context.Context, disk *v1alpha1.Disk, opts v1.UpdateOptions) (*v1alpha1.Disk, error)
+	// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
 	UpdateStatus(ctx context.Context, disk *v1alpha1.Disk, opts v1.UpdateOptions) (*v1alpha1.Disk, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
@@ -38,206 +36,25 @@ type DiskInterface interface {
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.Disk, err error)
 	Apply(ctx context.Context, disk *corev1alpha1.DiskApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Disk, err error)
+	// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
 	ApplyStatus(ctx context.Context, disk *corev1alpha1.DiskApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Disk, err error)
 	DiskExpansion
 }
 
 // disks implements DiskInterface
 type disks struct {
-	client rest.Interface
-	ns     string
+	*gentype.ClientWithListAndApply[*v1alpha1.Disk, *v1alpha1.DiskList, *corev1alpha1.DiskApplyConfiguration]
 }
 
 // newDisks returns a Disks
 func newDisks(c *CoreV1alpha1Client, namespace string) *disks {
 	return &disks{
-		client: c.RESTClient(),
-		ns:     namespace,
+		gentype.NewClientWithListAndApply[*v1alpha1.Disk, *v1alpha1.DiskList, *corev1alpha1.DiskApplyConfiguration](
+			"disks",
+			c.RESTClient(),
+			scheme.ParameterCodec,
+			namespace,
+			func() *v1alpha1.Disk { return &v1alpha1.Disk{} },
+			func() *v1alpha1.DiskList { return &v1alpha1.DiskList{} }),
 	}
-}
-
-// Get takes name of the disk, and returns the corresponding disk object, and an error if there is any.
-func (c *disks) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.Disk, err error) {
-	result = &v1alpha1.Disk{}
-	err = c.client.Get().
-		Namespace(c.ns).
-		Resource("disks").
-		Name(name).
-		VersionedParams(&options, scheme.ParameterCodec).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// List takes label and field selectors, and returns the list of Disks that match those selectors.
-func (c *disks) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.DiskList, err error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
-	result = &v1alpha1.DiskList{}
-	err = c.client.Get().
-		Namespace(c.ns).
-		Resource("disks").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Timeout(timeout).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Watch returns a watch.Interface that watches the requested disks.
-func (c *disks) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
-	opts.Watch = true
-	return c.client.Get().
-		Namespace(c.ns).
-		Resource("disks").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Timeout(timeout).
-		Watch(ctx)
-}
-
-// Create takes the representation of a disk and creates it.  Returns the server's representation of the disk, and an error, if there is any.
-func (c *disks) Create(ctx context.Context, disk *v1alpha1.Disk, opts v1.CreateOptions) (result *v1alpha1.Disk, err error) {
-	result = &v1alpha1.Disk{}
-	err = c.client.Post().
-		Namespace(c.ns).
-		Resource("disks").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(disk).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Update takes the representation of a disk and updates it. Returns the server's representation of the disk, and an error, if there is any.
-func (c *disks) Update(ctx context.Context, disk *v1alpha1.Disk, opts v1.UpdateOptions) (result *v1alpha1.Disk, err error) {
-	result = &v1alpha1.Disk{}
-	err = c.client.Put().
-		Namespace(c.ns).
-		Resource("disks").
-		Name(disk.Name).
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(disk).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// UpdateStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *disks) UpdateStatus(ctx context.Context, disk *v1alpha1.Disk, opts v1.UpdateOptions) (result *v1alpha1.Disk, err error) {
-	result = &v1alpha1.Disk{}
-	err = c.client.Put().
-		Namespace(c.ns).
-		Resource("disks").
-		Name(disk.Name).
-		SubResource("status").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(disk).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Delete takes name of the disk and deletes it. Returns an error if one occurs.
-func (c *disks) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
-	return c.client.Delete().
-		Namespace(c.ns).
-		Resource("disks").
-		Name(name).
-		Body(&opts).
-		Do(ctx).
-		Error()
-}
-
-// DeleteCollection deletes a collection of objects.
-func (c *disks) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	var timeout time.Duration
-	if listOpts.TimeoutSeconds != nil {
-		timeout = time.Duration(*listOpts.TimeoutSeconds) * time.Second
-	}
-	return c.client.Delete().
-		Namespace(c.ns).
-		Resource("disks").
-		VersionedParams(&listOpts, scheme.ParameterCodec).
-		Timeout(timeout).
-		Body(&opts).
-		Do(ctx).
-		Error()
-}
-
-// Patch applies the patch and returns the patched disk.
-func (c *disks) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.Disk, err error) {
-	result = &v1alpha1.Disk{}
-	err = c.client.Patch(pt).
-		Namespace(c.ns).
-		Resource("disks").
-		Name(name).
-		SubResource(subresources...).
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(data).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Apply takes the given apply declarative configuration, applies it and returns the applied disk.
-func (c *disks) Apply(ctx context.Context, disk *corev1alpha1.DiskApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Disk, err error) {
-	if disk == nil {
-		return nil, fmt.Errorf("disk provided to Apply must not be nil")
-	}
-	patchOpts := opts.ToPatchOptions()
-	data, err := json.Marshal(disk)
-	if err != nil {
-		return nil, err
-	}
-	name := disk.Name
-	if name == nil {
-		return nil, fmt.Errorf("disk.Name must be provided to Apply")
-	}
-	result = &v1alpha1.Disk{}
-	err = c.client.Patch(types.ApplyPatchType).
-		Namespace(c.ns).
-		Resource("disks").
-		Name(*name).
-		VersionedParams(&patchOpts, scheme.ParameterCodec).
-		Body(data).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// ApplyStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-func (c *disks) ApplyStatus(ctx context.Context, disk *corev1alpha1.DiskApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Disk, err error) {
-	if disk == nil {
-		return nil, fmt.Errorf("disk provided to Apply must not be nil")
-	}
-	patchOpts := opts.ToPatchOptions()
-	data, err := json.Marshal(disk)
-	if err != nil {
-		return nil, err
-	}
-
-	name := disk.Name
-	if name == nil {
-		return nil, fmt.Errorf("disk.Name must be provided to Apply")
-	}
-
-	result = &v1alpha1.Disk{}
-	err = c.client.Patch(types.ApplyPatchType).
-		Namespace(c.ns).
-		Resource("disks").
-		Name(*name).
-		SubResource("status").
-		VersionedParams(&patchOpts, scheme.ParameterCodec).
-		Body(data).
-		Do(ctx).
-		Into(result)
-	return
 }

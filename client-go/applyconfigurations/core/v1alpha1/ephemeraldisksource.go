@@ -5,13 +5,13 @@
 
 package v1alpha1
 
-// EphemeralDiskSourceApplyConfiguration represents an declarative configuration of the EphemeralDiskSource type for use
+// EphemeralDiskSourceApplyConfiguration represents a declarative configuration of the EphemeralDiskSource type for use
 // with apply.
 type EphemeralDiskSourceApplyConfiguration struct {
 	DiskTemplate *DiskTemplateSpecApplyConfiguration `json:"diskTemplate,omitempty"`
 }
 
-// EphemeralDiskSourceApplyConfiguration constructs an declarative configuration of the EphemeralDiskSource type for use with
+// EphemeralDiskSourceApplyConfiguration constructs a declarative configuration of the EphemeralDiskSource type for use with
 // apply.
 func EphemeralDiskSource() *EphemeralDiskSourceApplyConfiguration {
 	return &EphemeralDiskSourceApplyConfiguration{}

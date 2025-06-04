@@ -6,8 +6,8 @@
 package v1alpha1
 
 import (
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/listers"
 	"k8s.io/client-go/tools/cache"
 	v1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
 )
@@ -25,25 +25,17 @@ type SubnetLister interface {
 
 // subnetLister implements the SubnetLister interface.
 type subnetLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*v1alpha1.Subnet]
 }
 
 // NewSubnetLister returns a new SubnetLister.
 func NewSubnetLister(indexer cache.Indexer) SubnetLister {
-	return &subnetLister{indexer: indexer}
-}
-
-// List lists all Subnets in the indexer.
-func (s *subnetLister) List(selector labels.Selector) (ret []*v1alpha1.Subnet, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.Subnet))
-	})
-	return ret, err
+	return &subnetLister{listers.New[*v1alpha1.Subnet](indexer, v1alpha1.Resource("subnet"))}
 }
 
 // Subnets returns an object that can list and get Subnets.
 func (s *subnetLister) Subnets(namespace string) SubnetNamespaceLister {
-	return subnetNamespaceLister{indexer: s.indexer, namespace: namespace}
+	return subnetNamespaceLister{listers.NewNamespaced[*v1alpha1.Subnet](s.ResourceIndexer, namespace)}
 }
 
 // SubnetNamespaceLister helps list and get Subnets.
@@ -61,26 +53,5 @@ type SubnetNamespaceLister interface {
 // subnetNamespaceLister implements the SubnetNamespaceLister
 // interface.
 type subnetNamespaceLister struct {
-	indexer   cache.Indexer
-	namespace string
-}
-
-// List lists all Subnets in the indexer for a given namespace.
-func (s subnetNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.Subnet, err error) {
-	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.Subnet))
-	})
-	return ret, err
-}
-
-// Get retrieves the Subnet from the indexer for a given namespace and name.
-func (s subnetNamespaceLister) Get(name string) (*v1alpha1.Subnet, error) {
-	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("subnet"), name)
-	}
-	return obj.(*v1alpha1.Subnet), nil
+	listers.ResourceIndexer[*v1alpha1.Subnet]
 }

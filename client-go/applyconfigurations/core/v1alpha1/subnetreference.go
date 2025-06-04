@@ -5,14 +5,14 @@
 
 package v1alpha1
 
-// SubnetReferenceApplyConfiguration represents an declarative configuration of the SubnetReference type for use
+// SubnetReferenceApplyConfiguration represents a declarative configuration of the SubnetReference type for use
 // with apply.
 type SubnetReferenceApplyConfiguration struct {
 	NetworkName *string `json:"networkName,omitempty"`
 	Name        *string `json:"name,omitempty"`
 }
 
-// SubnetReferenceApplyConfiguration constructs an declarative configuration of the SubnetReference type for use with
+// SubnetReferenceApplyConfiguration constructs a declarative configuration of the SubnetReference type for use with
 // apply.
 func SubnetReference() *SubnetReferenceApplyConfiguration {
 	return &SubnetReferenceApplyConfiguration{}

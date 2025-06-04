@@ -7,13 +7,12 @@ package common
 
 import (
 	"fmt"
-	"text/template"
 	"time"
 
 	"spheric.cloud/spheric/irictl/clientcmd"
 	"spheric.cloud/spheric/irictl/tableconverters"
 
-	iriremoteinstance "spheric.cloud/spheric/spherelet/iri/remote"
+	iriremote "spheric.cloud/spheric/spherelet/iri/remote"
 
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"
@@ -21,7 +20,6 @@ import (
 	iri "spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1"
 	"spheric.cloud/spheric/irictl/renderer"
 	"spheric.cloud/spheric/irictl/tableconverter"
-	"spheric.cloud/spheric/utils/generic"
 )
 
 type Factory interface {
@@ -36,140 +34,23 @@ type Options struct {
 	ConfigFile string
 }
 
+func NewOptions() *Options {
+	return &Options{
+		Address:    clientcmd.RecommendedInstanceRuntimeEndpoint,
+		ConfigFile: "",
+	}
+}
+
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
-	fs.StringVar(&o.ConfigFile, clientcmd.RecommendedConfigPathFlag, "", "Config file to use")
-	fs.StringVar(&o.Address, "address", "", "Address to the iri server.")
+	fs.StringVar(&o.ConfigFile, clientcmd.RecommendedConfigPathFlag, o.ConfigFile, "Config file to use")
+	fs.StringVar(&o.Address, "address", o.Address, "Address to the iri server.")
 }
 
 func (o *Options) Config() (*clientcmd.Config, error) {
 	return clientcmd.GetConfig(o.ConfigFile)
 }
 
-func TemplateTableBuilderFromColumns[E any](columns []clientcmd.Column) (tableconverter.Funcs[E], error) {
-	tColumns := make([]tableconverter.TemplateTableColumn, len(columns))
-	for i, col := range columns {
-		tmpl, err := template.New(col.Name).Parse(col.Template)
-		if err != nil {
-			return tableconverter.Funcs[E]{}, fmt.Errorf("[column %s] error parsing template: %w", col.Name, err)
-		}
-
-		tColumns[i] = tableconverter.TemplateTableColumn{
-			Name:     col.Name,
-			Template: tmpl,
-		}
-	}
-
-	return tableconverter.TemplateTableBuilder[E](tColumns...), nil
-}
-
-func modifyTableConverter[E any](
-	reg *tableconverter.Registry,
-	modifyFunc func(conv tableconverter.TableConverter[any]) tableconverter.TableConverter[any],
-) error {
-	tag := generic.ReflectType[E]()
-	conv, err := reg.Lookup(tag)
-	if err != nil {
-		return err
-	}
-
-	oldConv := conv
-	conv = modifyFunc(conv)
-
-	// Fast track: no modification
-	if conv == oldConv {
-		return nil
-	}
-
-	if err := reg.Delete(tag); err != nil {
-		return err
-	}
-
-	return reg.Register(tag, conv)
-}
-
-func applyTableConverterOverlay[E any](
-	reg *tableconverter.Registry,
-	prependColumns, appendColumns []clientcmd.Column,
-) error {
-	if len(prependColumns) == 0 && len(appendColumns) == 0 {
-		return nil
-	}
-
-	var (
-		toPrepend      tableconverter.Funcs[E]
-		toPrependSlice tableconverter.SliceFuncs[E]
-	)
-	if len(prependColumns) > 0 {
-		conv, err := TemplateTableBuilderFromColumns[E](prependColumns)
-		if err != nil {
-			return err
-		}
-
-		toPrepend = conv
-		toPrependSlice = tableconverter.SliceFuncs[E](toPrepend)
-	}
-
-	var (
-		toAppend      tableconverter.Funcs[E]
-		toAppendSlice tableconverter.SliceFuncs[E]
-	)
-	if len(appendColumns) > 0 {
-		conv, err := TemplateTableBuilderFromColumns[E](appendColumns)
-		if err != nil {
-			return err
-		}
-
-		toAppend = conv
-		toAppendSlice = tableconverter.SliceFuncs[E](toAppend)
-	}
-
-	if err := modifyTableConverter[E](reg, func(conv tableconverter.TableConverter[any]) tableconverter.TableConverter[any] {
-		var convs []tableconverter.TableConverter[any]
-		if len(prependColumns) > 0 {
-			convs = append(convs, tableconverter.TypedAnyConverter[E, tableconverter.Funcs[E]]{Converter: toPrepend})
-		}
-		convs = append(convs, conv)
-		if len(appendColumns) > 0 {
-			convs = append(convs, tableconverter.TypedAnyConverter[E, tableconverter.Funcs[E]]{Converter: toAppend})
-		}
-
-		return tableconverter.Zip(convs...)
-	}); err != nil {
-		return err
-	}
-
-	if err := modifyTableConverter[[]E](reg, func(conv tableconverter.TableConverter[any]) tableconverter.TableConverter[any] {
-		var convs []tableconverter.TableConverter[any]
-		if len(prependColumns) > 0 {
-			convs = append(convs, tableconverter.TypedAnyConverter[[]E, tableconverter.SliceFuncs[E]]{Converter: toPrependSlice})
-		}
-		convs = append(convs, conv)
-		if len(appendColumns) > 0 {
-			convs = append(convs, tableconverter.TypedAnyConverter[[]E, tableconverter.SliceFuncs[E]]{Converter: toAppendSlice})
-		}
-
-		return tableconverter.Zip(convs...)
-	}); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (o *Options) applyTableConvertersOverlay(cfg *clientcmd.TableConfig, reg *tableconverter.Registry) error {
-	if err := applyTableConverterOverlay[*iri.Instance](reg, cfg.PrependInstanceColumns, cfg.AppendInstanceColumns); err != nil {
-		return fmt.Errorf("error applying instance table converter overlay: %w", err)
-	}
-
-	return nil
-}
-
 func (o *Options) Registry() (*renderer.Registry, error) {
-	cfg, err := o.Config()
-	if err != nil {
-		return nil, fmt.Errorf("error reading config: %w", err)
-	}
-
 	registry := renderer.NewRegistry()
 	if err := renderer.AddToRegistry(registry); err != nil {
 		return nil, err
@@ -180,12 +61,6 @@ func (o *Options) Registry() (*renderer.Registry, error) {
 		return nil, err
 	}
 
-	if tableCfg := cfg.TableConfig; tableCfg != nil {
-		if err := o.applyTableConvertersOverlay(tableCfg, tableConvRegistry); err != nil {
-			return nil, err
-		}
-	}
-
 	if err := registry.Register("table", renderer.NewTable(tableConvRegistry)); err != nil {
 		return nil, err
 	}
@@ -194,7 +69,7 @@ func (o *Options) Registry() (*renderer.Registry, error) {
 }
 
 func (o *Options) Client() (iri.RuntimeServiceClient, func() error, error) {
-	address, err := iriremoteinstance.GetAddressWithTimeout(3*time.Second, o.Address)
+	address, err := iriremote.GetAddressWithTimeout(3*time.Second, o.Address)
 	if err != nil {
 		return nil, nil, err
 	}

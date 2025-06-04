@@ -5,7 +5,7 @@
 
 package v1alpha1
 
-// AttachedDiskSourceApplyConfiguration represents an declarative configuration of the AttachedDiskSource type for use
+// AttachedDiskSourceApplyConfiguration represents a declarative configuration of the AttachedDiskSource type for use
 // with apply.
 type AttachedDiskSourceApplyConfiguration struct {
 	DiskRef   *LocalObjectReferenceApplyConfiguration `json:"diskRef,omitempty"`
@@ -13,7 +13,7 @@ type AttachedDiskSourceApplyConfiguration struct {
 	Ephemeral *EphemeralDiskSourceApplyConfiguration  `json:"ephemeral,omitempty"`
 }
 
-// AttachedDiskSourceApplyConfiguration constructs an declarative configuration of the AttachedDiskSource type for use with
+// AttachedDiskSourceApplyConfiguration constructs a declarative configuration of the AttachedDiskSource type for use with
 // apply.
 func AttachedDiskSource() *AttachedDiskSourceApplyConfiguration {
 	return &AttachedDiskSourceApplyConfiguration{}

@@ -27,6 +27,19 @@ func Zero[E any]() E {
 	return zero
 }
 
+func New[E any]() *E {
+	return new(E)
+}
+
+func IsZero[E comparable](e E) bool {
+	var zero E
+	return e == zero
+}
+
+func IsNil(e any) bool {
+	return e == nil
+}
+
 func Cast[E any](v any) (E, error) {
 	e, ok := v.(E)
 	if !ok {
@@ -105,6 +118,27 @@ func DerefOrZero[E any](e *E) E {
 func TODO[V any](args ...any) V {
 	var sb strings.Builder
 	sb.WriteString("TODO: ")
+	if len(args) > 0 {
+		_, _ = fmt.Fprintln(&sb, args...)
+	} else {
+		_, _ = fmt.Fprintf(&sb, "provide a value of type %T", Zero[V]())
+	}
+	panic(sb.String())
+}
+
+// Stub is a stub left empty by intent.
+//
+// For instance, to check generic types implement certain interfaces, a blank ('_') function declaration
+// can be used to check the type definition.
+//
+// Example:
+//
+//	func _[K]() MyInterface[K] {
+//		return Stub[MyImplementation[K]]()
+//	}
+func Stub[V any](args ...any) V {
+	var sb strings.Builder
+	sb.WriteString("Stub was called - this should not happen: ")
 	if len(args) > 0 {
 		_, _ = fmt.Fprintln(&sb, args...)
 	} else {

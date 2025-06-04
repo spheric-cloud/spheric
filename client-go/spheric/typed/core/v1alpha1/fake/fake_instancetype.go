@@ -30,20 +30,22 @@ var instancetypesKind = v1alpha1.SchemeGroupVersion.WithKind("InstanceType")
 
 // Get takes name of the instanceType, and returns the corresponding instanceType object, and an error if there is any.
 func (c *FakeInstanceTypes) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.InstanceType, err error) {
+	emptyResult := &v1alpha1.InstanceType{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootGetAction(instancetypesResource, name), &v1alpha1.InstanceType{})
+		Invokes(testing.NewRootGetActionWithOptions(instancetypesResource, name, options), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.InstanceType), err
 }
 
 // List takes label and field selectors, and returns the list of InstanceTypes that match those selectors.
 func (c *FakeInstanceTypes) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.InstanceTypeList, err error) {
+	emptyResult := &v1alpha1.InstanceTypeList{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootListAction(instancetypesResource, instancetypesKind, opts), &v1alpha1.InstanceTypeList{})
+		Invokes(testing.NewRootListActionWithOptions(instancetypesResource, instancetypesKind, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 
 	label, _, _ := testing.ExtractFromListOptions(opts)
@@ -62,25 +64,27 @@ func (c *FakeInstanceTypes) List(ctx context.Context, opts v1.ListOptions) (resu
 // Watch returns a watch.Interface that watches the requested instanceTypes.
 func (c *FakeInstanceTypes) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewRootWatchAction(instancetypesResource, opts))
+		InvokesWatch(testing.NewRootWatchActionWithOptions(instancetypesResource, opts))
 }
 
 // Create takes the representation of a instanceType and creates it.  Returns the server's representation of the instanceType, and an error, if there is any.
 func (c *FakeInstanceTypes) Create(ctx context.Context, instanceType *v1alpha1.InstanceType, opts v1.CreateOptions) (result *v1alpha1.InstanceType, err error) {
+	emptyResult := &v1alpha1.InstanceType{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootCreateAction(instancetypesResource, instanceType), &v1alpha1.InstanceType{})
+		Invokes(testing.NewRootCreateActionWithOptions(instancetypesResource, instanceType, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.InstanceType), err
 }
 
 // Update takes the representation of a instanceType and updates it. Returns the server's representation of the instanceType, and an error, if there is any.
 func (c *FakeInstanceTypes) Update(ctx context.Context, instanceType *v1alpha1.InstanceType, opts v1.UpdateOptions) (result *v1alpha1.InstanceType, err error) {
+	emptyResult := &v1alpha1.InstanceType{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootUpdateAction(instancetypesResource, instanceType), &v1alpha1.InstanceType{})
+		Invokes(testing.NewRootUpdateActionWithOptions(instancetypesResource, instanceType, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.InstanceType), err
 }
@@ -94,7 +98,7 @@ func (c *FakeInstanceTypes) Delete(ctx context.Context, name string, opts v1.Del
 
 // DeleteCollection deletes a collection of objects.
 func (c *FakeInstanceTypes) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewRootDeleteCollectionAction(instancetypesResource, listOpts)
+	action := testing.NewRootDeleteCollectionActionWithOptions(instancetypesResource, opts, listOpts)
 
 	_, err := c.Fake.Invokes(action, &v1alpha1.InstanceTypeList{})
 	return err
@@ -102,10 +106,11 @@ func (c *FakeInstanceTypes) DeleteCollection(ctx context.Context, opts v1.Delete
 
 // Patch applies the patch and returns the patched instanceType.
 func (c *FakeInstanceTypes) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.InstanceType, err error) {
+	emptyResult := &v1alpha1.InstanceType{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(instancetypesResource, name, pt, data, subresources...), &v1alpha1.InstanceType{})
+		Invokes(testing.NewRootPatchSubresourceActionWithOptions(instancetypesResource, name, pt, data, opts, subresources...), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.InstanceType), err
 }
@@ -123,10 +128,11 @@ func (c *FakeInstanceTypes) Apply(ctx context.Context, instanceType *corev1alpha
 	if name == nil {
 		return nil, fmt.Errorf("instanceType.Name must be provided to Apply")
 	}
+	emptyResult := &v1alpha1.InstanceType{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(instancetypesResource, *name, types.ApplyPatchType, data), &v1alpha1.InstanceType{})
+		Invokes(testing.NewRootPatchSubresourceActionWithOptions(instancetypesResource, *name, types.ApplyPatchType, data, opts.ToPatchOptions()), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.InstanceType), err
 }

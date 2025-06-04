@@ -5,13 +5,13 @@
 
 package v1alpha1
 
-// FleetDaemonEndpointsApplyConfiguration represents an declarative configuration of the FleetDaemonEndpoints type for use
+// FleetDaemonEndpointsApplyConfiguration represents a declarative configuration of the FleetDaemonEndpoints type for use
 // with apply.
 type FleetDaemonEndpointsApplyConfiguration struct {
 	SphereletEndpoint *DaemonEndpointApplyConfiguration `json:"sphereletEndpoint,omitempty"`
 }
 
-// FleetDaemonEndpointsApplyConfiguration constructs an declarative configuration of the FleetDaemonEndpoints type for use with
+// FleetDaemonEndpointsApplyConfiguration constructs a declarative configuration of the FleetDaemonEndpoints type for use with
 // apply.
 func FleetDaemonEndpoints() *FleetDaemonEndpointsApplyConfiguration {
 	return &FleetDaemonEndpointsApplyConfiguration{}

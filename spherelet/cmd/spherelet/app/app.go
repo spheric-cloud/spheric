@@ -16,7 +16,6 @@ import (
 	"spheric.cloud/spheric/spherelet/event/instanceevent"
 	"spheric.cloud/spheric/spherelet/event/runtimeevent"
 
-	"spheric.cloud/spheric/api/core/v1alpha1"
 	"spheric.cloud/spheric/spherelet/iri/remote"
 
 	"github.com/ironcore-dev/controller-utils/configutils"
@@ -213,9 +212,9 @@ func Run(ctx context.Context, opts Options) error {
 		LeaderElectionConfig:    leaderElectionCfg,
 		Cache:                   cache.Options{ByObject: map[client.Object]cache.ByObject{}},
 		NewCache: func(config *rest.Config, cacheOpts cache.Options) (cache.Cache, error) {
-			cacheOpts.ByObject[&v1alpha1.Instance{}] = cache.ByObject{
+			cacheOpts.ByObject[&corev1alpha1.Instance{}] = cache.ByObject{
 				Field: fields.OneTermEqualSelector(
-					v1alpha1.InstanceFleetRefNameField,
+					corev1alpha1.InstanceFleetRefNameField,
 					opts.FleetName,
 				),
 			}

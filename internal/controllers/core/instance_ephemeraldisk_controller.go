@@ -13,7 +13,6 @@ import (
 
 	utilpredicate "spheric.cloud/spheric/spherelet/predicate"
 
-	"spheric.cloud/spheric/api/core/v1alpha1"
 	coreclient "spheric.cloud/spheric/internal/client/core"
 
 	"spheric.cloud/spheric/utils/annotations"
@@ -38,7 +37,7 @@ type InstanceEphemeralDiskReconciler struct {
 
 func (r *InstanceEphemeralDiskReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
-	instance := &v1alpha1.Instance{}
+	instance := &corev1alpha1.Instance{}
 	if err := r.Get(ctx, req.NamespacedName, instance); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
@@ -46,7 +45,7 @@ func (r *InstanceEphemeralDiskReconciler) Reconcile(ctx context.Context, req ctr
 	return r.reconcileExists(ctx, log, instance)
 }
 
-func (r *InstanceEphemeralDiskReconciler) reconcileExists(ctx context.Context, log logr.Logger, instance *v1alpha1.Instance) (ctrl.Result, error) {
+func (r *InstanceEphemeralDiskReconciler) reconcileExists(ctx context.Context, log logr.Logger, instance *corev1alpha1.Instance) (ctrl.Result, error) {
 	if !instance.DeletionTimestamp.IsZero() {
 		log.V(1).Info("Instance is deleting, nothing to do")
 		return ctrl.Result{}, nil
@@ -55,7 +54,7 @@ func (r *InstanceEphemeralDiskReconciler) reconcileExists(ctx context.Context, l
 	return r.reconcile(ctx, log, instance)
 }
 
-func (r *InstanceEphemeralDiskReconciler) ephemeralInstanceDiskByName(instance *v1alpha1.Instance) map[string]*corev1alpha1.Disk {
+func (r *InstanceEphemeralDiskReconciler) ephemeralInstanceDiskByName(instance *corev1alpha1.Instance) map[string]*corev1alpha1.Disk {
 	res := make(map[string]*corev1alpha1.Disk)
 	for _, attachedDisk := range instance.Spec.Disks {
 		ephemeral := attachedDisk.Ephemeral
@@ -63,7 +62,7 @@ func (r *InstanceEphemeralDiskReconciler) ephemeralInstanceDiskByName(instance *
 			continue
 		}
 
-		diskName := v1alpha1.InstanceEphemeralDiskName(instance.Name, attachedDisk.Name)
+		diskName := corev1alpha1.InstanceEphemeralDiskName(instance.Name, attachedDisk.Name)
 		disk := &corev1alpha1.Disk{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:   instance.Namespace,
@@ -83,7 +82,7 @@ func (r *InstanceEphemeralDiskReconciler) ephemeralInstanceDiskByName(instance *
 func (r *InstanceEphemeralDiskReconciler) handleExistingDisk(
 	ctx context.Context,
 	log logr.Logger,
-	instance *v1alpha1.Instance,
+	instance *corev1alpha1.Instance,
 	shouldManage bool,
 	disk *corev1alpha1.Disk,
 ) error {
@@ -114,7 +113,7 @@ func (r *InstanceEphemeralDiskReconciler) handleExistingDisk(
 func (r *InstanceEphemeralDiskReconciler) handleCreateDisk(
 	ctx context.Context,
 	log logr.Logger,
-	instance *v1alpha1.Instance,
+	instance *corev1alpha1.Instance,
 	disk *corev1alpha1.Disk,
 ) error {
 	diskKey := client.ObjectKeyFromObject(disk)
@@ -137,7 +136,7 @@ func (r *InstanceEphemeralDiskReconciler) handleCreateDisk(
 	return r.handleExistingDisk(ctx, log, instance, true, disk)
 }
 
-func (r *InstanceEphemeralDiskReconciler) reconcile(ctx context.Context, log logr.Logger, instance *v1alpha1.Instance) (ctrl.Result, error) {
+func (r *InstanceEphemeralDiskReconciler) reconcile(ctx context.Context, log logr.Logger, instance *corev1alpha1.Instance) (ctrl.Result, error) {
 	log.V(1).Info("Reconcile")
 
 	log.V(1).Info("Listing disks")
@@ -182,7 +181,7 @@ func (r *InstanceEphemeralDiskReconciler) enqueueByDisk() handler.EventHandler {
 		disk := obj.(*corev1alpha1.Disk)
 		log := ctrl.LoggerFrom(ctx)
 
-		instanceList := &v1alpha1.InstanceList{}
+		instanceList := &corev1alpha1.InstanceList{}
 		if err := r.List(ctx, instanceList,
 			client.InNamespace(disk.Namespace),
 			client.MatchingFields{
@@ -209,7 +208,7 @@ func (r *InstanceEphemeralDiskReconciler) SetupWithManager(mgr ctrl.Manager) err
 	return ctrl.NewControllerManagedBy(mgr).
 		Named("instanceephemeraldisk").
 		For(
-			&v1alpha1.Instance{},
+			&corev1alpha1.Instance{},
 			builder.WithPredicates(
 				utilpredicate.IsNotInDeletionPredicate(),
 			),

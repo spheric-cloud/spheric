@@ -9,7 +9,7 @@ import (
 	v1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
 )
 
-// InstanceStatusApplyConfiguration represents an declarative configuration of the InstanceStatus type for use
+// InstanceStatusApplyConfiguration represents a declarative configuration of the InstanceStatus type for use
 // with apply.
 type InstanceStatusApplyConfiguration struct {
 	InstanceID         *string                                    `json:"instanceID,omitempty"`
@@ -19,7 +19,7 @@ type InstanceStatusApplyConfiguration struct {
 	Disks              []AttachedDiskStatusApplyConfiguration     `json:"disks,omitempty"`
 }
 
-// InstanceStatusApplyConfiguration constructs an declarative configuration of the InstanceStatus type for use with
+// InstanceStatusApplyConfiguration constructs a declarative configuration of the InstanceStatus type for use with
 // apply.
 func InstanceStatus() *InstanceStatusApplyConfiguration {
 	return &InstanceStatusApplyConfiguration{}

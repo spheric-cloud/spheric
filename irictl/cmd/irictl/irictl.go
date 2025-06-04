@@ -8,6 +8,8 @@ package irictl
 import (
 	goflag "flag"
 
+	"spheric.cloud/spheric/irictl/cmd/irictl/version"
+
 	"github.com/spf13/cobra"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
@@ -25,11 +27,11 @@ import (
 func Command(streams clicommon.Streams) *cobra.Command {
 	var (
 		zapOpts    zap.Options
-		clientOpts common.Options
+		clientOpts = common.NewOptions()
 	)
 
 	cmd := &cobra.Command{
-		Use: "irictl-instance",
+		Use: "irictl",
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			logger := zap.New(zap.UseFlagOptions(&zapOpts))
 			ctrl.SetLogger(logger)
@@ -44,13 +46,14 @@ func Command(streams clicommon.Streams) *cobra.Command {
 	clientOpts.AddFlags(cmd.PersistentFlags())
 
 	cmd.AddCommand(
-		get.Command(streams, &clientOpts),
-		create.Command(streams, &clientOpts),
-		delete.Command(streams, &clientOpts),
-		update.Command(streams, &clientOpts),
-		exec.Command(streams, &clientOpts),
-		attach.Command(streams, &clientOpts),
-		detach.Command(streams, &clientOpts),
+		get.Command(streams, clientOpts),
+		create.Command(streams, clientOpts),
+		delete.Command(streams, clientOpts),
+		update.Command(streams, clientOpts),
+		exec.Command(streams, clientOpts),
+		attach.Command(streams, clientOpts),
+		detach.Command(streams, clientOpts),
+		version.Command(streams, clientOpts),
 	)
 
 	return cmd

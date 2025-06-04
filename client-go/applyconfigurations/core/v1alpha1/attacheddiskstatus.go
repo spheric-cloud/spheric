@@ -10,7 +10,7 @@ import (
 	v1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
 )
 
-// AttachedDiskStatusApplyConfiguration represents an declarative configuration of the AttachedDiskStatus type for use
+// AttachedDiskStatusApplyConfiguration represents a declarative configuration of the AttachedDiskStatus type for use
 // with apply.
 type AttachedDiskStatusApplyConfiguration struct {
 	Name                    *string                     `json:"name,omitempty"`
@@ -18,7 +18,7 @@ type AttachedDiskStatusApplyConfiguration struct {
 	LastStateTransitionTime *v1.Time                    `json:"lastStateTransitionTime,omitempty"`
 }
 
-// AttachedDiskStatusApplyConfiguration constructs an declarative configuration of the AttachedDiskStatus type for use with
+// AttachedDiskStatusApplyConfiguration constructs a declarative configuration of the AttachedDiskStatus type for use with
 // apply.
 func AttachedDiskStatus() *AttachedDiskStatusApplyConfiguration {
 	return &AttachedDiskStatusApplyConfiguration{}

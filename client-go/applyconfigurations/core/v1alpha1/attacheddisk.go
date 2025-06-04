@@ -5,7 +5,7 @@
 
 package v1alpha1
 
-// AttachedDiskApplyConfiguration represents an declarative configuration of the AttachedDisk type for use
+// AttachedDiskApplyConfiguration represents a declarative configuration of the AttachedDisk type for use
 // with apply.
 type AttachedDiskApplyConfiguration struct {
 	Name                                 *string `json:"name,omitempty"`
@@ -13,7 +13,7 @@ type AttachedDiskApplyConfiguration struct {
 	AttachedDiskSourceApplyConfiguration `json:",inline"`
 }
 
-// AttachedDiskApplyConfiguration constructs an declarative configuration of the AttachedDisk type for use with
+// AttachedDiskApplyConfiguration constructs a declarative configuration of the AttachedDisk type for use with
 // apply.
 func AttachedDisk() *AttachedDiskApplyConfiguration {
 	return &AttachedDiskApplyConfiguration{}

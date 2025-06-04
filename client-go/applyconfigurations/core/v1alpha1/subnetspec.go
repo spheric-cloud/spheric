@@ -5,14 +5,14 @@
 
 package v1alpha1
 
-// SubnetSpecApplyConfiguration represents an declarative configuration of the SubnetSpec type for use
+// SubnetSpecApplyConfiguration represents a declarative configuration of the SubnetSpec type for use
 // with apply.
 type SubnetSpecApplyConfiguration struct {
 	NetworkRef *LocalObjectReferenceApplyConfiguration `json:"networkRef,omitempty"`
 	CIDRs      []string                                `json:"cidrs,omitempty"`
 }
 
-// SubnetSpecApplyConfiguration constructs an declarative configuration of the SubnetSpec type for use with
+// SubnetSpecApplyConfiguration constructs a declarative configuration of the SubnetSpec type for use with
 // apply.
 func SubnetSpec() *SubnetSpecApplyConfiguration {
 	return &SubnetSpecApplyConfiguration{}

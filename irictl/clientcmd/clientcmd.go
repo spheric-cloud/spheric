@@ -23,8 +23,9 @@ const (
 )
 
 var (
-	RecommendedConfigDir = filepath.Join(homedir.HomeDir(), RecommendedHomeDir)
-	RecommendedHomeFile  = filepath.Join(RecommendedConfigDir, RecommendedFileName)
+	RecommendedConfigDir               = filepath.Join(homedir.HomeDir(), RecommendedHomeDir)
+	RecommendedHomeFile                = filepath.Join(RecommendedConfigDir, RecommendedFileName)
+	RecommendedInstanceRuntimeEndpoint = fmt.Sprintf("unix://%s", filepath.Join("/run", "vee", "vee.sock"))
 )
 
 type Column struct {
@@ -32,13 +33,7 @@ type Column struct {
 	Template string `json:"template"`
 }
 
-type TableConfig struct {
-	PrependInstanceColumns []Column `json:"prependInstanceColumns,omitempty"`
-	AppendInstanceColumns  []Column `json:"appendInstanceColumns,omitempty"`
-}
-
 type Config struct {
-	TableConfig *TableConfig `json:"tableConfig,omitempty"`
 }
 
 func DefaultConfig() *Config {

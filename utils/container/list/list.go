@@ -197,3 +197,17 @@ func (l *List[E]) PushFrontList(other *List[E]) {
 		l.insertValue(e.Value, &l.root)
 	}
 }
+
+// Enqueue implements Queue.
+func (l *List[E]) Enqueue(e E) {
+	l.PushBack(e)
+}
+
+// Dequeue implements Queue.
+func (l *List[E]) Dequeue() (E, bool) {
+	if l.len == 0 {
+		var zero E
+		return zero, false
+	}
+	return l.Remove(l.Front()), true
+}

@@ -9,13 +9,13 @@ import (
 	v1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
 )
 
-// SubnetStatusApplyConfiguration represents an declarative configuration of the SubnetStatus type for use
+// SubnetStatusApplyConfiguration represents a declarative configuration of the SubnetStatus type for use
 // with apply.
 type SubnetStatusApplyConfiguration struct {
 	State *v1alpha1.SubnetState `json:"state,omitempty"`
 }
 
-// SubnetStatusApplyConfiguration constructs an declarative configuration of the SubnetStatus type for use with
+// SubnetStatusApplyConfiguration constructs a declarative configuration of the SubnetStatus type for use with
 // apply.
 func SubnetStatus() *SubnetStatusApplyConfiguration {
 	return &SubnetStatusApplyConfiguration{}

@@ -14,7 +14,7 @@ import (
 	internal "spheric.cloud/spheric/client-go/applyconfigurations/internal"
 )
 
-// SubnetApplyConfiguration represents an declarative configuration of the Subnet type for use
+// SubnetApplyConfiguration represents a declarative configuration of the Subnet type for use
 // with apply.
 type SubnetApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -23,7 +23,7 @@ type SubnetApplyConfiguration struct {
 	Status                           *SubnetStatusApplyConfiguration `json:"status,omitempty"`
 }
 
-// Subnet constructs an declarative configuration of the Subnet type for use with
+// Subnet constructs a declarative configuration of the Subnet type for use with
 // apply.
 func Subnet(name, namespace string) *SubnetApplyConfiguration {
 	b := &SubnetApplyConfiguration{}
@@ -242,4 +242,10 @@ func (b *SubnetApplyConfiguration) WithSpec(value *SubnetSpecApplyConfiguration)
 func (b *SubnetApplyConfiguration) WithStatus(value *SubnetStatusApplyConfiguration) *SubnetApplyConfiguration {
 	b.Status = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *SubnetApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

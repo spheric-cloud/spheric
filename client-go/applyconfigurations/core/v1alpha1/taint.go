@@ -9,7 +9,7 @@ import (
 	v1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
 )
 
-// TaintApplyConfiguration represents an declarative configuration of the Taint type for use
+// TaintApplyConfiguration represents a declarative configuration of the Taint type for use
 // with apply.
 type TaintApplyConfiguration struct {
 	Key    *string               `json:"key,omitempty"`
@@ -17,7 +17,7 @@ type TaintApplyConfiguration struct {
 	Effect *v1alpha1.TaintEffect `json:"effect,omitempty"`
 }
 
-// TaintApplyConfiguration constructs an declarative configuration of the Taint type for use with
+// TaintApplyConfiguration constructs a declarative configuration of the Taint type for use with
 // apply.
 func Taint() *TaintApplyConfiguration {
 	return &TaintApplyConfiguration{}

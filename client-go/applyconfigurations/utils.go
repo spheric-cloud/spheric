@@ -6,9 +6,12 @@
 package applyconfigurations
 
 import (
+	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
+	testing "k8s.io/client-go/testing"
 	v1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
 	corev1alpha1 "spheric.cloud/spheric/client-go/applyconfigurations/core/v1alpha1"
+	internal "spheric.cloud/spheric/client-go/applyconfigurations/internal"
 )
 
 // ForKind returns an apply configuration type for the given GroupVersionKind, or nil if no
@@ -91,4 +94,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 
 	}
 	return nil
+}
+
+func NewTypeConverter(scheme *runtime.Scheme) *testing.TypeConverter {
+	return &testing.TypeConverter{Scheme: scheme, TypeResolver: internal.Parser()}
 }

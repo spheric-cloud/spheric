@@ -176,13 +176,13 @@ func (r *FakeRuntimeService) CreateInstance(ctx context.Context, req *iri.Create
 	fakeInst := &FakeInstance{}
 	proto.Merge(&fakeInst.Instance, req.Instance)
 
-	fakeInst.Instance.Metadata.Id = generateID(defaultIDLength)
-	fakeInst.Instance.Metadata.CreatedAt = time.Now().UnixNano()
-	fakeInst.Instance.Status = &iri.InstanceStatus{
+	fakeInst.Metadata.Id = generateID(defaultIDLength)
+	fakeInst.Metadata.CreatedAt = time.Now().UnixNano()
+	fakeInst.Status = &iri.InstanceStatus{
 		State: iri.InstanceState_INSTANCE_PENDING,
 	}
 
-	r.Instances[fakeInst.Instance.Metadata.Id] = fakeInst
+	r.Instances[fakeInst.Metadata.Id] = fakeInst
 
 	return &iri.CreateInstanceResponse{
 		Instance: &fakeInst.Instance,

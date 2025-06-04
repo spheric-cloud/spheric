@@ -31,22 +31,24 @@ var disksKind = v1alpha1.SchemeGroupVersion.WithKind("Disk")
 
 // Get takes name of the disk, and returns the corresponding disk object, and an error if there is any.
 func (c *FakeDisks) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.Disk, err error) {
+	emptyResult := &v1alpha1.Disk{}
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(disksResource, c.ns, name), &v1alpha1.Disk{})
+		Invokes(testing.NewGetActionWithOptions(disksResource, c.ns, name, options), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.Disk), err
 }
 
 // List takes label and field selectors, and returns the list of Disks that match those selectors.
 func (c *FakeDisks) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.DiskList, err error) {
+	emptyResult := &v1alpha1.DiskList{}
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(disksResource, disksKind, c.ns, opts), &v1alpha1.DiskList{})
+		Invokes(testing.NewListActionWithOptions(disksResource, disksKind, c.ns, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 
 	label, _, _ := testing.ExtractFromListOptions(opts)
@@ -65,40 +67,43 @@ func (c *FakeDisks) List(ctx context.Context, opts v1.ListOptions) (result *v1al
 // Watch returns a watch.Interface that watches the requested disks.
 func (c *FakeDisks) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewWatchAction(disksResource, c.ns, opts))
+		InvokesWatch(testing.NewWatchActionWithOptions(disksResource, c.ns, opts))
 
 }
 
 // Create takes the representation of a disk and creates it.  Returns the server's representation of the disk, and an error, if there is any.
 func (c *FakeDisks) Create(ctx context.Context, disk *v1alpha1.Disk, opts v1.CreateOptions) (result *v1alpha1.Disk, err error) {
+	emptyResult := &v1alpha1.Disk{}
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(disksResource, c.ns, disk), &v1alpha1.Disk{})
+		Invokes(testing.NewCreateActionWithOptions(disksResource, c.ns, disk, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.Disk), err
 }
 
 // Update takes the representation of a disk and updates it. Returns the server's representation of the disk, and an error, if there is any.
 func (c *FakeDisks) Update(ctx context.Context, disk *v1alpha1.Disk, opts v1.UpdateOptions) (result *v1alpha1.Disk, err error) {
+	emptyResult := &v1alpha1.Disk{}
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(disksResource, c.ns, disk), &v1alpha1.Disk{})
+		Invokes(testing.NewUpdateActionWithOptions(disksResource, c.ns, disk, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.Disk), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeDisks) UpdateStatus(ctx context.Context, disk *v1alpha1.Disk, opts v1.UpdateOptions) (*v1alpha1.Disk, error) {
+func (c *FakeDisks) UpdateStatus(ctx context.Context, disk *v1alpha1.Disk, opts v1.UpdateOptions) (result *v1alpha1.Disk, err error) {
+	emptyResult := &v1alpha1.Disk{}
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceAction(disksResource, "status", c.ns, disk), &v1alpha1.Disk{})
+		Invokes(testing.NewUpdateSubresourceActionWithOptions(disksResource, "status", c.ns, disk, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.Disk), err
 }
@@ -113,7 +118,7 @@ func (c *FakeDisks) Delete(ctx context.Context, name string, opts v1.DeleteOptio
 
 // DeleteCollection deletes a collection of objects.
 func (c *FakeDisks) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(disksResource, c.ns, listOpts)
+	action := testing.NewDeleteCollectionActionWithOptions(disksResource, c.ns, opts, listOpts)
 
 	_, err := c.Fake.Invokes(action, &v1alpha1.DiskList{})
 	return err
@@ -121,11 +126,12 @@ func (c *FakeDisks) DeleteCollection(ctx context.Context, opts v1.DeleteOptions,
 
 // Patch applies the patch and returns the patched disk.
 func (c *FakeDisks) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.Disk, err error) {
+	emptyResult := &v1alpha1.Disk{}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(disksResource, c.ns, name, pt, data, subresources...), &v1alpha1.Disk{})
+		Invokes(testing.NewPatchSubresourceActionWithOptions(disksResource, c.ns, name, pt, data, opts, subresources...), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.Disk), err
 }
@@ -143,11 +149,12 @@ func (c *FakeDisks) Apply(ctx context.Context, disk *corev1alpha1.DiskApplyConfi
 	if name == nil {
 		return nil, fmt.Errorf("disk.Name must be provided to Apply")
 	}
+	emptyResult := &v1alpha1.Disk{}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(disksResource, c.ns, *name, types.ApplyPatchType, data), &v1alpha1.Disk{})
+		Invokes(testing.NewPatchSubresourceActionWithOptions(disksResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions()), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.Disk), err
 }
@@ -166,11 +173,12 @@ func (c *FakeDisks) ApplyStatus(ctx context.Context, disk *corev1alpha1.DiskAppl
 	if name == nil {
 		return nil, fmt.Errorf("disk.Name must be provided to Apply")
 	}
+	emptyResult := &v1alpha1.Disk{}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(disksResource, c.ns, *name, types.ApplyPatchType, data, "status"), &v1alpha1.Disk{})
+		Invokes(testing.NewPatchSubresourceActionWithOptions(disksResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions(), "status"), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.Disk), err
 }

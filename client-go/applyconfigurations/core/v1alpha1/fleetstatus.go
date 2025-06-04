@@ -9,7 +9,7 @@ import (
 	v1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
 )
 
-// FleetStatusApplyConfiguration represents an declarative configuration of the FleetStatus type for use
+// FleetStatusApplyConfiguration represents a declarative configuration of the FleetStatus type for use
 // with apply.
 type FleetStatusApplyConfiguration struct {
 	State           *v1alpha1.FleetState                    `json:"state,omitempty"`
@@ -20,7 +20,7 @@ type FleetStatusApplyConfiguration struct {
 	Allocatable     *v1alpha1.ResourceList                  `json:"allocatable,omitempty"`
 }
 
-// FleetStatusApplyConfiguration constructs an declarative configuration of the FleetStatus type for use with
+// FleetStatusApplyConfiguration constructs a declarative configuration of the FleetStatus type for use with
 // apply.
 func FleetStatus() *FleetStatusApplyConfiguration {
 	return &FleetStatusApplyConfiguration{}

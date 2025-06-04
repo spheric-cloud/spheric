@@ -11,14 +11,14 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// DiskTemplateSpecApplyConfiguration represents an declarative configuration of the DiskTemplateSpec type for use
+// DiskTemplateSpecApplyConfiguration represents a declarative configuration of the DiskTemplateSpec type for use
 // with apply.
 type DiskTemplateSpecApplyConfiguration struct {
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *DiskSpecApplyConfiguration `json:"spec,omitempty"`
 }
 
-// DiskTemplateSpecApplyConfiguration constructs an declarative configuration of the DiskTemplateSpec type for use with
+// DiskTemplateSpecApplyConfiguration constructs a declarative configuration of the DiskTemplateSpec type for use with
 // apply.
 func DiskTemplateSpec() *DiskTemplateSpecApplyConfiguration {
 	return &DiskTemplateSpecApplyConfiguration{}
@@ -172,4 +172,10 @@ func (b *DiskTemplateSpecApplyConfiguration) ensureObjectMetaApplyConfigurationE
 func (b *DiskTemplateSpecApplyConfiguration) WithSpec(value *DiskSpecApplyConfiguration) *DiskTemplateSpecApplyConfiguration {
 	b.Spec = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *DiskTemplateSpecApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

@@ -9,14 +9,14 @@ import (
 	v1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
 )
 
-// FleetAddressApplyConfiguration represents an declarative configuration of the FleetAddress type for use
+// FleetAddressApplyConfiguration represents a declarative configuration of the FleetAddress type for use
 // with apply.
 type FleetAddressApplyConfiguration struct {
 	Type    *v1alpha1.FleetAddressType `json:"type,omitempty"`
 	Address *string                    `json:"address,omitempty"`
 }
 
-// FleetAddressApplyConfiguration constructs an declarative configuration of the FleetAddress type for use with
+// FleetAddressApplyConfiguration constructs a declarative configuration of the FleetAddress type for use with
 // apply.
 func FleetAddress() *FleetAddressApplyConfiguration {
 	return &FleetAddressApplyConfiguration{}

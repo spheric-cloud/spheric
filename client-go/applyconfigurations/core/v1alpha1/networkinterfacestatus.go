@@ -10,7 +10,7 @@ import (
 	v1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
 )
 
-// NetworkInterfaceStatusApplyConfiguration represents an declarative configuration of the NetworkInterfaceStatus type for use
+// NetworkInterfaceStatusApplyConfiguration represents a declarative configuration of the NetworkInterfaceStatus type for use
 // with apply.
 type NetworkInterfaceStatusApplyConfiguration struct {
 	Name                    *string                         `json:"name,omitempty"`
@@ -20,7 +20,7 @@ type NetworkInterfaceStatusApplyConfiguration struct {
 	LastStateTransitionTime *v1.Time                        `json:"lastStateTransitionTime,omitempty"`
 }
 
-// NetworkInterfaceStatusApplyConfiguration constructs an declarative configuration of the NetworkInterfaceStatus type for use with
+// NetworkInterfaceStatusApplyConfiguration constructs a declarative configuration of the NetworkInterfaceStatus type for use with
 // apply.
 func NetworkInterfaceStatus() *NetworkInterfaceStatusApplyConfiguration {
 	return &NetworkInterfaceStatusApplyConfiguration{}

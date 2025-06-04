@@ -9,7 +9,7 @@ import (
 	v1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
 )
 
-// TolerationApplyConfiguration represents an declarative configuration of the Toleration type for use
+// TolerationApplyConfiguration represents a declarative configuration of the Toleration type for use
 // with apply.
 type TolerationApplyConfiguration struct {
 	Key      *string                      `json:"key,omitempty"`
@@ -18,7 +18,7 @@ type TolerationApplyConfiguration struct {
 	Effect   *v1alpha1.TaintEffect        `json:"effect,omitempty"`
 }
 
-// TolerationApplyConfiguration constructs an declarative configuration of the Toleration type for use with
+// TolerationApplyConfiguration constructs a declarative configuration of the Toleration type for use with
 // apply.
 func Toleration() *TolerationApplyConfiguration {
 	return &TolerationApplyConfiguration{}

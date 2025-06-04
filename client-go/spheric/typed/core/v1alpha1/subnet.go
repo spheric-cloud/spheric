@@ -7,14 +7,11 @@ package v1alpha1
 
 import (
 	"context"
-	json "encoding/json"
-	"fmt"
-	"time"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
-	rest "k8s.io/client-go/rest"
+	gentype "k8s.io/client-go/gentype"
 	v1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
 	corev1alpha1 "spheric.cloud/spheric/client-go/applyconfigurations/core/v1alpha1"
 	scheme "spheric.cloud/spheric/client-go/spheric/scheme"
@@ -30,6 +27,7 @@ type SubnetsGetter interface {
 type SubnetInterface interface {
 	Create(ctx context.Context, subnet *v1alpha1.Subnet, opts v1.CreateOptions) (*v1alpha1.Subnet, error)
 	Update(ctx context.Context, subnet *v1alpha1.Subnet, opts v1.UpdateOptions) (*v1alpha1.Subnet, error)
+	// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
 	UpdateStatus(ctx context.Context, subnet *v1alpha1.Subnet, opts v1.UpdateOptions) (*v1alpha1.Subnet, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
@@ -38,206 +36,25 @@ type SubnetInterface interface {
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.Subnet, err error)
 	Apply(ctx context.Context, subnet *corev1alpha1.SubnetApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Subnet, err error)
+	// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
 	ApplyStatus(ctx context.Context, subnet *corev1alpha1.SubnetApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Subnet, err error)
 	SubnetExpansion
 }
 
 // subnets implements SubnetInterface
 type subnets struct {
-	client rest.Interface
-	ns     string
+	*gentype.ClientWithListAndApply[*v1alpha1.Subnet, *v1alpha1.SubnetList, *corev1alpha1.SubnetApplyConfiguration]
 }
 
 // newSubnets returns a Subnets
 func newSubnets(c *CoreV1alpha1Client, namespace string) *subnets {
 	return &subnets{
-		client: c.RESTClient(),
-		ns:     namespace,
+		gentype.NewClientWithListAndApply[*v1alpha1.Subnet, *v1alpha1.SubnetList, *corev1alpha1.SubnetApplyConfiguration](
+			"subnets",
+			c.RESTClient(),
+			scheme.ParameterCodec,
+			namespace,
+			func() *v1alpha1.Subnet { return &v1alpha1.Subnet{} },
+			func() *v1alpha1.SubnetList { return &v1alpha1.SubnetList{} }),
 	}
-}
-
-// Get takes name of the subnet, and returns the corresponding subnet object, and an error if there is any.
-func (c *subnets) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.Subnet, err error) {
-	result = &v1alpha1.Subnet{}
-	err = c.client.Get().
-		Namespace(c.ns).
-		Resource("subnets").
-		Name(name).
-		VersionedParams(&options, scheme.ParameterCodec).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// List takes label and field selectors, and returns the list of Subnets that match those selectors.
-func (c *subnets) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.SubnetList, err error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
-	result = &v1alpha1.SubnetList{}
-	err = c.client.Get().
-		Namespace(c.ns).
-		Resource("subnets").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Timeout(timeout).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Watch returns a watch.Interface that watches the requested subnets.
-func (c *subnets) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
-	opts.Watch = true
-	return c.client.Get().
-		Namespace(c.ns).
-		Resource("subnets").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Timeout(timeout).
-		Watch(ctx)
-}
-
-// Create takes the representation of a subnet and creates it.  Returns the server's representation of the subnet, and an error, if there is any.
-func (c *subnets) Create(ctx context.Context, subnet *v1alpha1.Subnet, opts v1.CreateOptions) (result *v1alpha1.Subnet, err error) {
-	result = &v1alpha1.Subnet{}
-	err = c.client.Post().
-		Namespace(c.ns).
-		Resource("subnets").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(subnet).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Update takes the representation of a subnet and updates it. Returns the server's representation of the subnet, and an error, if there is any.
-func (c *subnets) Update(ctx context.Context, subnet *v1alpha1.Subnet, opts v1.UpdateOptions) (result *v1alpha1.Subnet, err error) {
-	result = &v1alpha1.Subnet{}
-	err = c.client.Put().
-		Namespace(c.ns).
-		Resource("subnets").
-		Name(subnet.Name).
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(subnet).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// UpdateStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *subnets) UpdateStatus(ctx context.Context, subnet *v1alpha1.Subnet, opts v1.UpdateOptions) (result *v1alpha1.Subnet, err error) {
-	result = &v1alpha1.Subnet{}
-	err = c.client.Put().
-		Namespace(c.ns).
-		Resource("subnets").
-		Name(subnet.Name).
-		SubResource("status").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(subnet).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Delete takes name of the subnet and deletes it. Returns an error if one occurs.
-func (c *subnets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
-	return c.client.Delete().
-		Namespace(c.ns).
-		Resource("subnets").
-		Name(name).
-		Body(&opts).
-		Do(ctx).
-		Error()
-}
-
-// DeleteCollection deletes a collection of objects.
-func (c *subnets) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	var timeout time.Duration
-	if listOpts.TimeoutSeconds != nil {
-		timeout = time.Duration(*listOpts.TimeoutSeconds) * time.Second
-	}
-	return c.client.Delete().
-		Namespace(c.ns).
-		Resource("subnets").
-		VersionedParams(&listOpts, scheme.ParameterCodec).
-		Timeout(timeout).
-		Body(&opts).
-		Do(ctx).
-		Error()
-}
-
-// Patch applies the patch and returns the patched subnet.
-func (c *subnets) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.Subnet, err error) {
-	result = &v1alpha1.Subnet{}
-	err = c.client.Patch(pt).
-		Namespace(c.ns).
-		Resource("subnets").
-		Name(name).
-		SubResource(subresources...).
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(data).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Apply takes the given apply declarative configuration, applies it and returns the applied subnet.
-func (c *subnets) Apply(ctx context.Context, subnet *corev1alpha1.SubnetApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Subnet, err error) {
-	if subnet == nil {
-		return nil, fmt.Errorf("subnet provided to Apply must not be nil")
-	}
-	patchOpts := opts.ToPatchOptions()
-	data, err := json.Marshal(subnet)
-	if err != nil {
-		return nil, err
-	}
-	name := subnet.Name
-	if name == nil {
-		return nil, fmt.Errorf("subnet.Name must be provided to Apply")
-	}
-	result = &v1alpha1.Subnet{}
-	err = c.client.Patch(types.ApplyPatchType).
-		Namespace(c.ns).
-		Resource("subnets").
-		Name(*name).
-		VersionedParams(&patchOpts, scheme.ParameterCodec).
-		Body(data).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// ApplyStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-func (c *subnets) ApplyStatus(ctx context.Context, subnet *corev1alpha1.SubnetApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.Subnet, err error) {
-	if subnet == nil {
-		return nil, fmt.Errorf("subnet provided to Apply must not be nil")
-	}
-	patchOpts := opts.ToPatchOptions()
-	data, err := json.Marshal(subnet)
-	if err != nil {
-		return nil, err
-	}
-
-	name := subnet.Name
-	if name == nil {
-		return nil, fmt.Errorf("subnet.Name must be provided to Apply")
-	}
-
-	result = &v1alpha1.Subnet{}
-	err = c.client.Patch(types.ApplyPatchType).
-		Namespace(c.ns).
-		Resource("subnets").
-		Name(*name).
-		SubResource("status").
-		VersionedParams(&patchOpts, scheme.ParameterCodec).
-		Body(data).
-		Do(ctx).
-		Into(result)
-	return
 }

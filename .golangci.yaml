@@ -1,44 +1,61 @@
+version: "2"
 run:
   concurrency: 4
-  timeout: 10m
-
 linters:
   enable:
-    - revive
     - ginkgolinter
-    - ineffassign
-    - misspell
-    - goimports
     - importas
+    - misspell
+    - revive
+  disable:
     - unused
-
-severity:
-  default-severity: error
-
-linters-settings:
-  misspell:
-    ignore-words:
-      - strat
-      - iritable
-  revive:
-    severity: error
+  settings:
+    importas:
+      alias:
+        - pkg: spheric.cloud/spheric/api/(\w+)/(v[\w\d]+)
+          alias: $1$2
+        - pkg: spheric.cloud/spheric/internal/apis/(\w+)
+          alias: $1
+        - pkg: spheric.cloud/spheric/internal/client/(\w+)
+          alias: ${1}client
+        - pkg: spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1
+          alias: iri
+    misspell:
+      ignore-rules:
+        - strat
+        - iritable
+        - creater
+        - Creater
+    revive:
+      severity: error
+      rules:
+        - name: exported
+          arguments:
+            - disableStutteringCheck
+        - name: if-return
+          disabled: true
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
     rules:
-      - name: exported
-        arguments:
-          - disableStutteringCheck
-      - name: if-return
-        disabled: true
-  importas:
-    alias:
-      - pkg: spheric.cloud/spheric/api/(\w+)/(v[\w\d]+)
-        alias: $1$2
-      - pkg: spheric.cloud/spheric/internal/apis/(\w+)
-        alias: $1
-      - pkg: spheric.cloud/spheric/internal/client/(\w+)
-        alias: ${1}client
-      - pkg: spheric.cloud/spheric/iri-api/apis/runtime/v1alpha1
-        alias: iri
-
-issues:
-  exclude: # Exclude stutter issues (for now)
-    - "exported: type name will be used as (.+) by other packages, and that stutters; consider calling this (.+)"
+      - path: (.+)\.go$
+        text: 'exported: type name will be used as (.+) by other packages, and that stutters; consider calling this (.+)'
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+severity:
+  default: error
+formatters:
+  enable:
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

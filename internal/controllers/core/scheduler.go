@@ -103,7 +103,7 @@ func (s *InstanceScheduler) reconcileExists(ctx context.Context, log logr.Logger
 
 	fleets := s.snapshot.ListFleets()
 	if len(fleets) == 0 {
-		s.EventRecorder.Event(instance, corev1.EventTypeNormal, outOfCapacity, "No fleets available to schedule instance on")
+		s.Event(instance, corev1.EventTypeNormal, outOfCapacity, "No fleets available to schedule instance on")
 		return ctrl.Result{}, nil
 	}
 
@@ -126,7 +126,7 @@ func (s *InstanceScheduler) reconcileExists(ctx context.Context, log logr.Logger
 	}
 
 	if len(filteredFleets) == 0 {
-		s.EventRecorder.Event(instance, corev1.EventTypeNormal, outOfCapacity, "No fleets available after filtering to schedule instance on")
+		s.Event(instance, corev1.EventTypeNormal, outOfCapacity, "No fleets available after filtering to schedule instance on")
 		return ctrl.Result{}, nil
 	}
 

@@ -11,7 +11,7 @@ import (
 	v1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
 )
 
-// FleetConditionApplyConfiguration represents an declarative configuration of the FleetCondition type for use
+// FleetConditionApplyConfiguration represents a declarative configuration of the FleetCondition type for use
 // with apply.
 type FleetConditionApplyConfiguration struct {
 	Type               *v1alpha1.FleetConditionType `json:"type,omitempty"`
@@ -22,7 +22,7 @@ type FleetConditionApplyConfiguration struct {
 	LastTransitionTime *metav1.Time                 `json:"lastTransitionTime,omitempty"`
 }
 
-// FleetConditionApplyConfiguration constructs an declarative configuration of the FleetCondition type for use with
+// FleetConditionApplyConfiguration constructs a declarative configuration of the FleetCondition type for use with
 // apply.
 func FleetCondition() *FleetConditionApplyConfiguration {
 	return &FleetConditionApplyConfiguration{}

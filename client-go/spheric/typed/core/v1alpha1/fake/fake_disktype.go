@@ -30,20 +30,22 @@ var disktypesKind = v1alpha1.SchemeGroupVersion.WithKind("DiskType")
 
 // Get takes name of the diskType, and returns the corresponding diskType object, and an error if there is any.
 func (c *FakeDiskTypes) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.DiskType, err error) {
+	emptyResult := &v1alpha1.DiskType{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootGetAction(disktypesResource, name), &v1alpha1.DiskType{})
+		Invokes(testing.NewRootGetActionWithOptions(disktypesResource, name, options), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.DiskType), err
 }
 
 // List takes label and field selectors, and returns the list of DiskTypes that match those selectors.
 func (c *FakeDiskTypes) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.DiskTypeList, err error) {
+	emptyResult := &v1alpha1.DiskTypeList{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootListAction(disktypesResource, disktypesKind, opts), &v1alpha1.DiskTypeList{})
+		Invokes(testing.NewRootListActionWithOptions(disktypesResource, disktypesKind, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 
 	label, _, _ := testing.ExtractFromListOptions(opts)
@@ -62,25 +64,27 @@ func (c *FakeDiskTypes) List(ctx context.Context, opts v1.ListOptions) (result *
 // Watch returns a watch.Interface that watches the requested diskTypes.
 func (c *FakeDiskTypes) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewRootWatchAction(disktypesResource, opts))
+		InvokesWatch(testing.NewRootWatchActionWithOptions(disktypesResource, opts))
 }
 
 // Create takes the representation of a diskType and creates it.  Returns the server's representation of the diskType, and an error, if there is any.
 func (c *FakeDiskTypes) Create(ctx context.Context, diskType *v1alpha1.DiskType, opts v1.CreateOptions) (result *v1alpha1.DiskType, err error) {
+	emptyResult := &v1alpha1.DiskType{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootCreateAction(disktypesResource, diskType), &v1alpha1.DiskType{})
+		Invokes(testing.NewRootCreateActionWithOptions(disktypesResource, diskType, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.DiskType), err
 }
 
 // Update takes the representation of a diskType and updates it. Returns the server's representation of the diskType, and an error, if there is any.
 func (c *FakeDiskTypes) Update(ctx context.Context, diskType *v1alpha1.DiskType, opts v1.UpdateOptions) (result *v1alpha1.DiskType, err error) {
+	emptyResult := &v1alpha1.DiskType{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootUpdateAction(disktypesResource, diskType), &v1alpha1.DiskType{})
+		Invokes(testing.NewRootUpdateActionWithOptions(disktypesResource, diskType, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.DiskType), err
 }
@@ -94,7 +98,7 @@ func (c *FakeDiskTypes) Delete(ctx context.Context, name string, opts v1.DeleteO
 
 // DeleteCollection deletes a collection of objects.
 func (c *FakeDiskTypes) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewRootDeleteCollectionAction(disktypesResource, listOpts)
+	action := testing.NewRootDeleteCollectionActionWithOptions(disktypesResource, opts, listOpts)
 
 	_, err := c.Fake.Invokes(action, &v1alpha1.DiskTypeList{})
 	return err
@@ -102,10 +106,11 @@ func (c *FakeDiskTypes) DeleteCollection(ctx context.Context, opts v1.DeleteOpti
 
 // Patch applies the patch and returns the patched diskType.
 func (c *FakeDiskTypes) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.DiskType, err error) {
+	emptyResult := &v1alpha1.DiskType{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(disktypesResource, name, pt, data, subresources...), &v1alpha1.DiskType{})
+		Invokes(testing.NewRootPatchSubresourceActionWithOptions(disktypesResource, name, pt, data, opts, subresources...), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.DiskType), err
 }
@@ -123,10 +128,11 @@ func (c *FakeDiskTypes) Apply(ctx context.Context, diskType *corev1alpha1.DiskTy
 	if name == nil {
 		return nil, fmt.Errorf("diskType.Name must be provided to Apply")
 	}
+	emptyResult := &v1alpha1.DiskType{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(disktypesResource, *name, types.ApplyPatchType, data), &v1alpha1.DiskType{})
+		Invokes(testing.NewRootPatchSubresourceActionWithOptions(disktypesResource, *name, types.ApplyPatchType, data, opts.ToPatchOptions()), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.DiskType), err
 }

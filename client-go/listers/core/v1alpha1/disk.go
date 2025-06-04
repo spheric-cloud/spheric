@@ -6,8 +6,8 @@
 package v1alpha1
 
 import (
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/listers"
 	"k8s.io/client-go/tools/cache"
 	v1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
 )
@@ -25,25 +25,17 @@ type DiskLister interface {
 
 // diskLister implements the DiskLister interface.
 type diskLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*v1alpha1.Disk]
 }
 
 // NewDiskLister returns a new DiskLister.
 func NewDiskLister(indexer cache.Indexer) DiskLister {
-	return &diskLister{indexer: indexer}
-}
-
-// List lists all Disks in the indexer.
-func (s *diskLister) List(selector labels.Selector) (ret []*v1alpha1.Disk, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.Disk))
-	})
-	return ret, err
+	return &diskLister{listers.New[*v1alpha1.Disk](indexer, v1alpha1.Resource("disk"))}
 }
 
 // Disks returns an object that can list and get Disks.
 func (s *diskLister) Disks(namespace string) DiskNamespaceLister {
-	return diskNamespaceLister{indexer: s.indexer, namespace: namespace}
+	return diskNamespaceLister{listers.NewNamespaced[*v1alpha1.Disk](s.ResourceIndexer, namespace)}
 }
 
 // DiskNamespaceLister helps list and get Disks.
@@ -61,26 +53,5 @@ type DiskNamespaceLister interface {
 // diskNamespaceLister implements the DiskNamespaceLister
 // interface.
 type diskNamespaceLister struct {
-	indexer   cache.Indexer
-	namespace string
-}
-
-// List lists all Disks in the indexer for a given namespace.
-func (s diskNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.Disk, err error) {
-	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.Disk))
-	})
-	return ret, err
-}
-
-// Get retrieves the Disk from the indexer for a given namespace and name.
-func (s diskNamespaceLister) Get(name string) (*v1alpha1.Disk, error) {
-	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("disk"), name)
-	}
-	return obj.(*v1alpha1.Disk), nil
+	listers.ResourceIndexer[*v1alpha1.Disk]
 }

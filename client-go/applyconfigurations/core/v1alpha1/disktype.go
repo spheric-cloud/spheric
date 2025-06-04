@@ -14,14 +14,14 @@ import (
 	internal "spheric.cloud/spheric/client-go/applyconfigurations/internal"
 )
 
-// DiskTypeApplyConfiguration represents an declarative configuration of the DiskType type for use
+// DiskTypeApplyConfiguration represents a declarative configuration of the DiskType type for use
 // with apply.
 type DiskTypeApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 }
 
-// DiskType constructs an declarative configuration of the DiskType type for use with
+// DiskType constructs a declarative configuration of the DiskType type for use with
 // apply.
 func DiskType(name string) *DiskTypeApplyConfiguration {
 	b := &DiskTypeApplyConfiguration{}
@@ -222,4 +222,10 @@ func (b *DiskTypeApplyConfiguration) ensureObjectMetaApplyConfigurationExists() 
 	if b.ObjectMetaApplyConfiguration == nil {
 		b.ObjectMetaApplyConfiguration = &v1.ObjectMetaApplyConfiguration{}
 	}
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *DiskTypeApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

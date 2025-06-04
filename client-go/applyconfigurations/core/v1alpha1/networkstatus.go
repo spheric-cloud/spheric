@@ -9,13 +9,13 @@ import (
 	v1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
 )
 
-// NetworkStatusApplyConfiguration represents an declarative configuration of the NetworkStatus type for use
+// NetworkStatusApplyConfiguration represents a declarative configuration of the NetworkStatus type for use
 // with apply.
 type NetworkStatusApplyConfiguration struct {
 	State *v1alpha1.NetworkState `json:"state,omitempty"`
 }
 
-// NetworkStatusApplyConfiguration constructs an declarative configuration of the NetworkStatus type for use with
+// NetworkStatusApplyConfiguration constructs a declarative configuration of the NetworkStatus type for use with
 // apply.
 func NetworkStatus() *NetworkStatusApplyConfiguration {
 	return &NetworkStatusApplyConfiguration{}

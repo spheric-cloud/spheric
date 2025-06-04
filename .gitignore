@@ -30,3 +30,5 @@ charts/
 apiserver.local.config/
 default.etcd/
 
+etcd-data/
+

@@ -10,8 +10,6 @@ import (
 	"errors"
 	"fmt"
 
-	"spheric.cloud/spheric/api/core/v1alpha1"
-
 	"github.com/go-logr/logr"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -57,10 +55,10 @@ func (s *diskClaimStrategy) Release(ctx context.Context, claimer client.Object, 
 	return s.Patch(ctx, disk, client.StrategicMergeFrom(base))
 }
 
-func (r *InstanceReconciler) diskNameToAttachedDisk(instance *v1alpha1.Instance) map[string]v1alpha1.AttachedDisk {
-	sel := make(map[string]v1alpha1.AttachedDisk)
+func (r *InstanceReconciler) diskNameToAttachedDisk(instance *corev1alpha1.Instance) map[string]corev1alpha1.AttachedDisk {
+	sel := make(map[string]corev1alpha1.AttachedDisk)
 	for _, instanceDisk := range instance.Spec.Disks {
-		diskClaimName := v1alpha1.InstanceDiskName(instance.Name, instanceDisk)
+		diskClaimName := corev1alpha1.InstanceDiskName(instance.Name, instanceDisk)
 		if diskClaimName == "" {
 			// disk claim name is empty on empty disk disks.
 			continue
@@ -70,15 +68,15 @@ func (r *InstanceReconciler) diskNameToAttachedDisk(instance *v1alpha1.Instance)
 	return sel
 }
 
-func (r *InstanceReconciler) instanceClaimSelector(instance *v1alpha1.Instance) claimmanager.Selector {
-	names := sets.New(v1alpha1.InstanceDiskNames(instance)...)
+func (r *InstanceReconciler) instanceClaimSelector(instance *corev1alpha1.Instance) claimmanager.Selector {
+	names := sets.New(corev1alpha1.InstanceDiskNames(instance)...)
 	return claimmanager.SelectorFunc(func(obj client.Object) bool {
 		disk := obj.(*corev1alpha1.Disk)
 		return names.Has(disk.Name)
 	})
 }
 
-func (r *InstanceReconciler) getDisksForInstance(ctx context.Context, instance *v1alpha1.Instance) ([]corev1alpha1.Disk, error) {
+func (r *InstanceReconciler) getDisksForInstance(ctx context.Context, instance *corev1alpha1.Instance) ([]corev1alpha1.Disk, error) {
 	diskList := &corev1alpha1.DiskList{}
 	if err := r.List(ctx, diskList,
 		client.InNamespace(instance.Namespace),
@@ -114,8 +112,8 @@ func (r *InstanceReconciler) getDisksForInstance(ctx context.Context, instance *
 
 func (r *InstanceReconciler) prepareRemoteIRIDisk(
 	ctx context.Context,
-	instance *v1alpha1.Instance,
-	instanceDisk *v1alpha1.AttachedDisk,
+	instance *corev1alpha1.Instance,
+	instanceDisk *corev1alpha1.AttachedDisk,
 	disk *corev1alpha1.Disk,
 ) (*iri.Disk, bool, error) {
 	access := disk.Status.Access
@@ -152,7 +150,7 @@ func (r *InstanceReconciler) prepareRemoteIRIDisk(
 	}, true, nil
 }
 
-func (r *InstanceReconciler) prepareEmptyDiskIRIDisk(instanceDisk *v1alpha1.AttachedDisk) *iri.Disk {
+func (r *InstanceReconciler) prepareEmptyDiskIRIDisk(instanceDisk *corev1alpha1.AttachedDisk) *iri.Disk {
 	var sizeBytes int64
 	if sizeLimit := instanceDisk.EmptyDisk.SizeLimit; sizeLimit != nil {
 		sizeBytes = sizeLimit.Value()
@@ -168,7 +166,7 @@ func (r *InstanceReconciler) prepareEmptyDiskIRIDisk(instanceDisk *v1alpha1.Atta
 
 func (r *InstanceReconciler) prepareIRIDisks(
 	ctx context.Context,
-	instance *v1alpha1.Instance,
+	instance *corev1alpha1.Instance,
 	disks []corev1alpha1.Disk,
 ) ([]*iri.Disk, bool, error) {
 	var (
@@ -203,7 +201,7 @@ func (r *InstanceReconciler) prepareIRIDisks(
 	}
 
 	if len(iriDisks) != len(instance.Spec.Disks) {
-		expectedDiskNames := utilslices.ToSetFunc(instance.Spec.Disks, func(v v1alpha1.AttachedDisk) string { return v.Name })
+		expectedDiskNames := utilslices.ToSetFunc(instance.Spec.Disks, func(v corev1alpha1.AttachedDisk) string { return v.Name })
 		actualDiskNames := utilslices.ToSetFunc(iriDisks, (*iri.Disk).GetName)
 		missingDiskNames := sets.List(expectedDiskNames.Difference(actualDiskNames))
 		r.Eventf(instance, corev1.EventTypeNormal, events.DiskNotReady, "Instance disks are not ready: %v", missingDiskNames)
@@ -285,7 +283,7 @@ func (r *InstanceReconciler) getNewIRIDisksForInstance(
 func (r *InstanceReconciler) updateIRIDisks(
 	ctx context.Context,
 	log logr.Logger,
-	instance *v1alpha1.Instance,
+	instance *corev1alpha1.Instance,
 	iriInstance *iri.Instance,
 	disks []corev1alpha1.Disk,
 ) error {
@@ -308,21 +306,21 @@ func (r *InstanceReconciler) updateIRIDisks(
 }
 
 func (r *InstanceReconciler) getDiskStatusesForInstance(
-	instance *v1alpha1.Instance,
+	instance *corev1alpha1.Instance,
 	iriInstance *iri.Instance,
 	now metav1.Time,
-) ([]v1alpha1.AttachedDiskStatus, error) {
+) ([]corev1alpha1.AttachedDiskStatus, error) {
 	var (
 		iriDiskStatusByName        = utilslices.ToMapByKey(iriInstance.Status.Disks, (*iri.DiskStatus).GetName)
-		existingDiskStatusesByName = utilslices.ToMapByKey(instance.Status.Disks, func(status v1alpha1.AttachedDiskStatus) string { return status.Name })
-		diskStatuses               []v1alpha1.AttachedDiskStatus
+		existingDiskStatusesByName = utilslices.ToMapByKey(instance.Status.Disks, func(status corev1alpha1.AttachedDiskStatus) string { return status.Name })
+		diskStatuses               []corev1alpha1.AttachedDiskStatus
 		errs                       []error
 	)
 
 	for _, instanceDisk := range instance.Spec.Disks {
 		var (
 			iriDiskStatus, ok = iriDiskStatusByName[instanceDisk.Name]
-			diskStatusValues  v1alpha1.AttachedDiskStatus
+			diskStatusValues  corev1alpha1.AttachedDiskStatus
 		)
 		if ok {
 			var err error
@@ -331,9 +329,9 @@ func (r *InstanceReconciler) getDiskStatusesForInstance(
 				return nil, fmt.Errorf("[disk %s] %w", instanceDisk.Name, err)
 			}
 		} else {
-			diskStatusValues = v1alpha1.AttachedDiskStatus{
+			diskStatusValues = corev1alpha1.AttachedDiskStatus{
 				Name:  instanceDisk.Name,
-				State: v1alpha1.AttachedDiskStatePending,
+				State: corev1alpha1.AttachedDiskStatePending,
 			}
 		}
 
@@ -347,31 +345,31 @@ func (r *InstanceReconciler) getDiskStatusesForInstance(
 	return diskStatuses, nil
 }
 
-var iriDiskStateToDiskState = map[iri.DiskState]v1alpha1.AttachedDiskState{
-	iri.DiskState_DISK_ATTACHED: v1alpha1.AttachedDiskStateAttached,
-	iri.DiskState_DISK_PENDING:  v1alpha1.AttachedDiskStatePending,
+var iriDiskStateToDiskState = map[iri.DiskState]corev1alpha1.AttachedDiskState{
+	iri.DiskState_DISK_ATTACHED: corev1alpha1.AttachedDiskStateAttached,
+	iri.DiskState_DISK_PENDING:  corev1alpha1.AttachedDiskStatePending,
 }
 
-func (r *InstanceReconciler) convertIRIDiskState(iriState iri.DiskState) (v1alpha1.AttachedDiskState, error) {
+func (r *InstanceReconciler) convertIRIDiskState(iriState iri.DiskState) (corev1alpha1.AttachedDiskState, error) {
 	if res, ok := iriDiskStateToDiskState[iriState]; ok {
 		return res, nil
 	}
 	return "", fmt.Errorf("unknown iri disk state %v", iriState)
 }
 
-func (r *InstanceReconciler) convertIRIDiskStatus(iriDiskStatus *iri.DiskStatus) (v1alpha1.AttachedDiskStatus, error) {
+func (r *InstanceReconciler) convertIRIDiskStatus(iriDiskStatus *iri.DiskStatus) (corev1alpha1.AttachedDiskStatus, error) {
 	state, err := r.convertIRIDiskState(iriDiskStatus.State)
 	if err != nil {
-		return v1alpha1.AttachedDiskStatus{}, err
+		return corev1alpha1.AttachedDiskStatus{}, err
 	}
 
-	return v1alpha1.AttachedDiskStatus{
+	return corev1alpha1.AttachedDiskStatus{
 		Name:  iriDiskStatus.Name,
 		State: state,
 	}, nil
 }
 
-func (r *InstanceReconciler) addDiskStatusValues(now metav1.Time, existing, newValues *v1alpha1.AttachedDiskStatus) {
+func (r *InstanceReconciler) addDiskStatusValues(now metav1.Time, existing, newValues *corev1alpha1.AttachedDiskStatus) {
 	if existing.State != newValues.State {
 		existing.LastStateTransitionTime = &now
 	}

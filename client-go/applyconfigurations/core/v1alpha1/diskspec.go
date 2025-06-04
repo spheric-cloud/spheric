@@ -9,7 +9,7 @@ import (
 	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
 )
 
-// DiskSpecApplyConfiguration represents an declarative configuration of the DiskSpec type for use
+// DiskSpecApplyConfiguration represents a declarative configuration of the DiskSpec type for use
 // with apply.
 type DiskSpecApplyConfiguration struct {
 	TypeRef     *LocalObjectReferenceApplyConfiguration `json:"typeRef,omitempty"`
@@ -17,7 +17,7 @@ type DiskSpecApplyConfiguration struct {
 	Resources   *corev1alpha1.ResourceList              `json:"resources,omitempty"`
 }
 
-// DiskSpecApplyConfiguration constructs an declarative configuration of the DiskSpec type for use with
+// DiskSpecApplyConfiguration constructs a declarative configuration of the DiskSpec type for use with
 // apply.
 func DiskSpec() *DiskSpecApplyConfiguration {
 	return &DiskSpecApplyConfiguration{}

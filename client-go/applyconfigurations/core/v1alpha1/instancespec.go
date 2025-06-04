@@ -9,7 +9,7 @@ import (
 	corev1alpha1 "spheric.cloud/spheric/api/core/v1alpha1"
 )
 
-// InstanceSpecApplyConfiguration represents an declarative configuration of the InstanceSpec type for use
+// InstanceSpecApplyConfiguration represents a declarative configuration of the InstanceSpec type for use
 // with apply.
 type InstanceSpecApplyConfiguration struct {
 	InstanceTypeRef    *LocalObjectReferenceApplyConfiguration `json:"instanceTypeRef,omitempty"`
@@ -25,7 +25,7 @@ type InstanceSpecApplyConfiguration struct {
 	Tolerations        []TolerationApplyConfiguration          `json:"tolerations,omitempty"`
 }
 
-// InstanceSpecApplyConfiguration constructs an declarative configuration of the InstanceSpec type for use with
+// InstanceSpecApplyConfiguration constructs a declarative configuration of the InstanceSpec type for use with
 // apply.
 func InstanceSpec() *InstanceSpecApplyConfiguration {
 	return &InstanceSpecApplyConfiguration{}
