@@ -1,0 +1,3744 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../overview/">
+      
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>Core - Spheric</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Work+Sans:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Work Sans";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Spheric" class="md-header__button md-logo" aria-label="Spheric" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Spheric
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Core
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/spheric-cloud/spheric/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Spheric" class="md-nav__button md-logo" aria-label="Spheric" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    Spheric
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/spheric-cloud/spheric/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Concepts
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Concepts
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/iri.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Instance Runtime Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/machine-exec-flow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Machine Exec
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Developer Guide
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Developer Guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Local Setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/documentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Documentation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Testing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/contribution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contribution Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../proposals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Proposals
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    API Reference
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            API Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Core
+    
+  </span>
+  
+
+      </a>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+  <h1>Core</h1>
+
+<p>Packages:</p>
+<ul>
+<li>
+<a href="#core.spheric.cloud%2fv1alpha1">core.spheric.cloud/v1alpha1</a>
+</li>
+</ul>
+<h2 id="core.spheric.cloud/v1alpha1">core.spheric.cloud/v1alpha1</h2>
+<div>
+<p>Package v1alpha1 is the v1alpha1 version of the API.</p>
+</div>
+<p>Resource Types:</p>
+<ul><li>
+<a href="#core.spheric.cloud/v1alpha1.Disk">Disk</a>
+</li><li>
+<a href="#core.spheric.cloud/v1alpha1.DiskType">DiskType</a>
+</li><li>
+<a href="#core.spheric.cloud/v1alpha1.Fleet">Fleet</a>
+</li><li>
+<a href="#core.spheric.cloud/v1alpha1.Instance">Instance</a>
+</li><li>
+<a href="#core.spheric.cloud/v1alpha1.InstanceType">InstanceType</a>
+</li><li>
+<a href="#core.spheric.cloud/v1alpha1.Network">Network</a>
+</li><li>
+<a href="#core.spheric.cloud/v1alpha1.Subnet">Subnet</a>
+</li></ul>
+<h3 id="core.spheric.cloud/v1alpha1.Disk">Disk
+</h3>
+<div>
+<p>Disk is the Schema for the disks API</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+core.spheric.cloud/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>Disk</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.DiskSpec">
+DiskSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>typeRef</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.LocalObjectReference">
+LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>TypeRef references the DiskClass of the Disk.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>instanceRef</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.LocalUIDReference">
+LocalUIDReference
+</a>
+</em>
+</td>
+<td>
+<p>InstanceRef references the using instance of the Disk.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>resources</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.ResourceList">
+ResourceList
+</a>
+</em>
+</td>
+<td>
+<p>Resources is a description of the Disk&rsquo;s resources and capacity.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.DiskStatus">
+DiskStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.DiskType">DiskType
+</h3>
+<div>
+<p>DiskType is the Schema for the disktypes API.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+core.spheric.cloud/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>DiskType</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.Fleet">Fleet
+</h3>
+<div>
+<p>Fleet is the Schema for the fleets API</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+core.spheric.cloud/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>Fleet</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.FleetSpec">
+FleetSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>providerID</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>ProviderID identifies the Fleet on provider side.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>taints</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.Taint">
+[]Taint
+</a>
+</em>
+</td>
+<td>
+<p>Taints of the Fleet. Only Machines who tolerate all the taints
+will land in the Fleet.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.FleetStatus">
+FleetStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.Instance">Instance
+</h3>
+<div>
+<p>Instance is the Schema for the instances API</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+core.spheric.cloud/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>Instance</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.InstanceSpec">
+InstanceSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>instanceTypeRef</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.LocalObjectReference">
+LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>InstanceTypeRef references the instance type of the instance.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>fleetSelector</code><br/>
+<em>
+map[string]string
+</em>
+</td>
+<td>
+<p>FleetSelector selects a suitable Fleet by the given labels.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>fleetRef</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.LocalObjectReference">
+LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>FleetRef defines the fleet to run the instance in.
+If empty, a scheduler will figure out an appropriate pool to run the instance in.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>power</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.Power">
+Power
+</a>
+</em>
+</td>
+<td>
+<p>Power is the desired instance power state.
+Defaults to PowerOn.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>image</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Image is the optional URL providing the operating system image of the instance.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>imagePullSecret</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.LocalObjectReference">
+LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>ImagePullSecretRef is an optional secret for pulling the image of a instance.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkInterfaces</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.NetworkInterface">
+[]NetworkInterface
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>NetworkInterfaces define a list of network interfaces present on the instance</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>disks</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.AttachedDisk">
+[]AttachedDisk
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Disks are the disks attached to this instance.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ignitionRef</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.SecretKeySelector">
+SecretKeySelector
+</a>
+</em>
+</td>
+<td>
+<p>IgnitionRef is a reference to a secret containing the ignition YAML for the instance to boot up.
+If key is empty, DefaultIgnitionKey will be used as fallback.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>efiVars</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.EFIVar">
+[]EFIVar
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>EFIVars are variables to pass to EFI while booting up.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>tolerations</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.Toleration">
+[]Toleration
+</a>
+</em>
+</td>
+<td>
+<p>Tolerations define tolerations the Instance has. Only fleets whose taints
+covered by Tolerations will be considered to run the Instance.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.InstanceStatus">
+InstanceStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.InstanceType">InstanceType
+</h3>
+<div>
+<p>InstanceType is the Schema for the instancetypes API</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+core.spheric.cloud/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>InstanceType</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>class</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.InstanceTypeClass">
+InstanceTypeClass
+</a>
+</em>
+</td>
+<td>
+<p>Class specifies the class of the InstanceType.
+Can either be &lsquo;Continuous&rsquo; or &lsquo;Discrete&rsquo;.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>capabilities</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.ResourceList">
+ResourceList
+</a>
+</em>
+</td>
+<td>
+<p>Capabilities are the capabilities of the instance type.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.Network">Network
+</h3>
+<div>
+<p>Network is the Schema for the network API</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+core.spheric.cloud/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>Network</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.NetworkSpec">
+NetworkSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.NetworkStatus">
+NetworkStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.Subnet">Subnet
+</h3>
+<div>
+<p>Subnet is the Schema for the network API</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+core.spheric.cloud/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>Subnet</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.SubnetSpec">
+SubnetSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.LocalObjectReference">
+LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef references the network this subnet is part of.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>cidrs</code><br/>
+<em>
+[]string
+</em>
+</td>
+<td>
+<p>CIDRs are the primary CIDR ranges of this Subnet.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.SubnetStatus">
+SubnetStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.AttachedDisk">AttachedDisk
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.InstanceSpec">InstanceSpec</a>)
+</p>
+<div>
+<p>AttachedDisk defines a disk attached to a instance.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the disk.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>device</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Device is the device name where the disk should be attached.
+Pointer to distinguish between explicit zero and not specified.
+If empty, an unused device name will be determined if possible.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>AttachedDiskSource</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.AttachedDiskSource">
+AttachedDiskSource
+</a>
+</em>
+</td>
+<td>
+<p>
+(Members of <code>AttachedDiskSource</code> are embedded into this type.)
+</p>
+<p>AttachedDiskSource is the source where the storage for the disk resides at.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.AttachedDiskSource">AttachedDiskSource
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.AttachedDisk">AttachedDisk</a>)
+</p>
+<div>
+<p>AttachedDiskSource specifies the source to use for a disk.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>diskRef</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.LocalObjectReference">
+LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>DiskRef instructs to use the specified Disk as source for the attachment.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>emptyDisk</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.EmptyDiskSource">
+EmptyDiskSource
+</a>
+</em>
+</td>
+<td>
+<p>EmptyDisk instructs to use a disk offered by the fleet provider.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ephemeral</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.EphemeralDiskSource">
+EphemeralDiskSource
+</a>
+</em>
+</td>
+<td>
+<p>Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object)
+disk to use.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.AttachedDiskState">AttachedDiskState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.AttachedDiskStatus">AttachedDiskStatus</a>)
+</p>
+<div>
+<p>AttachedDiskState is the infrastructure attachment state a disk can be in.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Attached&#34;</p></td>
+<td><p>AttachedDiskStateAttached indicates that a disk has been successfully attached.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>AttachedDiskStatePending indicates that the attachment of a disk is pending.</p>
+</td>
+</tr></tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.AttachedDiskStatus">AttachedDiskStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.InstanceStatus">InstanceStatus</a>)
+</p>
+<div>
+<p>AttachedDiskStatus is the status of a disk.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the attached disk.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>state</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.AttachedDiskState">
+AttachedDiskState
+</a>
+</em>
+</td>
+<td>
+<p>State represents the attachment state of a disk.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastStateTransitionTime</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastStateTransitionTime is the last time the State transitioned.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.ConfigMapKeySelector">ConfigMapKeySelector
+</h3>
+<div>
+<p>ConfigMapKeySelector is a reference to a specific &lsquo;key&rsquo; within a ConfigMap resource.
+In some instances, <code>key</code> is a required field.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name of the referent.
+More info: <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names">https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names</a></p>
+</td>
+</tr>
+<tr>
+<td>
+<code>key</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>The key of the entry in the ConfigMap resource&rsquo;s <code>data</code> field to be used.
+Some instances of this field may be defaulted, in others it may be
+required.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.DaemonEndpoint">DaemonEndpoint
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.FleetDaemonEndpoints">FleetDaemonEndpoints</a>)
+</p>
+<div>
+<p>DaemonEndpoint contains information about a single Daemon endpoint.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>port</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>Port number of the given endpoint.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.DiskAccess">DiskAccess
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.DiskStatus">DiskStatus</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>driver</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Driver is the name of the drive to use for this volume. Required.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>handle</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Handle is the unique handle of the volume.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>attributes</code><br/>
+<em>
+map[string]string
+</em>
+</td>
+<td>
+<p>Attributes are attributes of the volume to use.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>secretRef</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.LocalObjectReference">
+LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>SecretRef references the (optional) secret containing the data to access the Disk.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.DiskSpec">DiskSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.Disk">Disk</a>, <a href="#core.spheric.cloud/v1alpha1.DiskTemplateSpec">DiskTemplateSpec</a>)
+</p>
+<div>
+<p>DiskSpec defines the desired state of Disk</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>typeRef</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.LocalObjectReference">
+LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>TypeRef references the DiskClass of the Disk.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>instanceRef</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.LocalUIDReference">
+LocalUIDReference
+</a>
+</em>
+</td>
+<td>
+<p>InstanceRef references the using instance of the Disk.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>resources</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.ResourceList">
+ResourceList
+</a>
+</em>
+</td>
+<td>
+<p>Resources is a description of the Disk&rsquo;s resources and capacity.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.DiskState">DiskState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.DiskStatus">DiskStatus</a>)
+</p>
+<div>
+<p>DiskState represents the infrastructure state of a Disk.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Available&#34;</p></td>
+<td><p>DiskStateAvailable reports whether a Disk is available to be used.</p>
+</td>
+</tr><tr><td><p>&#34;Error&#34;</p></td>
+<td><p>DiskStateError reports that a Disk is in an error state.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>DiskStatePending reports whether a Disk is about to be ready.</p>
+</td>
+</tr></tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.DiskStatus">DiskStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.Disk">Disk</a>)
+</p>
+<div>
+<p>DiskStatus defines the observed state of Disk</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>state</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.DiskState">
+DiskState
+</a>
+</em>
+</td>
+<td>
+<p>State represents the infrastructure state of a Disk.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>access</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.DiskAccess">
+DiskAccess
+</a>
+</em>
+</td>
+<td>
+<p>Access contains information to access the Disk. Must be set when Disk is in DiskStateAvailable.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastStateTransitionTime</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastStateTransitionTime is the last time the State transitioned between values.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.DiskTemplateSpec">DiskTemplateSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.EphemeralDiskSource">EphemeralDiskSource</a>)
+</p>
+<div>
+<p>DiskTemplateSpec is the specification of a Disk template.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.DiskSpec">
+DiskSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>typeRef</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.LocalObjectReference">
+LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>TypeRef references the DiskClass of the Disk.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>instanceRef</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.LocalUIDReference">
+LocalUIDReference
+</a>
+</em>
+</td>
+<td>
+<p>InstanceRef references the using instance of the Disk.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>resources</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.ResourceList">
+ResourceList
+</a>
+</em>
+</td>
+<td>
+<p>Resources is a description of the Disk&rsquo;s resources and capacity.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.EFIVar">EFIVar
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.InstanceSpec">InstanceSpec</a>)
+</p>
+<div>
+<p>EFIVar is a variable to pass to EFI while booting up.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the EFIVar.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>uuid</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>UUID is the uuid of the EFIVar.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>value</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Value is the value of the EFIVar.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.EmptyDiskSource">EmptyDiskSource
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.AttachedDiskSource">AttachedDiskSource</a>)
+</p>
+<div>
+<p>EmptyDiskSource is a disk that&rsquo;s offered by the fleet provider.
+Usually ephemeral (i.e. deleted when the surrounding entity is deleted), with
+varying performance characteristics. Potentially not recoverable.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>sizeLimit</code><br/>
+<em>
+<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/api/resource#Quantity">
+k8s.io/apimachinery/pkg/api/resource.Quantity
+</a>
+</em>
+</td>
+<td>
+<p>SizeLimit is the total amount of local storage required for this EmptyDisk disk.
+The default is nil which means that the limit is undefined.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.EphemeralDiskSource">EphemeralDiskSource
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.AttachedDiskSource">AttachedDiskSource</a>)
+</p>
+<div>
+<p>EphemeralDiskSource is a definition for an ephemeral (i.e. coupled to the lifetime of the surrounding object)
+disk.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>diskTemplate</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.DiskTemplateSpec">
+DiskTemplateSpec
+</a>
+</em>
+</td>
+<td>
+<p>DiskTemplate is the template definition of a Disk.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.FleetAddress">FleetAddress
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.FleetStatus">FleetStatus</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.FleetAddressType">
+FleetAddressType
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>address</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.FleetAddressType">FleetAddressType
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.FleetAddress">FleetAddress</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;ExternalDNS&#34;</p></td>
+<td><p>FleetExternalDNS identifies a DNS name which resolves to an IP address which has the characteristics
+of FleetExternalIP. The IP it resolves to may or may not be a listed MachineExternalIP address.</p>
+</td>
+</tr><tr><td><p>&#34;ExternalIP&#34;</p></td>
+<td><p>FleetExternalIP identifies an IP address which is, in some way, intended to be more usable from outside
+the cluster than an internal IP, though no specific semantics are defined.</p>
+</td>
+</tr><tr><td><p>&#34;Hostname&#34;</p></td>
+<td><p>FleetHostName identifies a name of the fleet. Although every fleet can be assumed
+to have a FleetAddress of this type, its exact syntax and semantics are not
+defined, and are not consistent between different clusters.</p>
+</td>
+</tr><tr><td><p>&#34;InternalDNS&#34;</p></td>
+<td><p>FleetInternalDNS identifies a DNS name which resolves to an IP address which has
+the characteristics of a FleetInternalIP. The IP it resolves to may or may not
+be a listed FleetInternalIP address.</p>
+</td>
+</tr><tr><td><p>&#34;InternalIP&#34;</p></td>
+<td><p>FleetInternalIP identifies an IP address which may not be visible to hosts outside the cluster.
+By default, it is assumed that apiserver can reach fleet internal IPs, though it is possible
+to configure clusters where this is not the case.</p>
+<p>FleetInternalIP is the default type of fleet IP, and does not necessarily imply
+that the IP is ONLY reachable internally. If a fleet has multiple internal IPs,
+no specific semantics are assigned to the additional IPs.</p>
+</td>
+</tr></tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.FleetCondition">FleetCondition
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.FleetStatus">FleetStatus</a>)
+</p>
+<div>
+<p>FleetCondition is one of the conditions of a disk.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.FleetConditionType">
+FleetConditionType
+</a>
+</em>
+</td>
+<td>
+<p>Type is the type of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#conditionstatus-v1-core">
+Kubernetes core/v1.ConditionStatus
+</a>
+</em>
+</td>
+<td>
+<p>Status is the status of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>reason</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Reason is a machine-readable indication of why the condition is in a certain state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>message</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Message is a human-readable explanation of why the condition has a certain reason / state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>observedGeneration</code><br/>
+<em>
+int64
+</em>
+</td>
+<td>
+<p>ObservedGeneration represents the .metadata.generation that the condition was set based upon.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastTransitionTime</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastTransitionTime is the last time the status of a condition has transitioned from one state to another.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.FleetConditionType">FleetConditionType
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.FleetCondition">FleetCondition</a>)
+</p>
+<div>
+<p>FleetConditionType is a type a FleetCondition can have.</p>
+</div>
+<h3 id="core.spheric.cloud/v1alpha1.FleetDaemonEndpoints">FleetDaemonEndpoints
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.FleetStatus">FleetStatus</a>)
+</p>
+<div>
+<p>FleetDaemonEndpoints lists ports opened by daemons running on the Fleet.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>sphereletEndpoint</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.DaemonEndpoint">
+DaemonEndpoint
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Endpoint on which spherelet is listening.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.FleetSpec">FleetSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.Fleet">Fleet</a>)
+</p>
+<div>
+<p>FleetSpec defines the desired state of Fleet</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>providerID</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>ProviderID identifies the Fleet on provider side.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>taints</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.Taint">
+[]Taint
+</a>
+</em>
+</td>
+<td>
+<p>Taints of the Fleet. Only Machines who tolerate all the taints
+will land in the Fleet.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.FleetState">FleetState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.FleetStatus">FleetStatus</a>)
+</p>
+<div>
+<p>FleetState is a state a Fleet can be in.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Error&#34;</p></td>
+<td><p>FleetStateError marks a Fleet in an error state.</p>
+</td>
+</tr><tr><td><p>&#34;Offline&#34;</p></td>
+<td><p>FleetStateOffline marks a Fleet as offline.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>FleetStatePending marks a Fleet as pending readiness.</p>
+</td>
+</tr><tr><td><p>&#34;Ready&#34;</p></td>
+<td><p>FleetStateReady marks a Fleet as ready for accepting a Machine.</p>
+</td>
+</tr></tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.FleetStatus">FleetStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.Fleet">Fleet</a>)
+</p>
+<div>
+<p>FleetStatus defines the observed state of Fleet</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>state</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.FleetState">
+FleetState
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>conditions</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.FleetCondition">
+[]FleetCondition
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>addresses</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.FleetAddress">
+[]FleetAddress
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>daemonEndpoints</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.FleetDaemonEndpoints">
+FleetDaemonEndpoints
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>capacity</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.ResourceList">
+ResourceList
+</a>
+</em>
+</td>
+<td>
+<p>Capacity represents the total resources of a fleet.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>allocatable</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.ResourceList">
+ResourceList
+</a>
+</em>
+</td>
+<td>
+<p>Allocatable represents the resources of a fleet that are available for scheduling.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.InstanceExecOptions">InstanceExecOptions
+</h3>
+<div>
+<p>InstanceExecOptions is the query options to a Instance&rsquo;s remote exec call</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>insecureSkipTLSVerifyBackend</code><br/>
+<em>
+bool
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.InstanceSpec">InstanceSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.Instance">Instance</a>)
+</p>
+<div>
+<p>InstanceSpec defines the desired state of Instance</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>instanceTypeRef</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.LocalObjectReference">
+LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>InstanceTypeRef references the instance type of the instance.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>fleetSelector</code><br/>
+<em>
+map[string]string
+</em>
+</td>
+<td>
+<p>FleetSelector selects a suitable Fleet by the given labels.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>fleetRef</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.LocalObjectReference">
+LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>FleetRef defines the fleet to run the instance in.
+If empty, a scheduler will figure out an appropriate pool to run the instance in.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>power</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.Power">
+Power
+</a>
+</em>
+</td>
+<td>
+<p>Power is the desired instance power state.
+Defaults to PowerOn.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>image</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Image is the optional URL providing the operating system image of the instance.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>imagePullSecret</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.LocalObjectReference">
+LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>ImagePullSecretRef is an optional secret for pulling the image of a instance.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkInterfaces</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.NetworkInterface">
+[]NetworkInterface
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>NetworkInterfaces define a list of network interfaces present on the instance</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>disks</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.AttachedDisk">
+[]AttachedDisk
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Disks are the disks attached to this instance.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ignitionRef</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.SecretKeySelector">
+SecretKeySelector
+</a>
+</em>
+</td>
+<td>
+<p>IgnitionRef is a reference to a secret containing the ignition YAML for the instance to boot up.
+If key is empty, DefaultIgnitionKey will be used as fallback.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>efiVars</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.EFIVar">
+[]EFIVar
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>EFIVars are variables to pass to EFI while booting up.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>tolerations</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.Toleration">
+[]Toleration
+</a>
+</em>
+</td>
+<td>
+<p>Tolerations define tolerations the Instance has. Only fleets whose taints
+covered by Tolerations will be considered to run the Instance.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.InstanceState">InstanceState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.InstanceStatus">InstanceStatus</a>)
+</p>
+<div>
+<p>InstanceState is the state of a instance.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>InstanceStatePending means the Instance has been accepted by the system, but not yet completely started.
+This includes time before being bound to a Fleet, as well as time spent setting up the Instance on that
+Fleet.</p>
+</td>
+</tr><tr><td><p>&#34;Running&#34;</p></td>
+<td><p>InstanceStateRunning means the instance is running on a Fleet.</p>
+</td>
+</tr><tr><td><p>&#34;Shutdown&#34;</p></td>
+<td><p>InstanceStateShutdown means the instance is shut down.</p>
+</td>
+</tr><tr><td><p>&#34;Terminated&#34;</p></td>
+<td><p>InstanceStateTerminated means the instance has been permanently stopped and cannot be started.</p>
+</td>
+</tr></tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.InstanceStatus">InstanceStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.Instance">Instance</a>)
+</p>
+<div>
+<p>InstanceStatus defines the observed state of Instance</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>instanceID</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>InstanceID is the provider specific instance ID in the format &lsquo;<type>://<instance_id>&rsquo;.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>observedGeneration</code><br/>
+<em>
+int64
+</em>
+</td>
+<td>
+<p>ObservedGeneration is the last generation the Fleet observed of the Instance.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>state</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.InstanceState">
+InstanceState
+</a>
+</em>
+</td>
+<td>
+<p>State is the infrastructure state of the instance.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkInterfaces</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.NetworkInterfaceStatus">
+[]NetworkInterfaceStatus
+</a>
+</em>
+</td>
+<td>
+<p>NetworkInterfaces is the list of network interface states for the instance.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>disks</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.AttachedDiskStatus">
+[]AttachedDiskStatus
+</a>
+</em>
+</td>
+<td>
+<p>Disks is the list of disk states for the instance.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.InstanceTypeClass">InstanceTypeClass
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.InstanceType">InstanceType</a>)
+</p>
+<div>
+<p>InstanceTypeClass denotes the type of InstanceType.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Continuous&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Discrete&#34;</p></td>
+<td></td>
+</tr></tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.LocalObjectReference">LocalObjectReference
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.AttachedDiskSource">AttachedDiskSource</a>, <a href="#core.spheric.cloud/v1alpha1.DiskAccess">DiskAccess</a>, <a href="#core.spheric.cloud/v1alpha1.DiskSpec">DiskSpec</a>, <a href="#core.spheric.cloud/v1alpha1.InstanceSpec">InstanceSpec</a>, <a href="#core.spheric.cloud/v1alpha1.SubnetSpec">SubnetSpec</a>)
+</p>
+<div>
+<p>LocalObjectReference contains enough information to let you locate the
+referenced object inside the same namespace.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name of the referent.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.LocalUIDReference">LocalUIDReference
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.DiskSpec">DiskSpec</a>)
+</p>
+<div>
+<p>LocalUIDReference is a reference to another entity including its UID</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the referenced entity.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>uid</code><br/>
+<em>
+<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/types#UID">
+k8s.io/apimachinery/pkg/types.UID
+</a>
+</em>
+</td>
+<td>
+<p>UID is the UID of the referenced entity.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.NetworkInterface">NetworkInterface
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.InstanceSpec">InstanceSpec</a>)
+</p>
+<div>
+<p>NetworkInterface is the definition of a single interface</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>subnetRef</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.SubnetReference">
+SubnetReference
+</a>
+</em>
+</td>
+<td>
+<p>SubnetRef references the Subnet this NetworkInterface is connected to</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ipFamilies</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#ipfamily-v1-core">
+[]Kubernetes core/v1.IPFamily
+</a>
+</em>
+</td>
+<td>
+<p>IPFamilies defines which IPFamilies this NetworkInterface is supporting</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+[]string
+</em>
+</td>
+<td>
+<p>IPs are the literal requested IPs for this NetworkInterface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>accessIPFamilies</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#ipfamily-v1-core">
+[]Kubernetes core/v1.IPFamily
+</a>
+</em>
+</td>
+<td>
+<p>AccessIPFamilies are the access configuration IP families.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>accessIPs</code><br/>
+<em>
+[]string
+</em>
+</td>
+<td>
+<p>AccessIPs are the literal request access IPs.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.NetworkInterfaceState">NetworkInterfaceState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus</a>)
+</p>
+<div>
+<p>NetworkInterfaceState is the infrastructure attachment state a NetworkInterface can be in.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Attached&#34;</p></td>
+<td><p>NetworkInterfaceStateAttached indicates that a network interface has been successfully attached.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>NetworkInterfaceStatePending indicates that the attachment of a network interface is pending.</p>
+</td>
+</tr></tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.InstanceStatus">InstanceStatus</a>)
+</p>
+<div>
+<p>NetworkInterfaceStatus reports the status of an NetworkInterfaceSource.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the NetworkInterface to whom the status belongs to.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+[]string
+</em>
+</td>
+<td>
+<p>IPs are the ips allocated for the network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>accessIPs</code><br/>
+<em>
+[]string
+</em>
+</td>
+<td>
+<p>AccessIPs are the allocated access IPs for the network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>state</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.NetworkInterfaceState">
+NetworkInterfaceState
+</a>
+</em>
+</td>
+<td>
+<p>State represents the attachment state of a NetworkInterface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastStateTransitionTime</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastStateTransitionTime is the last time the State transitioned.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.NetworkSpec">NetworkSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.Network">Network</a>)
+</p>
+<div>
+<p>NetworkSpec defines the desired state of Network</p>
+</div>
+<h3 id="core.spheric.cloud/v1alpha1.NetworkState">NetworkState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.NetworkStatus">NetworkStatus</a>)
+</p>
+<div>
+<p>NetworkState is the state of a network.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Available&#34;</p></td>
+<td><p>NetworkStateAvailable means the network is ready to use.</p>
+</td>
+</tr><tr><td><p>&#34;Error&#34;</p></td>
+<td><p>NetworkStateError means the network is in an error state.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>NetworkStatePending means the network is being provisioned.</p>
+</td>
+</tr></tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.NetworkStatus">NetworkStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.Network">Network</a>)
+</p>
+<div>
+<p>NetworkStatus defines the observed state of Network</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>state</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.NetworkState">
+NetworkState
+</a>
+</em>
+</td>
+<td>
+<p>State is the state of the machine.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.ObjectSelector">ObjectSelector
+</h3>
+<div>
+<p>ObjectSelector specifies how to select objects of a certain kind.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>kind</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Kind is the kind of object to select.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>LabelSelector</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>
+(Members of <code>LabelSelector</code> are embedded into this type.)
+</p>
+<p>LabelSelector is the label selector to select objects of the specified Kind by.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.Power">Power
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.InstanceSpec">InstanceSpec</a>)
+</p>
+<div>
+<p>Power is the desired power state of a Instance.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Off&#34;</p></td>
+<td><p>PowerOff indicates that a Instance should be powered off.</p>
+</td>
+</tr><tr><td><p>&#34;On&#34;</p></td>
+<td><p>PowerOn indicates that a Instance should be powered on.</p>
+</td>
+</tr></tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.ResourceName">ResourceName
+(<code>string</code> alias)</h3>
+<div>
+<p>ResourceName is the name of a resource, most often used alongside a resource.Quantity.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;cpu&#34;</p></td>
+<td><p>ResourceCPU is the amount of cpu in cores.</p>
+</td>
+</tr><tr><td><p>&#34;iops&#34;</p></td>
+<td><p>ResourceIOPS defines max IOPS in input/output operations per second.</p>
+</td>
+</tr><tr><td><p>&#34;memory&#34;</p></td>
+<td><p>ResourceMemory is the amount of memory in bytes.</p>
+</td>
+</tr><tr><td><p>&#34;storage&#34;</p></td>
+<td><p>ResourceStorage is the amount of storage, in bytes.</p>
+</td>
+</tr><tr><td><p>&#34;tps&#34;</p></td>
+<td><p>ResourceTPS defines max throughput per second. (e.g. 1Gi)</p>
+</td>
+</tr></tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.SecretKeySelector">SecretKeySelector
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.InstanceSpec">InstanceSpec</a>)
+</p>
+<div>
+<p>SecretKeySelector is a reference to a specific &lsquo;key&rsquo; within a Secret resource.
+In some instances, <code>key</code> is a required field.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name of the referent.
+More info: <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names">https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names</a></p>
+</td>
+</tr>
+<tr>
+<td>
+<code>key</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>The key of the entry in the Secret resource&rsquo;s <code>data</code> field to be used.
+Some instances of this field may be defaulted, in others it may be
+required.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.SubnetReference">SubnetReference
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.NetworkInterface">NetworkInterface</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>networkName</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>NetworkName is the name of the referenced network.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name of the referenced subnet.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.SubnetSpec">SubnetSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.Subnet">Subnet</a>)
+</p>
+<div>
+<p>SubnetSpec defines the desired state of Subnet</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.LocalObjectReference">
+LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef references the network this subnet is part of.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>cidrs</code><br/>
+<em>
+[]string
+</em>
+</td>
+<td>
+<p>CIDRs are the primary CIDR ranges of this Subnet.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.SubnetState">SubnetState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.SubnetStatus">SubnetStatus</a>)
+</p>
+<div>
+<p>SubnetState is the state of a network.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Available&#34;</p></td>
+<td><p>SubnetStateAvailable means the network is ready to use.</p>
+</td>
+</tr><tr><td><p>&#34;Error&#34;</p></td>
+<td><p>SubnetStateError means the network is in an error state.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>SubnetStatePending means the network is being provisioned.</p>
+</td>
+</tr></tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.SubnetStatus">SubnetStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.Subnet">Subnet</a>)
+</p>
+<div>
+<p>SubnetStatus defines the observed state of Subnet</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>state</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.SubnetState">
+SubnetState
+</a>
+</em>
+</td>
+<td>
+<p>State is the state of the machine.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.Taint">Taint
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.FleetSpec">FleetSpec</a>)
+</p>
+<div>
+<p>Taint marks an effect with a value on a target resource pool.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>key</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>The taint key to be applied to a resource pool.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>value</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>The taint value corresponding to the taint key.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>effect</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.TaintEffect">
+TaintEffect
+</a>
+</em>
+</td>
+<td>
+<p>The effect of the taint on resources
+that do not tolerate the taint.
+Valid effects are NoSchedule, PreferNoSchedule and NoExecute.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.TaintEffect">TaintEffect
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.Taint">Taint</a>, <a href="#core.spheric.cloud/v1alpha1.Toleration">Toleration</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;NoSchedule&#34;</p></td>
+<td><p>TaintEffectNoSchedule causes not to allow new resources to schedule onto the resource pool unless they tolerate
+the taint, but allow all already-running resources to continue running.
+Enforced by the scheduler.</p>
+</td>
+</tr></tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.Toleration">Toleration
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.InstanceSpec">InstanceSpec</a>)
+</p>
+<div>
+<p>Toleration marks the resource the toleration is attached to tolerate any taint that matches
+the triple <key,value,effect> using the matching operator <operator>.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>key</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Key is the taint key that the toleration applies to. Empty means match all taint keys.
+If the key is empty, operator must be Exists; this combination means to match all values and all keys.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>operator</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.TolerationOperator">
+TolerationOperator
+</a>
+</em>
+</td>
+<td>
+<p>Operator represents a key&rsquo;s relationship to the value.
+Valid operators are Exists and Equal. Defaults to Equal.
+Exists is equivalent to wildcard for value, so that a resource can
+tolerate all taints of a particular category.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>value</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Value is the taint value the toleration matches to.
+If the operator is Exists, the value should be empty, otherwise just a regular string.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>effect</code><br/>
+<em>
+<a href="#core.spheric.cloud/v1alpha1.TaintEffect">
+TaintEffect
+</a>
+</em>
+</td>
+<td>
+<p>Effect indicates the taint effect to match. Empty means match all taint effects.
+When specified, allowed values are NoSchedule.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.TolerationOperator">TolerationOperator
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#core.spheric.cloud/v1alpha1.Toleration">Toleration</a>)
+</p>
+<div>
+<p>TolerationOperator is the set of operators that can be used in a toleration.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Equal&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Exists&#34;</p></td>
+<td></td>
+</tr></tbody>
+</table>
+<h3 id="core.spheric.cloud/v1alpha1.UIDReference">UIDReference
+</h3>
+<div>
+<p>UIDReference is a reference to another entity in a potentially different namespace including its UID.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>namespace</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Namespace is the namespace of the referenced entity. If empty,
+the same namespace as the referring resource is implied.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the referenced entity.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>uid</code><br/>
+<em>
+<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/types#UID">
+k8s.io/apimachinery/pkg/types.UID
+</a>
+</em>
+</td>
+<td>
+<p>UID is the UID of the referenced entity.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<p><em>
+Generated with <code>gen-crd-api-reference-docs</code>
+</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/spheric-cloud/spheric" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.expand", "navigation.indexes", "navigation.top"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>
